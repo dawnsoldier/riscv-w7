@@ -1,0 +1,8 @@
+*
+!sim/
+!soft/
+!tools/
+!vhdl/
+!Makefile
+!README.md
+!.gitignore
