@@ -20,7 +20,7 @@ entity memory_stage is
 		csr_eo     : in  csr_exception_out_type;
 		fpu_o      : in  fpu_out_type;
 		fpu_i      : out fpu_in_type;
-		dmem_o     : in  mem_iface_out_type;
+		dmem_o     : in  mem_out_type;
 		d          : in  memory_in_type;
 		q          : out memory_out_type
 	);

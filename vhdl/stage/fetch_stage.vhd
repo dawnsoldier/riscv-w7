@@ -24,8 +24,10 @@ entity fetch_stage is
 		btb_i    : out btb_in_type;
 		pfetch_o : in  prefetch_out_type;
 		pfetch_i : out prefetch_in_type;
-		imem_o   : in  mem_iface_out_type;
-		imem_i   : out mem_iface_in_type;
+		imem_o   : in  mem_out_type;
+		imem_i   : out mem_in_type;
+		ipmp_o   : in  pmp_out_type;
+		ipmp_i   : out pmp_in_type;
 		d        : in  fetch_in_type;
 		q        : out fetch_out_type
 	);
@@ -38,7 +40,7 @@ architecture behavior of fetch_stage is
 
 begin
 
-	combinational : process(d, r, csr_eo, btb_o, pfetch_o, imem_o)
+	combinational : process(d, r, csr_eo, btb_o, pfetch_o, imem_o, ipmp_o)
 
 		variable v : fetch_reg_type;
 
@@ -118,6 +120,19 @@ begin
 		pfetch_i.fence <= d.d.fence;
 		pfetch_i.mem_rdata <= imem_o.mem_rdata;
 		pfetch_i.mem_ready <= imem_o.mem_ready;
+
+		ipmp_i.mem_valid <= v.valid;
+		ipmp_i.mem_instr <= '1';
+		ipmp_i.mem_addr <= pfetch_o.fpc;
+		ipmp_i.mem_wstrb <= (others => '0');
+
+		v.exc := ipmp_o.exc;
+		v.etval := ipmp_o.etval;
+		v.ecause := ipmp_o.ecause;
+
+		if v.exc = '1' then
+			v.valid := '0';
+		end if;
 
 		imem_i.mem_valid <= v.valid;
 		imem_i.mem_instr <= '1';

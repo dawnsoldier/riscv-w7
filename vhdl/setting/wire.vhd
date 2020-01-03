@@ -585,12 +585,12 @@ package wire is
 
 	type pmp_in_type is record
 		mem_valid : std_logic;
-		mem_load  : std_logic;
-		mem_store : std_logic;
+		mem_instr : std_logic;
 		mem_addr  : std_logic_vector(63 downto 0);
+		mem_wstrb : std_logic_vector(7 downto 0);
+		priv_mode : std_logic_vector(1 downto 0);
 		pmpcfg    : csr_pmpcfg_type;
 		pmpaddr   : csr_pmpaddr_type;
-		mode      : std_logic_vector(1 downto 0);
 	end record;
 
 	type pmp_out_type is record
@@ -639,7 +639,7 @@ package wire is
 		pred_uncond : std_logic;
 	end record;
 
-	type mem_iface_in_type is record
+	type mem_in_type is record
 		mem_valid : std_logic;
 		mem_instr : std_logic;
 		mem_addr  : std_logic_vector(63 downto 0);
@@ -647,7 +647,7 @@ package wire is
 		mem_wstrb : std_logic_vector(7 downto 0);
 	end record;
 
-	type mem_iface_out_type is record
+	type mem_out_type is record
 		mem_ready : std_logic;
 		mem_rdata : std_logic_vector(63 downto 0);
 	end record;

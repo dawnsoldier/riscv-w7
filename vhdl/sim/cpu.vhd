@@ -35,32 +35,23 @@ architecture behavior of cpu is
 		port(
 			reset    : in  std_logic;
 			clock    : in  std_logic;
-			pfetch_o : in  prefetch_out_type;
-			pfetch_i : out prefetch_in_type;
-			imem_o   : in  mem_iface_out_type;
-			imem_i   : out mem_iface_in_type;
-			dmem_o   : in  mem_iface_out_type;
-			dmem_i   : out mem_iface_in_type
+			imem_o   : in  mem_out_type;
+			imem_i   : out mem_in_type;
+			dmem_o   : in  mem_out_type;
+			dmem_i   : out mem_in_type;
+			ipmp_o   : in  pmp_out_type;
+			ipmp_i   : out pmp_in_type;
+			dpmp_o   : in  pmp_out_type;
+			dpmp_i   : out pmp_in_type
 		);
 	end component;
-
-	component prefetch
-		port(
-			reset    : in  std_logic;
-			clock    : in  std_logic;
-			pfetch_i : in  prefetch_in_type;
-			pfetch_o : out prefetch_out_type
-  	);
-  end component;
 
 	component pmp
 		port(
 			reset  : in  std_logic;
 			clock  : in  std_logic;
-			ipmp_i : in  pmp_in_type;
-			ipmp_o : out pmp_out_type;
-			dpmp_i : in  pmp_in_type;
-			dpmp_o : out pmp_out_type
+			pmp_i  : in  pmp_in_type;
+			pmp_o  : out pmp_out_type
 		);
 	end component;
 
@@ -112,10 +103,10 @@ architecture behavior of cpu is
 			reset           : in  std_logic;
 			clock           : in  std_logic;
 			-- MEMORY
-			imem_i          : in  mem_iface_in_type;
-			imem_o          : out mem_iface_out_type;
-			dmem_i          : in  mem_iface_in_type;
-			dmem_o          : out mem_iface_out_type;
+			imem_i          : in  mem_in_type;
+			imem_o          : out mem_out_type;
+			dmem_i          : in  mem_in_type;
+			dmem_o          : out mem_out_type;
 			-- BRAM
 			bram_mem_valid  : out std_logic;
 			bram_mem_ready  : in  std_logic;
@@ -177,18 +168,14 @@ architecture behavior of cpu is
 		);
 	end component;
 
-	signal imem_i : mem_iface_in_type;
-	signal imem_o : mem_iface_out_type;
+	signal imem_i : mem_in_type;
+	signal imem_o : mem_out_type;
 
-	signal dmem_i : mem_iface_in_type;
-	signal dmem_o : mem_iface_out_type;
-
-	signal pfetch_i : prefetch_in_type;
-	signal pfetch_o : prefetch_out_type;
+	signal dmem_i : mem_in_type;
+	signal dmem_o : mem_out_type;
 
 	signal ipmp_i : pmp_in_type;
 	signal ipmp_o : pmp_out_type;
-
 	signal dpmp_i : pmp_in_type;
 	signal dpmp_o : pmp_out_type;
 
@@ -236,32 +223,32 @@ begin
 
 	pipeline_comp : pipeline
 		port map(
-			reset    => reset,
-			clock    => clock,
-			pfetch_o => pfetch_o,
-			pfetch_i => pfetch_i,
-			imem_o   => imem_o,
-			imem_i   => imem_i,
-			dmem_o   => dmem_o,
-			dmem_i   => dmem_i
+			reset  => reset,
+			clock  => clock,
+			imem_o => imem_o,
+			imem_i => imem_i,
+			dmem_o => dmem_o,
+			dmem_i => dmem_i,
+			ipmp_o => ipmp_o,
+			ipmp_i => ipmp_i,
+			dpmp_o => dpmp_o,
+			dpmp_i => dpmp_i
 		);
 
-	prefetch_comp : prefetch
-		port map(
-			reset    => reset,
-			clock    => clock,
-			pfetch_i => pfetch_i,
-			pfetch_o => pfetch_o
-		);
-
-	pmp_comp : pmp
+	ipmp_comp : pmp
 		port map(
 			reset  => reset,
 			clock  => clock,
-			ipmp_i => ipmp_i,
-			ipmp_o => ipmp_o,
-			dpmp_i => dpmp_i,
-			dpmp_o => dpmp_o
+			pmp_i  => ipmp_i,
+			pmp_o  => ipmp_o
+		);
+
+	dpmp_comp : pmp
+		port map(
+			reset  => reset,
+			clock  => clock,
+			pmp_i  => dpmp_i,
+			pmp_o  => dpmp_o
 		);
 
 	bram_comp : bram_mem

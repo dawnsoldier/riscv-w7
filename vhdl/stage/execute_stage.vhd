@@ -30,7 +30,9 @@ entity execute_stage is
 		csr_eo         : in  csr_exception_out_type;
 		fpu_o          : in  fpu_out_type;
 		fpu_i          : out fpu_in_type;
-		dmem_i         : out mem_iface_in_type;
+		dmem_i         : out mem_in_type;
+		dpmp_o         : in  pmp_out_type;
+		dpmp_i         : out pmp_in_type;
 		d              : in  execute_in_type;
 		q              : out execute_out_type
 	);
@@ -43,7 +45,7 @@ architecture behavior of execute_stage is
 
 begin
 
-	combinational : process(d, r, int_for_o, int_reg_o, csr_o, csr_eo, int_pipeline_o, csr_alu_o, fpu_o)
+	combinational : process(d, r, int_for_o, int_reg_o, csr_o, csr_eo, int_pipeline_o, csr_alu_o, fpu_o, dpmp_o)
 
 		variable v : execute_reg_type;
 
@@ -125,10 +127,6 @@ begin
 					d.e.mret or d.m.mret or d.w.mret or
 					d.e.jump or d.w.clear;
 
-		-- if d.e.jump = '0' and d.f.taken = '1' then
-		-- 	v.clear := '1';
-		-- end if;
-
 		v.int_enable := not (d.e.stall or d.m.stall or d.w.stall or v.clear);
 
 		fpu_i.idata <= v.rdata1;
@@ -176,6 +174,17 @@ begin
 
 		v.cdata := csr_alu_o.result;
 
+		if (v.store or v.fpu_store)  = '1' then
+			v.strobe := v.byteenable;
+		else
+			v.strobe := (others => '0');
+		end if;
+
+		dpmp_i.mem_valid <= v.load or v.fpu_load or v.store or v.fpu_store;
+		dpmp_i.mem_instr <= '0';
+		dpmp_i.mem_addr <= v.address;
+		dpmp_i.mem_wstrb <= v.strobe;
+
 		if v.exc = '0' then
 			if int_pipeline_o.exc = '1' then
 				if (v.jump or v.load or v.fpu_load or v.store or v.fpu_store) = '1' then
@@ -192,6 +201,10 @@ begin
 						v.int_wren := '0';
 					end if;
 				end if;
+			elsif dpmp_o.exc = '1' then
+				v.exc := dpmp_o.exc;
+				v.etval := dpmp_o.etval;
+				v.ecause := dpmp_o.ecause;
 			end if;
 		end if;
 
@@ -241,12 +254,6 @@ begin
 
 		if v.clear = '1' then
 			v.stall := '0';
-		end if;
-
-		if (v.store or v.fpu_store)  = '1' then
-			v.strobe := v.byteenable;
-		else
-			v.strobe := (others => '0');
 		end if;
 
 		dmem_i.mem_valid <= v.load or v.fpu_load or v.store or v.fpu_store;

@@ -18,10 +18,10 @@ entity interconnect is
 		reset           : in  std_logic;
 		clock           : in  std_logic;
 		-- memory
-		imem_i          : in  mem_iface_in_type;
-		imem_o          : out mem_iface_out_type;
-		dmem_i          : in  mem_iface_in_type;
-		dmem_o          : out mem_iface_out_type;
+		imem_i          : in  mem_in_type;
+		imem_o          : out mem_out_type;
+		dmem_i          : in  mem_in_type;
+		dmem_o          : out mem_out_type;
 		-- blockram
 		bram_mem_valid  : out std_logic;
 		bram_mem_ready  : in  std_logic;

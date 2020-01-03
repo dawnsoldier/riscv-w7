@@ -19,12 +19,14 @@ entity pipeline is
 	port(
 		reset    : in  std_logic;
 		clock    : in  std_logic;
-		pfetch_o : in  prefetch_out_type;
-		pfetch_i : out prefetch_in_type;
-		imem_o   : in  mem_iface_out_type;
-		imem_i   : out mem_iface_in_type;
-		dmem_o   : in  mem_iface_out_type;
-		dmem_i   : out mem_iface_in_type
+		imem_o   : in  mem_out_type;
+		imem_i   : out mem_in_type;
+		dmem_o   : in  mem_out_type;
+		dmem_i   : out mem_in_type;
+		ipmp_o   : in  pmp_out_type;
+		ipmp_i   : out pmp_in_type;
+		dpmp_o   : in  pmp_out_type;
+		dpmp_i   : out pmp_in_type
 	);
 end pipeline;
 
@@ -41,8 +43,10 @@ architecture behavior of pipeline is
 			btb_i    : out btb_in_type;
 			pfetch_o : in  prefetch_out_type;
 			pfetch_i : out prefetch_in_type;
-			imem_o   : in  mem_iface_out_type;
-			imem_i   : out mem_iface_in_type;
+			imem_o   : in  mem_out_type;
+			imem_i   : out mem_in_type;
+			ipmp_o   : in  pmp_out_type;
+			ipmp_i   : out pmp_in_type;
 			d        : in  fetch_in_type;
 			q        : out fetch_out_type
 		);
@@ -83,7 +87,9 @@ architecture behavior of pipeline is
 			csr_eo         : in  csr_exception_out_type;
 			fpu_o          : in  fpu_out_type;
 			fpu_i          : out fpu_in_type;
-			dmem_i         : out mem_iface_in_type;
+			dmem_i         : out mem_in_type;
+			dpmp_o         : in  pmp_out_type;
+			dpmp_i         : out pmp_in_type;
 			d              : in  execute_in_type;
 			q              : out execute_out_type
 		);
@@ -96,7 +102,7 @@ architecture behavior of pipeline is
 			csr_eo     : in  csr_exception_out_type;
 			fpu_o      : in  fpu_out_type;
 			fpu_i      : out fpu_in_type;
-			dmem_o     : in  mem_iface_out_type;
+			dmem_o     : in  mem_out_type;
 			d          : in  memory_in_type;
 			q          : out memory_out_type
 		);
@@ -148,6 +154,15 @@ architecture behavior of pipeline is
 		);
 	end component;
 
+	component prefetch
+		port(
+			reset    : in  std_logic;
+			clock    : in  std_logic;
+			pfetch_i : in  prefetch_in_type;
+			pfetch_o : out prefetch_out_type
+  	);
+  end component;
+
 	component fpu
 		port(
 			reset    : in  std_logic;
@@ -180,6 +195,9 @@ architecture behavior of pipeline is
 	signal btb_i : btb_in_type;
 	signal btb_o : btb_out_type;
 
+	signal pfetch_i : prefetch_in_type;
+	signal pfetch_o : prefetch_out_type;
+
 	signal fpu_i : fpu_in_type;
 	signal fpu_o : fpu_out_type;
 
@@ -198,6 +216,8 @@ begin
 			pfetch_i => pfetch_i,
 			imem_o   => imem_o,
 			imem_i   => imem_i,
+			ipmp_o   => ipmp_o,
+			ipmp_i   => ipmp_i,
 			d.f      => fetch_q,
 			d.d      => decode_q,
 			d.e      => execute_q,
@@ -245,6 +265,8 @@ begin
 			fpu_o          => fpu_o,
 			fpu_i          => fpu_i,
 			dmem_i         => dmem_i,
+			dpmp_o         => dpmp_o,
+			dpmp_i         => dpmp_i,
 			d.f            => fetch_q,
 			d.d            => decode_q,
 			d.e            => execute_q,
@@ -312,6 +334,14 @@ begin
 			clock => clock,
 			btb_i => btb_i,
 			btb_o => btb_o
+		);
+
+	prefetch_comp : prefetch
+		port map(
+			reset    => reset,
+			clock    => clock,
+			pfetch_i => pfetch_i,
+			pfetch_o => pfetch_o
 		);
 
 	FP_Unit : if fpu_enable = true generate
