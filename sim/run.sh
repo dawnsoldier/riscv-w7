@@ -107,8 +107,6 @@ $ANALYS $DIR/vhdl/bus/avalon/avalon_master.vhd
 
 $SYNTAX $DIR/vhdl/memory/interconnect.vhd
 $ANALYS $DIR/vhdl/memory/interconnect.vhd
-$SYNTAX $DIR/vhdl/memory/plic.vhd
-$ANALYS $DIR/vhdl/memory/plic.vhd
 $SYNTAX $DIR/vhdl/memory/pmp.vhd
 $ANALYS $DIR/vhdl/memory/pmp.vhd
 $SYNTAX $DIR/vhdl/memory/time.vhd

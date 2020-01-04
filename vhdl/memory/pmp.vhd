@@ -64,7 +64,7 @@ begin
 							highaddr := pmp_i.pmpaddr(i);
 							if unsigned(pmp_i.mem_addr(55 downto 2)) < unsigned(highaddr(53 downto 0)) and
 									unsigned(pmp_i.mem_addr(55 downto 2)) >= unsigned(lowaddr(53 downto 0)) then
-								if pmp_i.pmpcfg(i).L = "1" or pmp_i.priv_mode = "00" then
+								if pmp_i.pmpcfg(i).L = "1" or pmp_i.priv_mode = u_mode then
 									if pmp_i.pmpcfg(i).X = "0" and pmp_i.mem_instr = '1' then
 										exc := '1';
 										etval := pmp_i.mem_addr;
@@ -83,7 +83,7 @@ begin
 							end if;
 						elsif pmp_i.pmpcfg(i).A = "10" then
 							if nor_reduce(pmp_i.mem_addr(55 downto 2) xor pmp_i.pmpaddr(i)(53 downto 0)) = '1' then
-								if pmp_i.pmpcfg(i).L = "1" or pmp_i.priv_mode = "00" then
+								if pmp_i.pmpcfg(i).L = "1" or pmp_i.priv_mode = u_mode then
 									if pmp_i.pmpcfg(i).X = "0" and pmp_i.mem_instr = '1' then
 										exc := '1';
 										etval := pmp_i.mem_addr;
@@ -160,7 +160,7 @@ begin
 							end case;
 							lowaddr := pmp_i.pmpaddr(i) and mask;
 							if nor_reduce((pmp_i.mem_addr(55 downto 2) and mask(53 downto 0)) xor lowaddr(53 downto 0)) = '1' then
-								if pmp_i.pmpcfg(i).L = "1" or pmp_i.priv_mode = "00" then
+								if pmp_i.pmpcfg(i).L = "1" or pmp_i.priv_mode = u_mode then
 									if pmp_i.pmpcfg(i).X = "0" and pmp_i.mem_instr = '1' then
 										exc := '1';
 										etval := pmp_i.mem_addr;

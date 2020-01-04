@@ -10,14 +10,15 @@ use work.wire.all;
 entity time is
 	port(
 		reset      : in  std_logic;
-		clock_t    : in  std_logic;
+		clock_rtc  : in  std_logic;
 		time_valid : in  std_logic;
 		time_instr : in  std_logic;
 		time_ready : out std_logic;
 		time_addr  : in  std_logic_vector(63 downto 0);
 		time_wdata : in  std_logic_vector(63 downto 0);
 		time_wstrb : in  std_logic_vector(7 downto 0);
-		time_rdata : out std_logic_vector(63 downto 0)
+		time_rdata : out std_logic_vector(63 downto 0);
+		time_irpt  : out std_logic
 	);
 end time;
 
@@ -123,17 +124,13 @@ begin
 			end if;
 		end if;
 
-		-- if v.mtime >= v.mtimecmp then
-		-- 	time_irpt <= '1';
-		-- else
-		-- 	time_irpt <= '0';
-		-- end if;
-
-		if v.mtime < X"FFFFFFFFFFFFFFFF" then
-			v.mtime := v.mtime + 1;
+		if v.mtime >= v.mtimecmp then
+			time_irpt <= '1';
 		else
-			v.mtime := X"0000000000000000";
+			time_irpt <= '0';
 		end if;
+
+		v.mtime := v.mtime + 1;
 
 		rin <= v;
 
@@ -143,10 +140,10 @@ begin
 								std_logic_vector(r.mtimecmp) when r.mtimecmp_re = '1' else X"0000000000000000";
 	time_ready <= r.mtime_re or r.mtime_we or r.mtimecmp_re or r.mtimecmp_we;
 
-	process(clock_t)
+	process(clock_rtc)
 	begin
 
-		if rising_edge(clock_t) then
+		if rising_edge(clock_rtc) then
 
 			if reset = '0' then
 

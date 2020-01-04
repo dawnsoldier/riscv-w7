@@ -232,9 +232,9 @@ begin
 				v.ecause := except_illegal_instruction;
 			elsif v.ecall = '1' then
 				v.exc := '1';
-				if csr_eo.mode = u_mode then
+				if csr_eo.priv_mode = u_mode then
 					v.ecause := except_env_call_user;
-				elsif csr_eo.mode = m_mode then
+				elsif csr_eo.priv_mode = m_mode then
 					v.ecause := except_env_call_mach;
 				end if;
 			elsif v.ebreak = '1' then

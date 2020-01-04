@@ -20,22 +20,22 @@ package fp_cons is
 	constant funct_fcvt_i2f : std_logic_vector(4 downto 0) := "11010";
 	constant funct_fcvt_f2f : std_logic_vector(4 downto 0) := "01000";
 
-	constant funct_fmadd  : std_logic_vector(6 downto 0) := "1000011";
-	constant funct_fmsub  : std_logic_vector(6 downto 0) := "1000111";
-	constant funct_fnmsub : std_logic_vector(6 downto 0) := "1001011";
-	constant funct_fnmadd : std_logic_vector(6 downto 0) := "1001111";
+	constant funct_fmadd    : std_logic_vector(6 downto 0) := "1000011";
+	constant funct_fmsub    : std_logic_vector(6 downto 0) := "1000111";
+	constant funct_fnmsub   : std_logic_vector(6 downto 0) := "1001011";
+	constant funct_fnmadd   : std_logic_vector(6 downto 0) := "1001111";
 
-	constant opcode_fp     : std_logic_vector(6 downto 0) := "1010011";
-	constant opcode_fload  : std_logic_vector(6 downto 0) := "0000111";
-	constant opcode_fstore : std_logic_vector(6 downto 0) := "0100111";
-	constant opcode_fmadd  : std_logic_vector(6 downto 0) := "1000011";
-	constant opcode_fmsub  : std_logic_vector(6 downto 0) := "1000111";
-	constant opcode_fnmsub : std_logic_vector(6 downto 0) := "1001011";
-	constant opcode_fnmadd : std_logic_vector(6 downto 0) := "1001111";
+	constant opcode_fp      : std_logic_vector(6 downto 0) := "1010011";
+	constant opcode_fload   : std_logic_vector(6 downto 0) := "0000111";
+	constant opcode_fstore  : std_logic_vector(6 downto 0) := "0100111";
+	constant opcode_fmadd   : std_logic_vector(6 downto 0) := "1000011";
+	constant opcode_fmsub   : std_logic_vector(6 downto 0) := "1000111";
+	constant opcode_fnmsub  : std_logic_vector(6 downto 0) := "1001011";
+	constant opcode_fnmadd  : std_logic_vector(6 downto 0) := "1001111";
 
-	constant funct_lw : std_logic_vector(2 downto 0) := "010";
-	constant funct_ld : std_logic_vector(2 downto 0) := "011";
-	constant funct_sw : std_logic_vector(2 downto 0) := "010";
-	constant funct_sd : std_logic_vector(2 downto 0) := "011";
+	constant funct_lw       : std_logic_vector(2 downto 0) := "010";
+	constant funct_ld       : std_logic_vector(2 downto 0) := "011";
+	constant funct_sw       : std_logic_vector(2 downto 0) := "010";
+	constant funct_sd       : std_logic_vector(2 downto 0) := "011";
 
 end fp_cons;

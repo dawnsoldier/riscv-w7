@@ -10,22 +10,22 @@ use work.wire.all;
 
 entity cpu is
 	port(
-		reset             : in  std_logic;
-		clock             : in  std_logic;
-		clock_t           : in  std_logic;
+		reset       : in  std_logic;
+		clock       : in  std_logic;
+		clock_rtc   : in  std_logic;
 		-- Wishbone Master Interface
-		wbm_dat_i         : in  std_logic_vector(63 downto 0);
-		wbm_dat_o         : out std_logic_vector(63 downto 0);
-		wbm_ack_i         : in  std_logic;
-		wbm_adr_o         : out std_logic_vector(63 downto 0);
-		wbm_cyc_o         : out std_logic;
-		wbm_stall_i       : in  std_logic;
-		wbm_err_i         : in  std_logic;
-		wbm_lock_o        : out std_logic;
-		wbm_rty_i         : in  std_logic;
-		wbm_sel_o         : out std_logic_vector(7 downto 0);
-		wbm_stb_o         : out std_logic;
-		wbm_we_o          : out std_logic
+		wbm_dat_i   : in  std_logic_vector(63 downto 0);
+		wbm_dat_o   : out std_logic_vector(63 downto 0);
+		wbm_ack_i   : in  std_logic;
+		wbm_adr_o   : out std_logic_vector(63 downto 0);
+		wbm_cyc_o   : out std_logic;
+		wbm_stall_i : in  std_logic;
+		wbm_err_i   : in  std_logic;
+		wbm_lock_o  : out std_logic;
+		wbm_rty_i   : in  std_logic;
+		wbm_sel_o   : out std_logic_vector(7 downto 0);
+		wbm_stb_o   : out std_logic;
+		wbm_we_o    : out std_logic
 	);
 end entity cpu;
 
@@ -57,44 +57,31 @@ architecture behavior of cpu is
 
 	component bram_mem
 		port(
-			reset     : in  std_logic;
-			clock     : in  std_logic;
+			reset      : in  std_logic;
+			clock      : in  std_logic;
 			-- Memory Interface
-			mem_valid : in  std_logic;
-			mem_ready : out std_logic;
-			mem_instr : in  std_logic;
-			mem_addr  : in  std_logic_vector(63 downto 0);
-			mem_wdata : in  std_logic_vector(63 downto 0);
-			mem_wstrb : in  std_logic_vector(7 downto 0);
-			mem_rdata : out std_logic_vector(63 downto 0)
-		);
-	end component;
-
-	component plic
-		port(
-			reset           : in  std_logic;
-			clock           : in  std_logic;
-			plic_mem_valid  : in  std_logic;
-			plic_mem_instr  : in  std_logic;
-			plic_mem_ready  : out std_logic;
-			plic_mem_addr   : in  std_logic_vector(63 downto 0);
-			plic_mem_wdata  : in  std_logic_vector(63 downto 0);
-			plic_mem_wstrb  : in  std_logic_vector(7 downto 0);
-			plic_mem_rdata  : out std_logic_vector(63 downto 0)
+			bram_valid : in  std_logic;
+			bram_ready : out std_logic;
+			bram_instr : in  std_logic;
+			bram_addr  : in  std_logic_vector(63 downto 0);
+			bram_wdata : in  std_logic_vector(63 downto 0);
+			bram_wstrb : in  std_logic_vector(7 downto 0);
+			bram_rdata : out std_logic_vector(63 downto 0)
 		);
 	end component;
 
 	component time
 		port(
 			reset      : in  std_logic;
-			clock_t    : in  std_logic;
+			clock_rtc  : in  std_logic;
 			time_valid : in  std_logic;
 			time_instr : in  std_logic;
 			time_ready : out std_logic;
 			time_addr  : in  std_logic_vector(63 downto 0);
 			time_wdata : in  std_logic_vector(63 downto 0);
 			time_wstrb : in  std_logic_vector(7 downto 0);
-			time_rdata : out std_logic_vector(63 downto 0)
+			time_rdata : out std_logic_vector(63 downto 0);
+			time_irpt  : out std_logic
 		);
 	end component;
 
@@ -115,14 +102,6 @@ architecture behavior of cpu is
 			bram_mem_wdata  : out std_logic_vector(63 downto 0);
 			bram_mem_wstrb  : out std_logic_vector(7 downto 0);
 			bram_mem_rdata  : in  std_logic_vector(63 downto 0);
-			-- PLIC
-			plic_mem_valid  : out std_logic;
-			plic_mem_instr  : out std_logic;
-			plic_mem_ready  : in  std_logic;
-			plic_mem_addr   : out std_logic_vector(63 downto 0);
-			plic_mem_wdata  : out std_logic_vector(63 downto 0);
-			plic_mem_wstrb  : out std_logic_vector(7 downto 0);
-			plic_mem_rdata  : in  std_logic_vector(63 downto 0);
 			-- TIMER
 			time_mem_valid  : out std_logic;
 			time_mem_instr  : out std_logic;
@@ -144,27 +123,27 @@ architecture behavior of cpu is
 
 	component wishbone_master
 		port(
-			reset            : in  std_logic;
-			clock            : in  std_logic;
-			wbm_dat_i        : in  std_logic_vector(63 downto 0);
-			wbm_dat_o        : out std_logic_vector(63 downto 0);
-			wbm_ack_i        : in  std_logic;
-			wbm_adr_o        : out std_logic_vector(63 downto 0);
-			wbm_cyc_o        : out std_logic;
-			wbm_stall_i      : in  std_logic;
-			wbm_err_i        : in  std_logic;
-			wbm_lock_o       : out std_logic;
-			wbm_rty_i        : in  std_logic;
-			wbm_sel_o        : out std_logic_vector(7 downto 0);
-			wbm_stb_o        : out std_logic;
-			wbm_we_o         : out std_logic;
-			mem_valid        : in  std_logic;
-			mem_ready        : out std_logic;
-			mem_instr        : in  std_logic;
-			mem_addr         : in  std_logic_vector(63 downto 0);
-			mem_wdata        : in  std_logic_vector(63 downto 0);
-			mem_wstrb        : in  std_logic_vector(7 downto 0);
-			mem_rdata        : out std_logic_vector(63 downto 0)
+			reset       : in  std_logic;
+			clock       : in  std_logic;
+			wbm_dat_i   : in  std_logic_vector(63 downto 0);
+			wbm_dat_o   : out std_logic_vector(63 downto 0);
+			wbm_ack_i   : in  std_logic;
+			wbm_adr_o   : out std_logic_vector(63 downto 0);
+			wbm_cyc_o   : out std_logic;
+			wbm_stall_i : in  std_logic;
+			wbm_err_i   : in  std_logic;
+			wbm_lock_o  : out std_logic;
+			wbm_rty_i   : in  std_logic;
+			wbm_sel_o   : out std_logic_vector(7 downto 0);
+			wbm_stb_o   : out std_logic;
+			wbm_we_o    : out std_logic;
+			bus_valid   : in  std_logic;
+			bus_ready   : out std_logic;
+			bus_instr   : in  std_logic;
+			bus_addr    : in  std_logic_vector(63 downto 0);
+			bus_wdata   : in  std_logic_vector(63 downto 0);
+			bus_wstrb   : in  std_logic_vector(7 downto 0);
+			bus_rdata   : out std_logic_vector(63 downto 0)
 		);
 	end component;
 
@@ -195,14 +174,6 @@ architecture behavior of cpu is
 	signal bram_mem_wstrb : std_logic_vector(7 downto 0);
 	signal bram_mem_rdata : std_logic_vector(63 downto 0);
 
-	signal plic_mem_valid : std_logic;
-	signal plic_mem_ready : std_logic;
-	signal plic_mem_instr : std_logic;
-	signal plic_mem_addr  : std_logic_vector(63 downto 0);
-	signal plic_mem_wdata : std_logic_vector(63 downto 0);
-	signal plic_mem_wstrb : std_logic_vector(7 downto 0);
-	signal plic_mem_rdata : std_logic_vector(63 downto 0);
-
 	signal time_mem_valid : std_logic;
 	signal time_mem_instr : std_logic;
 	signal time_mem_ready : std_logic;
@@ -210,6 +181,8 @@ architecture behavior of cpu is
 	signal time_mem_wdata : std_logic_vector(63 downto 0);
 	signal time_mem_wstrb : std_logic_vector(7 downto 0);
 	signal time_mem_rdata : std_logic_vector(63 downto 0);
+
+	signal time_mem_irpt  : std_logic;
 
 	signal bus_mem_valid : std_logic;
 	signal bus_mem_ready : std_logic;
@@ -253,41 +226,29 @@ begin
 
 	bram_comp : bram_mem
 		port map(
-			reset     => reset,
-			clock     => clock,
-			mem_valid => bram_mem_valid,
-			mem_ready => bram_mem_ready,
-			mem_instr => bram_mem_instr,
-			mem_addr  => bram_mem_addr,
-			mem_wdata => bram_mem_wdata,
-			mem_wstrb => bram_mem_wstrb,
-			mem_rdata => bram_mem_rdata
+			reset      => reset,
+			clock      => clock,
+			bram_valid => bram_mem_valid,
+			bram_ready => bram_mem_ready,
+			bram_instr => bram_mem_instr,
+			bram_addr  => bram_mem_addr,
+			bram_wdata => bram_mem_wdata,
+			bram_wstrb => bram_mem_wstrb,
+			bram_rdata => bram_mem_rdata
 	);
-
-	plic_comp : plic
-		port map(
-			reset           => reset,
-			clock           => clock,
-			plic_mem_valid  => plic_mem_valid,
-			plic_mem_instr  => plic_mem_instr,
-			plic_mem_ready  => plic_mem_ready,
-			plic_mem_addr   => plic_mem_addr,
-			plic_mem_wdata  => plic_mem_wdata,
-			plic_mem_wstrb  => plic_mem_wstrb,
-			plic_mem_rdata  => plic_mem_rdata
-		);
 
 	time_comp : time
 		port map(
 			reset      => reset,
-			clock_t    => clock_t,
+			clock_rtc  => clock_rtc,
 			time_valid => time_mem_valid,
 			time_instr => time_mem_instr,
 			time_ready => time_mem_ready,
 			time_addr  => time_mem_addr,
 			time_wdata => time_mem_wdata,
 			time_wstrb => time_mem_wstrb,
-			time_rdata => time_mem_rdata
+			time_rdata => time_mem_rdata,
+			time_irpt  => time_mem_irpt
 		);
 
 	interconnect_comp : interconnect
@@ -305,13 +266,6 @@ begin
 			bram_mem_wdata  => bram_mem_wdata,
 			bram_mem_wstrb  => bram_mem_wstrb,
 			bram_mem_rdata  => bram_mem_rdata,
-			plic_mem_valid  => plic_mem_valid,
-			plic_mem_instr  => plic_mem_instr,
-			plic_mem_ready  => plic_mem_ready,
-			plic_mem_addr   => plic_mem_addr,
-			plic_mem_wdata  => plic_mem_wdata,
-			plic_mem_wstrb  => plic_mem_wstrb,
-			plic_mem_rdata  => plic_mem_rdata,
 			time_mem_valid  => time_mem_valid,
 			time_mem_instr  => time_mem_instr,
 			time_mem_ready  => time_mem_ready,
@@ -344,13 +298,13 @@ begin
 			wbm_sel_o        => wbm_sel_o,
 			wbm_stb_o        => wbm_stb_o,
 			wbm_we_o         => wbm_we_o,
-			mem_valid        => bus_mem_valid,
-			mem_ready        => bus_mem_ready,
-			mem_instr        => bus_mem_instr,
-			mem_addr         => bus_mem_addr,
-			mem_wdata        => bus_mem_wdata,
-			mem_wstrb        => bus_mem_wstrb,
-			mem_rdata        => bus_mem_rdata
+			bus_valid        => bus_mem_valid,
+			bus_ready        => bus_mem_ready,
+			bus_instr        => bus_mem_instr,
+			bus_addr         => bus_mem_addr,
+			bus_wdata        => bus_mem_wdata,
+			bus_wstrb        => bus_mem_wstrb,
+			bus_rdata        => bus_mem_rdata
 		);
 
 end architecture;

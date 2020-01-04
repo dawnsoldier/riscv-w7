@@ -17,16 +17,16 @@ entity bram_mem is
 		bram_depth : integer := bram_depth
 	);
 	port(
-		reset     : in  std_logic;
-		clock     : in  std_logic;
-		-- Memory Interface
-		mem_valid : in  std_logic;
-		mem_ready : out std_logic;
-		mem_instr : in  std_logic;
-		mem_addr  : in  std_logic_vector(63 downto 0);
-		mem_wdata : in  std_logic_vector(63 downto 0);
-		mem_wstrb : in  std_logic_vector(7 downto 0);
-		mem_rdata : out std_logic_vector(63 downto 0)
+		reset      : in  std_logic;
+		clock      : in  std_logic;
+		-- BRAM Interface
+		bram_valid : in  std_logic;
+		bram_ready : out std_logic;
+		bram_instr : in  std_logic;
+		bram_addr  : in  std_logic_vector(63 downto 0);
+		bram_wdata : in  std_logic_vector(63 downto 0);
+		bram_wstrb : in  std_logic_vector(7 downto 0);
+		bram_rdata : out std_logic_vector(63 downto 0)
 	);
 end bram_mem;
 
@@ -62,18 +62,10 @@ architecture behavior of bram_mem is
 		ok := '0';
 		if (nor_reduce(memory(512)) = '1') and (addr = 512) and (or_reduce(strb) = '1') then
 			ok := '1';
-		-- elsif (nor_reduce(memory(1024)) = '1') and (addr = 1024) and (or_reduce(strb) = '1') then
-		-- 	ok := '1';
-		-- elsif (nor_reduce(memory(1536)) = '1') and (addr = 1536) and (or_reduce(strb) = '1') then
-		-- 	ok := '1';
-		-- elsif (nor_reduce(memory(2048)) = '1') and (addr = 2048) and (or_reduce(strb) = '1') then
-		-- 	ok := '1';
-		-- elsif (nor_reduce(memory(2560)) = '1') and (addr = 2560) and (or_reduce(strb) = '1') then
-		-- 	ok := '1';
-		-- elsif (nor_reduce(memory(3072)) = '1') and (addr = 3072) and (or_reduce(strb) = '1') then
-		-- 	ok := '1';
-		-- elsif (nor_reduce(memory(3584)) = '1') and (addr = 3584) and (or_reduce(strb) = '1') then
-		-- 	ok := '1';
+		elsif (nor_reduce(memory(1024)) = '1') and (addr = 1024) and (or_reduce(strb) = '1') then
+			ok := '1';
+		elsif (nor_reduce(memory(1536)) = '1') and (addr = 1536) and (or_reduce(strb) = '1') then
+			ok := '1';
 		end if;
 		if ok = '1' then
 			if data(31 downto 0) = X"00000001" then
@@ -98,43 +90,43 @@ architecture behavior of bram_mem is
 
 begin
 
-	mem_rdata <= rdata;
-	mem_ready <= ready;
+	bram_rdata <= rdata;
+	bram_ready <= ready;
 
 	process(clock)
 		variable maddr : natural range 0 to 2**bram_depth-1;
 	begin
 		if rising_edge(clock) then
 
-			if mem_valid = '1' then
+			if bram_valid = '1' then
 
-				maddr := to_integer(unsigned(mem_addr(27 downto 3)));
+				maddr := to_integer(unsigned(bram_addr(27 downto 3)));
 
-				check(memory_block,maddr,mem_wstrb,mem_wdata);
+				check(memory_block,maddr,bram_wstrb,bram_wdata);
 
-				if mem_wstrb(7) = '1' then
-					memory_block(maddr)(63 downto 56) <= mem_wdata(63 downto 56);
+				if bram_wstrb(7) = '1' then
+					memory_block(maddr)(63 downto 56) <= bram_wdata(63 downto 56);
 				end if;
-				if mem_wstrb(6) = '1' then
-					memory_block(maddr)(55 downto 48) <= mem_wdata(55 downto 48);
+				if bram_wstrb(6) = '1' then
+					memory_block(maddr)(55 downto 48) <= bram_wdata(55 downto 48);
 				end if;
-				if mem_wstrb(5) = '1' then
-					memory_block(maddr)(47 downto 40) <= mem_wdata(47 downto 40);
+				if bram_wstrb(5) = '1' then
+					memory_block(maddr)(47 downto 40) <= bram_wdata(47 downto 40);
 				end if;
-				if mem_wstrb(4) = '1' then
-					memory_block(maddr)(39 downto 32) <= mem_wdata(39 downto 32);
+				if bram_wstrb(4) = '1' then
+					memory_block(maddr)(39 downto 32) <= bram_wdata(39 downto 32);
 				end if;
-				if mem_wstrb(3) = '1' then
-					memory_block(maddr)(31 downto 24) <= mem_wdata(31 downto 24);
+				if bram_wstrb(3) = '1' then
+					memory_block(maddr)(31 downto 24) <= bram_wdata(31 downto 24);
 				end if;
-				if mem_wstrb(2) = '1' then
-					memory_block(maddr)(23 downto 16) <= mem_wdata(23 downto 16);
+				if bram_wstrb(2) = '1' then
+					memory_block(maddr)(23 downto 16) <= bram_wdata(23 downto 16);
 				end if;
-				if mem_wstrb(1) = '1' then
-					memory_block(maddr)(15 downto 8) <= mem_wdata(15 downto 8);
+				if bram_wstrb(1) = '1' then
+					memory_block(maddr)(15 downto 8) <= bram_wdata(15 downto 8);
 				end if;
-				if mem_wstrb(0) = '1' then
-					memory_block(maddr)(7 downto 0) <= mem_wdata(7 downto 0);
+				if bram_wstrb(0) = '1' then
+					memory_block(maddr)(7 downto 0) <= bram_wdata(7 downto 0);
 				end if;
 
 				rdata <= memory_block(maddr);

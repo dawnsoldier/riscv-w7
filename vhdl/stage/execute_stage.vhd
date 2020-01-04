@@ -184,6 +184,9 @@ begin
 		dpmp_i.mem_instr <= '0';
 		dpmp_i.mem_addr <= v.address;
 		dpmp_i.mem_wstrb <= v.strobe;
+		dpmp_i.priv_mode <= csr_eo.priv_mode;
+		dpmp_i.pmpcfg <= csr_eo.pmpcfg;
+		dpmp_i.pmpaddr <= csr_eo.pmpaddr;
 
 		if v.exc = '0' then
 			if int_pipeline_o.exc = '1' then

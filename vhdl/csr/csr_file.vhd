@@ -27,11 +27,14 @@ architecture behavior of csr_file is
 
 	signal ucsr : csr_user_register := init_csr_user_reg;
 
-	signal mode : std_logic_vector(1 downto 0) := m_mode;
+	signal priv_mode : std_logic_vector(1 downto 0) := m_mode;
+
+	signal exc  : std_logic := '0';
+	signal mret : std_logic := '0';
 
 begin
 
-	process(csr_ei,mcsr,ucsr,mode)
+	process(csr_ei,mcsr,ucsr,priv_mode,exc,mret)
 
 	begin
 
@@ -40,7 +43,9 @@ begin
 		csr_eo.frm <= ucsr.frm;
 		csr_eo.pmpcfg <= mcsr.pmpcfg;
 		csr_eo.pmpaddr <= mcsr.pmpaddr;
-		csr_eo.mode <= mode;
+		csr_eo.priv_mode <= priv_mode;
+		csr_eo.exc <= exc;
+		csr_eo.mret <= mret;
 
 		if mcsr.mtvec.mode = "01" then
 			csr_eo.tvec <= std_logic_vector(unsigned(mcsr.mtvec.base) + unsigned(csr_ei.ecause)) & "00";
@@ -118,22 +123,22 @@ begin
 					csr_o.data <= mcsr.minstret;
 				when csr_pmpcfg0 =>
 					csr_o.data <= mcsr.pmpcfg(7).L & "00" & mcsr.pmpcfg(7).A & mcsr.pmpcfg(7).X & mcsr.pmpcfg(7).X & mcsr.pmpcfg(7).R &
-								  mcsr.pmpcfg(6).L & "00" & mcsr.pmpcfg(6).A & mcsr.pmpcfg(6).X & mcsr.pmpcfg(6).W & mcsr.pmpcfg(6).R &
-								  mcsr.pmpcfg(5).L & "00" & mcsr.pmpcfg(5).A & mcsr.pmpcfg(5).X & mcsr.pmpcfg(5).W & mcsr.pmpcfg(5).R &
-								  mcsr.pmpcfg(4).L & "00" & mcsr.pmpcfg(4).A & mcsr.pmpcfg(4).X & mcsr.pmpcfg(4).W & mcsr.pmpcfg(4).R &
-								  mcsr.pmpcfg(3).L & "00" & mcsr.pmpcfg(3).A & mcsr.pmpcfg(3).X & mcsr.pmpcfg(3).W & mcsr.pmpcfg(3).R &
-								  mcsr.pmpcfg(2).L & "00" & mcsr.pmpcfg(2).A & mcsr.pmpcfg(2).X & mcsr.pmpcfg(2).W & mcsr.pmpcfg(2).R &
-								  mcsr.pmpcfg(1).L & "00" & mcsr.pmpcfg(1).A & mcsr.pmpcfg(1).X & mcsr.pmpcfg(1).W & mcsr.pmpcfg(1).R &
-								  mcsr.pmpcfg(0).L & "00" & mcsr.pmpcfg(0).A & mcsr.pmpcfg(0).X & mcsr.pmpcfg(0).W & mcsr.pmpcfg(0).R;
+									mcsr.pmpcfg(6).L & "00" & mcsr.pmpcfg(6).A & mcsr.pmpcfg(6).X & mcsr.pmpcfg(6).W & mcsr.pmpcfg(6).R &
+									mcsr.pmpcfg(5).L & "00" & mcsr.pmpcfg(5).A & mcsr.pmpcfg(5).X & mcsr.pmpcfg(5).W & mcsr.pmpcfg(5).R &
+									mcsr.pmpcfg(4).L & "00" & mcsr.pmpcfg(4).A & mcsr.pmpcfg(4).X & mcsr.pmpcfg(4).W & mcsr.pmpcfg(4).R &
+									mcsr.pmpcfg(3).L & "00" & mcsr.pmpcfg(3).A & mcsr.pmpcfg(3).X & mcsr.pmpcfg(3).W & mcsr.pmpcfg(3).R &
+									mcsr.pmpcfg(2).L & "00" & mcsr.pmpcfg(2).A & mcsr.pmpcfg(2).X & mcsr.pmpcfg(2).W & mcsr.pmpcfg(2).R &
+									mcsr.pmpcfg(1).L & "00" & mcsr.pmpcfg(1).A & mcsr.pmpcfg(1).X & mcsr.pmpcfg(1).W & mcsr.pmpcfg(1).R &
+									mcsr.pmpcfg(0).L & "00" & mcsr.pmpcfg(0).A & mcsr.pmpcfg(0).X & mcsr.pmpcfg(0).W & mcsr.pmpcfg(0).R;
 				when csr_pmpcfg2 =>
 					csr_o.data <= mcsr.pmpcfg(15).L & "00" & mcsr.pmpcfg(15).A & mcsr.pmpcfg(15).X & mcsr.pmpcfg(15).X & mcsr.pmpcfg(15).R &
-								  mcsr.pmpcfg(14).L & "00" & mcsr.pmpcfg(14).A & mcsr.pmpcfg(14).X & mcsr.pmpcfg(14).W & mcsr.pmpcfg(14).R &
-								  mcsr.pmpcfg(13).L & "00" & mcsr.pmpcfg(13).A & mcsr.pmpcfg(13).X & mcsr.pmpcfg(13).W & mcsr.pmpcfg(13).R &
-								  mcsr.pmpcfg(12).L & "00" & mcsr.pmpcfg(12).A & mcsr.pmpcfg(12).X & mcsr.pmpcfg(12).W & mcsr.pmpcfg(12).R &
-								  mcsr.pmpcfg(11).L & "00" & mcsr.pmpcfg(11).A & mcsr.pmpcfg(11).X & mcsr.pmpcfg(11).W & mcsr.pmpcfg(11).R &
-								  mcsr.pmpcfg(10).L & "00" & mcsr.pmpcfg(10).A & mcsr.pmpcfg(10).X & mcsr.pmpcfg(10).W & mcsr.pmpcfg(10).R &
-								  mcsr.pmpcfg(9).L & "00" & mcsr.pmpcfg(9).A & mcsr.pmpcfg(9).X & mcsr.pmpcfg(9).W & mcsr.pmpcfg(9).R &
-								  mcsr.pmpcfg(8).L & "00" & mcsr.pmpcfg(8).A & mcsr.pmpcfg(8).X & mcsr.pmpcfg(8).W & mcsr.pmpcfg(8).R;
+									mcsr.pmpcfg(14).L & "00" & mcsr.pmpcfg(14).A & mcsr.pmpcfg(14).X & mcsr.pmpcfg(14).W & mcsr.pmpcfg(14).R &
+									mcsr.pmpcfg(13).L & "00" & mcsr.pmpcfg(13).A & mcsr.pmpcfg(13).X & mcsr.pmpcfg(13).W & mcsr.pmpcfg(13).R &
+									mcsr.pmpcfg(12).L & "00" & mcsr.pmpcfg(12).A & mcsr.pmpcfg(12).X & mcsr.pmpcfg(12).W & mcsr.pmpcfg(12).R &
+									mcsr.pmpcfg(11).L & "00" & mcsr.pmpcfg(11).A & mcsr.pmpcfg(11).X & mcsr.pmpcfg(11).W & mcsr.pmpcfg(11).R &
+									mcsr.pmpcfg(10).L & "00" & mcsr.pmpcfg(10).A & mcsr.pmpcfg(10).X & mcsr.pmpcfg(10).W & mcsr.pmpcfg(10).R &
+									mcsr.pmpcfg(9).L & "00" & mcsr.pmpcfg(9).A & mcsr.pmpcfg(9).X & mcsr.pmpcfg(9).W & mcsr.pmpcfg(9).R &
+									mcsr.pmpcfg(8).L & "00" & mcsr.pmpcfg(8).A & mcsr.pmpcfg(8).X & mcsr.pmpcfg(8).W & mcsr.pmpcfg(8).R;
 				when csr_pmpaddr0 =>
 					csr_o.data <= X"00" & "00" & mcsr.pmpaddr(0)(53 downto 0);
 				when csr_pmpaddr1 =>
@@ -237,43 +242,42 @@ begin
 
 				mcsr <= init_csr_machine_reg;
 
-				mode <= m_mode;
+				priv_mode <= m_mode;
+
+				exc  <= '0';
+				mret <= '0';
 
 			else
 
 				instr_valid := csr_ei.int or csr_ei.fpu or csr_ei.csr;
 
-				case mcsr.mcycle is
-					when X"FFFFFFFFFFFFFFFF" =>
-						mcsr.mcycle <= X"0000000000000000";
-					when others =>
-						mcsr.mcycle <= std_logic_vector(unsigned(mcsr.mcycle) + 1);
-				end case;
+				mcsr.mcycle <= std_logic_vector(unsigned(mcsr.mcycle) + 1);
 
-				case mcsr.minstret is
-					when X"FFFFFFFFFFFFFFFF" =>
-						mcsr.minstret <= X"0000000000000000";
-					when others =>
-						if instr_valid = '1' then
-							mcsr.minstret <= std_logic_vector(unsigned(mcsr.minstret) + 1);
-						end if;
-				end case;
+				if instr_valid = '1' then
+					mcsr.minstret <= std_logic_vector(unsigned(mcsr.minstret) + 1);
+				end if;
 
 				if csr_ei.exc = '1' then
 					mcsr.mstatus.mpie <= mcsr.mstatus.mie;
-					mcsr.mstatus.mpp <= mode;
+					mcsr.mstatus.mpp <= priv_mode;
 					mcsr.mstatus.mie <= "0";
-					mode <= m_mode;
+					priv_mode <= m_mode;
 					mcsr.mepc <= csr_ei.epc;
 					mcsr.mtval <= csr_ei.etval;
 					mcsr.mcause.code <= X"00000000000000" & "000" & csr_ei.ecause;
+					exc <= '1';
+				else
+					exc <= '0';
 				end if;
 
 				if csr_ei.mret = '1' then
-					mode <= mcsr.mstatus.mpp;
+					priv_mode <= mcsr.mstatus.mpp;
 					mcsr.mstatus.mie <= mcsr.mstatus.mpie;
 					mcsr.mstatus.mpie <= "1";
 					mcsr.mstatus.mpp <= u_mode;
+					mret <= '1';
+				else
+					mret <= '0';
 				end if;
 
 				if csr_wi.wren = '1' then

@@ -17,42 +17,42 @@ architecture behavior of test_cpu is
 
 	component cpu
 		port(
-			reset             : in  std_logic;
-			clock             : in  std_logic;
-			clock_t           : in  std_logic;
+			reset       : in  std_logic;
+			clock       : in  std_logic;
+			clock_rtc   : in  std_logic;
 			-- Wishbone Master Interface
-			wbm_dat_i         : in  std_logic_vector(63 downto 0);
-			wbm_dat_o         : out std_logic_vector(63 downto 0);
-			wbm_ack_i         : in  std_logic;
-			wbm_adr_o         : out std_logic_vector(63 downto 0);
-			wbm_cyc_o         : out std_logic;
-			wbm_stall_i       : in  std_logic;
-			wbm_err_i         : in  std_logic;
-			wbm_lock_o        : out std_logic;
-			wbm_rty_i         : in  std_logic;
-			wbm_sel_o         : out std_logic_vector(7 downto 0);
-			wbm_stb_o         : out std_logic;
-			wbm_we_o          : out std_logic
+			wbm_dat_i   : in  std_logic_vector(63 downto 0);
+			wbm_dat_o   : out std_logic_vector(63 downto 0);
+			wbm_ack_i   : in  std_logic;
+			wbm_adr_o   : out std_logic_vector(63 downto 0);
+			wbm_cyc_o   : out std_logic;
+			wbm_stall_i : in  std_logic;
+			wbm_err_i   : in  std_logic;
+			wbm_lock_o  : out std_logic;
+			wbm_rty_i   : in  std_logic;
+			wbm_sel_o   : out std_logic_vector(7 downto 0);
+			wbm_stb_o   : out std_logic;
+			wbm_we_o    : out std_logic
 		);
 	end component;
 
-	signal reset        : std_logic := '0';
-	signal clock        : std_logic := '0';
-	signal clock_t      : std_logic := '0';
+	signal reset     : std_logic := '0';
+	signal clock     : std_logic := '0';
+	signal clock_rtc : std_logic := '0';
 
-	-- AXI LITE Master Interface
-	signal wbm_dat_i    : std_logic_vector(63 downto 0);
-	signal wbm_dat_o    : std_logic_vector(63 downto 0);
-	signal wbm_ack_i    : std_logic;
-	signal wbm_adr_o    : std_logic_vector(63 downto 0);
-	signal wbm_cyc_o    : std_logic;
-	signal wbm_stall_i  : std_logic;
-	signal wbm_err_i    : std_logic;
-	signal wbm_lock_o   : std_logic;
-	signal wbm_rty_i    : std_logic;
-	signal wbm_sel_o    : std_logic_vector(7 downto 0);
-	signal wbm_stb_o    : std_logic;
-	signal wbm_we_o     : std_logic;
+	-- WishBone Master Interface
+	signal wbm_dat_i   : std_logic_vector(63 downto 0);
+	signal wbm_dat_o   : std_logic_vector(63 downto 0);
+	signal wbm_ack_i   : std_logic;
+	signal wbm_adr_o   : std_logic_vector(63 downto 0);
+	signal wbm_cyc_o   : std_logic;
+	signal wbm_stall_i : std_logic;
+	signal wbm_err_i   : std_logic;
+	signal wbm_lock_o  : std_logic;
+	signal wbm_rty_i   : std_logic;
+	signal wbm_sel_o   : std_logic_vector(7 downto 0);
+	signal wbm_stb_o   : std_logic;
+	signal wbm_we_o    : std_logic;
 
 	procedure print(
 		signal info        : inout string(1 to 255);
@@ -78,7 +78,7 @@ begin
 
 	reset <= '1' after 10 ns;
 	clock <= not clock after 1 ns;
-	clock_t <= not clock_t after 1 us;
+	clock_rtc <= not clock_rtc after 1 us;
 
 	process(clock)
 	begin
@@ -111,24 +111,24 @@ begin
 
 	end process;
 
-	cpu_comp              : cpu
+	cpu_comp : cpu
 		port map(
-			reset             => reset,
-			clock             => clock,
-			clock_t           => clock_t,
+			reset       => reset,
+			clock       => clock,
+			clock_rtc   => clock_rtc,
 			-- Wishbone Master Interface
-			wbm_dat_i         => wbm_dat_i,
-			wbm_dat_o         => wbm_dat_o,
-			wbm_ack_i         => wbm_ack_i,
-			wbm_adr_o         => wbm_adr_o,
-			wbm_cyc_o         => wbm_cyc_o,
-			wbm_stall_i       => wbm_stall_i,
-			wbm_err_i         => wbm_err_i,
-			wbm_lock_o        => wbm_lock_o,
-			wbm_rty_i         => wbm_rty_i,
-			wbm_sel_o         => wbm_sel_o,
-			wbm_stb_o         => wbm_stb_o,
-			wbm_we_o          => wbm_we_o
+			wbm_dat_i   => wbm_dat_i,
+			wbm_dat_o   => wbm_dat_o,
+			wbm_ack_i   => wbm_ack_i,
+			wbm_adr_o   => wbm_adr_o,
+			wbm_cyc_o   => wbm_cyc_o,
+			wbm_stall_i => wbm_stall_i,
+			wbm_err_i   => wbm_err_i,
+			wbm_lock_o  => wbm_lock_o,
+			wbm_rty_i   => wbm_rty_i,
+			wbm_sel_o   => wbm_sel_o,
+			wbm_stb_o   => wbm_stb_o,
+			wbm_we_o    => wbm_we_o
 		);
 
 end architecture;

@@ -30,14 +30,6 @@ entity interconnect is
 		bram_mem_wdata  : out std_logic_vector(63 downto 0);
 		bram_mem_wstrb  : out std_logic_vector(7 downto 0);
 		bram_mem_rdata  : in  std_logic_vector(63 downto 0);
-		-- plic
-		plic_mem_valid  : out std_logic;
-		plic_mem_instr  : out std_logic;
-		plic_mem_ready  : in  std_logic;
-		plic_mem_addr   : out std_logic_vector(63 downto 0);
-		plic_mem_wdata  : out std_logic_vector(63 downto 0);
-		plic_mem_wstrb  : out std_logic_vector(7 downto 0);
-		plic_mem_rdata  : in  std_logic_vector(63 downto 0);
 		-- timer
 		time_mem_valid  : out std_logic;
 		time_mem_instr  : out std_logic;

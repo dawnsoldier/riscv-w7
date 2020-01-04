@@ -82,11 +82,11 @@ begin
 		v.taken := '0';
 		v.spec := '0';
 
-		if d.w.exc = '1' then
+		if csr_eo.exc = '1' then
 			v.taken := '0';
 			v.spec := '1';
 			v.pc := csr_eo.tvec;
-		elsif d.w.mret = '1' then
+		elsif csr_eo.mret = '1' then
 			v.taken := '0';
 			v.spec := '1';
 			v.pc := csr_eo.epc;
@@ -125,6 +125,9 @@ begin
 		ipmp_i.mem_instr <= '1';
 		ipmp_i.mem_addr <= pfetch_o.fpc;
 		ipmp_i.mem_wstrb <= (others => '0');
+		ipmp_i.priv_mode <= csr_eo.priv_mode;
+		ipmp_i.pmpcfg <= csr_eo.pmpcfg;
+		ipmp_i.pmpaddr <= csr_eo.pmpaddr;
 
 		v.exc := ipmp_o.exc;
 		v.etval := ipmp_o.etval;

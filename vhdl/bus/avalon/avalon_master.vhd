@@ -20,13 +20,13 @@ entity avalon_master is
 		avm_writedata     : out std_logic_vector(63 downto 0);
 		avm_waitrequest   : in  std_logic;
 		-- Memory Interface
-		mem_valid         : in  std_logic;
-		mem_ready         : out std_logic;
-		mem_instr         : in  std_logic;
-		mem_addr          : in  std_logic_vector(63 downto 0);
-		mem_wdata         : in  std_logic_vector(63 downto 0);
-		mem_wstrb         : in  std_logic_vector(7 downto 0);
-		mem_rdata         : out std_logic_vector(63 downto 0)
+		bus_valid         : in  std_logic;
+		bus_ready         : out std_logic;
+		bus_instr         : in  std_logic;
+		bus_addr          : in  std_logic_vector(63 downto 0);
+		bus_wdata         : in  std_logic_vector(63 downto 0);
+		bus_wstrb         : in  std_logic_vector(7 downto 0);
+		bus_rdata         : out std_logic_vector(63 downto 0)
 	);
 end avalon_master;
 
@@ -36,24 +36,24 @@ architecture behavior of avalon_master is
 
 	type reg_type is record
 		bus_state         : bus_state_type;
-		mem_valid         : std_logic;
-		mem_instr         : std_logic;
-		mem_addr          : std_logic_vector(63 downto 0);
-		mem_wdata         : std_logic_vector(63 downto 0);
-		mem_wstrb         : std_logic_vector(7 downto 0);
-		mem_we            : std_logic;
-		mem_re            : std_logic;
+		bus_valid         : std_logic;
+		bus_instr         : std_logic;
+		bus_addr          : std_logic_vector(63 downto 0);
+		bus_wdata         : std_logic_vector(63 downto 0);
+		bus_wstrb         : std_logic_vector(7 downto 0);
+		bus_we            : std_logic;
+		bus_re            : std_logic;
 	end record;
 
 	constant init_reg  : reg_type := (
 		bus_state => idle,
-		mem_valid => '0',
-		mem_instr => '0',
-		mem_addr => (others => '0'),
-		mem_wdata => (others => '0'),
-		mem_wstrb => (others => '0'),
-		mem_we => '0',
-		mem_re => '0'
+		bus_valid => '0',
+		bus_instr => '0',
+		bus_addr => (others => '0'),
+		bus_wdata => (others => '0'),
+		bus_wstrb => (others => '0'),
+		bus_we => '0',
+		bus_re => '0'
 	);
 
 	signal r, rin      : reg_type := init_reg;
@@ -61,7 +61,7 @@ architecture behavior of avalon_master is
 begin
 
 	process(avm_readdata,avm_readdatavalid,avm_waitrequest,
-					mem_valid,mem_instr,mem_addr,mem_wdata,mem_wstrb)
+					bus_valid,bus_instr,bus_addr,bus_wdata,bus_wstrb)
 
 		variable v        : reg_type;
 
@@ -71,7 +71,7 @@ begin
 
 		case r.bus_state is
 			when idle =>
-				if mem_valid = '1' then
+				if bus_valid = '1' then
 					v.bus_state := active;
 				end if;
 			when active =>
@@ -80,9 +80,9 @@ begin
 				end if;
 			when busy =>
 				if avm_waitrequest = '0' then
-					if mem_valid = '1' then
+					if bus_valid = '1' then
 						v.bus_state := active;
-					elsif mem_valid = '0' then
+					elsif bus_valid = '0' then
 						v.bus_state := idle;
 					end if;
 				end if;
@@ -90,43 +90,43 @@ begin
 
 		case r.bus_state is
 			when idle =>
-				avm_address <= mem_addr;
+				avm_address <= bus_addr;
 				avm_burstcount <= "00000000001";
-				avm_byteenable <= mem_wstrb;
-				avm_writedata <= mem_wdata;
-				avm_write <= mem_valid and or_reduce(mem_wstrb);
-				avm_read <= mem_valid and nor_reduce(mem_wstrb);
+				avm_byteenable <= bus_wstrb;
+				avm_writedata <= bus_wdata;
+				avm_write <= bus_valid and or_reduce(bus_wstrb);
+				avm_read <= bus_valid and nor_reduce(bus_wstrb);
 				----------------------------------------------------
-				mem_rdata <= avm_readdata;
-				mem_ready <= not(avm_waitrequest) or avm_readdatavalid;
+				bus_rdata <= avm_readdata;
+				bus_ready <= not(avm_waitrequest) or avm_readdatavalid;
 			when active =>
-				v.mem_valid := mem_valid;
-				v.mem_instr := mem_instr;
-				v.mem_addr := mem_addr;
-				v.mem_wstrb := mem_wstrb;
-				v.mem_wdata := mem_wdata;
-				v.mem_we := mem_valid and or_reduce(mem_wstrb);
-				v.mem_re := mem_valid and nor_reduce(mem_wstrb);
+				v.bus_valid := bus_valid;
+				v.bus_instr := bus_instr;
+				v.bus_addr := bus_addr;
+				v.bus_wstrb := bus_wstrb;
+				v.bus_wdata := bus_wdata;
+				v.bus_we := bus_valid and or_reduce(bus_wstrb);
+				v.bus_re := bus_valid and nor_reduce(bus_wstrb);
 				----------------------------------------------------
-				avm_address <= v.mem_addr;
+				avm_address <= v.bus_addr;
 				avm_burstcount <= "00000000001";
-				avm_byteenable <= v.mem_wstrb;
-				avm_writedata <= v.mem_wdata;
-				avm_write <= v.mem_we;
-				avm_read <= v.mem_re;
+				avm_byteenable <= v.bus_wstrb;
+				avm_writedata <= v.bus_wdata;
+				avm_write <= v.bus_we;
+				avm_read <= v.bus_re;
 				----------------------------------------------------
-				mem_rdata <= avm_readdata;
-				mem_ready <= not(avm_waitrequest) or avm_readdatavalid;
+				bus_rdata <= avm_readdata;
+				bus_ready <= not(avm_waitrequest) or avm_readdatavalid;
 			when busy =>
-				avm_address <= r.mem_addr;
+				avm_address <= r.bus_addr;
 				avm_burstcount <= "00000000001";
-				avm_byteenable <= r.mem_wstrb;
-				avm_writedata <= r.mem_wdata;
-				avm_write <= r.mem_we;
-				avm_read <= r.mem_re;
+				avm_byteenable <= r.bus_wstrb;
+				avm_writedata <= r.bus_wdata;
+				avm_write <= r.bus_we;
+				avm_read <= r.bus_re;
 				----------------------------------------------------
-				mem_rdata <= avm_readdata;
-				mem_ready <= not(avm_waitrequest) or avm_readdatavalid;
+				bus_rdata <= avm_readdata;
+				bus_ready <= not(avm_waitrequest) or avm_readdatavalid;
 		end case;
 
 		rin <= v;
