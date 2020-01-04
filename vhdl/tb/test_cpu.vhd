@@ -78,7 +78,7 @@ begin
 
 	reset <= '1' after 10 ns;
 	clock <= not clock after 1 ns;
-	clock_rtc <= not clock_rtc after 1 us;
+	clock_rtc <= not clock_rtc after 30517578125 fs; --32.768 KHz
 
 	process(clock)
 	begin
