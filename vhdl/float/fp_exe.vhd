@@ -55,17 +55,19 @@ begin
 
 	begin
 
-		v.idata := fp_exe_i.idata;
-		v.data1 := fp_exe_i.data1;
-		v.data2 := fp_exe_i.data2;
-		v.data3 := fp_exe_i.data3;
-		v.op    := fp_exe_i.op;
-		v.fmt   := fp_exe_i.fmt;
-		v.rm    := fp_exe_i.rm;
+		v.idata  := fp_exe_i.idata;
+		v.data1  := fp_exe_i.data1;
+		v.data2  := fp_exe_i.data2;
+		v.data3  := fp_exe_i.data3;
+		v.op     := fp_exe_i.op;
+		v.fmt    := fp_exe_i.fmt;
+		v.rm     := fp_exe_i.rm;
+		v.enable := fp_exe_i.enable;
+		v.clear  := fp_exe_i.clear;
 
 		v.result := (others => '0');
 		v.flags  := (others => '0');
-		v.ready  := fp_exe_i.enable;
+		v.ready  := '0';
 
 		v.fp_rnd := init_fp_rnd_in;
 
@@ -151,7 +153,8 @@ begin
 		fp_fma_i.op <= v.op;
 		fp_fma_i.fmt <= v.fmt;
 		fp_fma_i.rm <= v.rm;
-		fp_fma_i.enable <= v.ready;
+		fp_fma_i.enable <= v.enable;
+		fp_fma_i.clear <= v.clear;
 
 		fp_fdiv_i.data1 <= v.ext1;
 		fp_fdiv_i.data2 <= v.ext2;
@@ -160,7 +163,8 @@ begin
 		fp_fdiv_i.op <= v.op;
 		fp_fdiv_i.fmt <= v.fmt;
 		fp_fdiv_i.rm <= v.rm;
-		fp_fdiv_i.enable <= v.ready;
+		fp_fdiv_i.enable <= v.enable;
+		fp_fdiv_i.clear <= v.clear;
 
 		if fp_fma_o.ready = '1' then
 			v.fp_rnd := fp_fma_o.fp_rnd;

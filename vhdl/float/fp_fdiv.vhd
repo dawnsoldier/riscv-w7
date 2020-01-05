@@ -88,24 +88,39 @@ begin
 					end if;
 					v.istate := 0;
 					v.ready := '0';
+					if fp_fdiv_i.clear = '1' then
+						v.state := F0;
+					end if;
 				when F1 =>
 					if v.istate = 10 then
 						v.state := F3;
 					end if;
 					v.istate := v.istate + 1;
 					v.ready := '0';
+					if fp_fdiv_i.clear = '1' then
+						v.state := F0;
+					end if;
 				when F2 =>
 					if v.istate = 13 then
 						v.state := F3;
 					end if;
 					v.istate := v.istate + 1;
 					v.ready := '0';
+					if fp_fdiv_i.clear = '1' then
+						v.state := F0;
+					end if;
 				when F3 =>
 					v.state := F4;
 					v.ready := '0';
+					if fp_fdiv_i.clear = '1' then
+						v.state := F0;
+					end if;
 				when others =>
 					v.state := F0;
 					v.ready := '1';
+					if fp_fdiv_i.clear = '1' then
+						v.ready := '0';
+					end if;
 			end case;
 
 			case r.state is
@@ -466,11 +481,11 @@ begin
 
 			case r_fix.state is
 				when F0 =>
-					if fp_fdiv_i.op.fdiv then
+					if fp_fdiv_i.enable and fp_fdiv_i.op.fdiv then
 						v.state := F1;
 						v.istate := 54;
 					end if;
-					if fp_fdiv_i.op.fsqrt then
+					if fp_fdiv_i.enable and fp_fdiv_i.op.fsqrt then
 						v.state := F1;
 						v.istate := 53;
 					end if;

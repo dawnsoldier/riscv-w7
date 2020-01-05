@@ -115,6 +115,7 @@ architecture behavior of pipeline is
 			int_reg_wi : out int_register_write_in_type;
 			csr_wi     : out csr_write_in_type;
 			csr_ei     : out csr_exception_in_type;
+			csr_eo     : in  csr_exception_out_type;
 			d          : in  writeback_in_type;
 			q          : out writeback_out_type
 		);
@@ -298,6 +299,7 @@ begin
 			int_reg_wi => int_unit_i.int_reg_wi,
 			csr_wi     => csr_unit_i.csr_wi,
 			csr_ei     => csr_unit_i.csr_ei,
+			csr_eo     => csr_unit_o.csr_eo,
 			d.f        => fetch_q,
 			d.d        => decode_q,
 			d.e        => execute_q,

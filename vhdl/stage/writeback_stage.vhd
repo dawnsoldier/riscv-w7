@@ -19,6 +19,7 @@ entity writeback_stage is
 		int_reg_wi : out int_register_write_in_type;
 		csr_wi     : out csr_write_in_type;
 		csr_ei     : out csr_exception_in_type;
+		csr_eo     : in  csr_exception_out_type;
 		d          : in  writeback_in_type;
 		q          : out writeback_out_type
 	);
@@ -31,7 +32,7 @@ architecture behavior of writeback_stage is
 
 begin
 
-	combinational : process(d, r)
+	combinational : process(d, r, csr_eo)
 
 		variable v : writeback_reg_type;
 
@@ -73,7 +74,7 @@ begin
 
 		v.stall := '0';
 
-		v.clear := d.w.exc or d.w.mret or d.w.clear;
+		v.clear := csr_eo.exc or csr_eo.mret or d.w.clear;
 
 		if (v.stall or v.clear) = '1' then
 			v.int_wren := '0';

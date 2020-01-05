@@ -52,11 +52,9 @@ begin
 			op    := int_mul_i.op;
 			word  := int_mul_i.word;
 			neg   := '0';
-			ready := '0';
-
-			if int_mul_i.enable = '1' then
-				ready := '1';
-			end if;
+			ready := int_mul_i.enable and
+								(int_mul_i.op.alu_mul or int_mul_i.op.alu_mulh or
+								int_mul_i.op.alu_mulhu or int_mul_i.op.alu_mulhsu);
 
 			if op.alu_mulhu = '1' then
 				aa := int_mul_i.data1;
@@ -85,11 +83,15 @@ begin
 			rin_1.neg <= neg;
 			rin_1.aa <= aa;
 			rin_1.bb <= bb;
-			rin_1.ready <= ready;
+			if int_mul_i.clear = '0' then
+				rin_1.ready <= ready;
+			elsif int_mul_i.clear = '1' then
+				rin_1.ready <= '0';
+			end if;
 
 		end process;
 
-		process(r_1)
+		process(r_1, int_mul_i)
 			variable op    : mul_operation_type;
 			variable word  : std_logic;
 			variable neg   : std_logic;
@@ -112,11 +114,15 @@ begin
 			rin_2.word <= word;
 			rin_2.neg <= neg;
 			rin_2.rr <= rr;
-			rin_2.ready <= ready;
+			if int_mul_i.clear = '0' then
+				rin_2.ready <= ready;
+			elsif int_mul_i.clear = '1' then
+				rin_2.ready <= '0';
+			end if;
 
 		end process;
 
-		process(r_2)
+		process(r_2, int_mul_i)
 			variable op     : mul_operation_type;
 			variable word   : std_logic;
 			variable neg    : std_logic;
@@ -146,7 +152,11 @@ begin
 			end if;
 
 			int_mul_o.result <= result;
-			int_mul_o.ready <= ready;
+			if int_mul_i.clear = '0' then
+				int_mul_o.ready <= ready;
+			elsif int_mul_i.clear = '1' then
+				int_mul_o.ready <= '0';
+			end if;
 
 		end process;
 
@@ -182,10 +192,14 @@ begin
 
 			case r.state is
 				when MUL0 =>
-					if int_mul_i.enable = '1' then
+					if (int_mul_i.enable and (int_mul_i.op.alu_mul or int_mul_i.op.alu_mulh or
+							int_mul_i.op.alu_mulhu or int_mul_i.op.alu_mulhsu)) = '1' then
 						v.state := MUL1;
 					end if;
 					v.ready := '0';
+					if int_mul_i.clear = '1' then
+						v.state := MUL0;
+					end if;
 				when MUL1 =>
 					case r.counter is
 						when 0 =>
@@ -194,9 +208,15 @@ begin
 							v.counter := v.counter - 1;
 					end case;
 					v.ready := '0';
+					if int_mul_i.clear = '1' then
+						v.state := MUL0;
+					end if;
 				when others =>
 					v.state := MUL0;
 					v.ready := '1';
+					if int_mul_i.clear = '1' then
+						v.ready := '0';
+					end if;
 			end case;
 
 			case r.state is

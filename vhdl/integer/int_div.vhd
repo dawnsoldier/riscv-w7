@@ -36,10 +36,14 @@ begin
 
 		case r.state is
 			when DIV0 =>
-				if int_div_i.enable = '1' then
+				if (int_div_i.enable and (int_div_i.op.alu_div or int_div_i.op.alu_divu or
+						int_div_i.op.alu_rem or int_div_i.op.alu_remu)) = '1' then
 					v.state := DIV1;
 				end if;
 				v.ready := '0';
+				if int_div_i.clear = '1' then
+					v.state := DIV0;
+				end if;
 			when DIV1 =>
 				case r.counter is
 					when 0 =>
@@ -48,9 +52,15 @@ begin
 						v.counter := v.counter - 1;
 				end case;
 				v.ready := '0';
+				if int_div_i.clear = '1' then
+					v.state := DIV0;
+				end if;
 			when others =>
 				v.state := DIV0;
 				v.ready := '1';
+				if int_div_i.clear = '1' then
+					v.ready := '0';
+				end if;
 		end case;
 
 		case r.state is

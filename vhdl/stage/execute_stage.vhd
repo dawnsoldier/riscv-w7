@@ -123,11 +123,9 @@ begin
 
 		v.stall := '0';
 
-		v.clear := d.e.exc or d.m.exc or d.w.exc or
-					d.e.mret or d.m.mret or d.w.mret or
-					d.e.jump or d.w.clear;
+		v.clear := csr_eo.exc or csr_eo.mret or d.e.jump or d.w.clear;
 
-		v.int_enable := not (d.e.stall or d.m.stall or d.w.stall or v.clear);
+		v.enable := not(d.e.stall or d.m.stall or d.w.stall);
 
 		fpu_i.idata <= v.rdata1;
 
@@ -151,13 +149,14 @@ begin
 		int_pipeline_i.load_op <= v.load_op;
 		int_pipeline_i.store_op <= v.store_op;
 		int_pipeline_i.int_op <= v.int_op;
-		int_pipeline_i.enable <= v.int_enable;
+		int_pipeline_i.enable <= v.enable;
+		int_pipeline_i.clear <= v.clear;
 
 		v.idata := int_pipeline_o.result;
 		v.jump := int_pipeline_o.jump;
 		v.address := int_pipeline_o.mem_addr;
 		v.byteenable := int_pipeline_o.mem_byte;
-		v.int_ready := int_pipeline_o.ready;
+		v.ready := int_pipeline_o.ready;
 
 		if v.csr = '1' then
 			v.wdata := v.cdata;
@@ -212,9 +211,9 @@ begin
 		end if;
 
 		if v.int_op.mcycle = '1' then
-			if v.int_ready = '0' then
+			if v.ready = '0' then
 				v.stall := '1';
-			elsif v.int_ready = '1' then
+			elsif v.ready = '1' then
 				v.int := '1';
 				v.int_wren := or_reduce(v.waddr);
 				v.wdata := v.idata;
@@ -299,7 +298,6 @@ begin
 		q.address <= r.address;
 		q.byteenable <= r.byteenable;
 		q.strobe <= r.strobe;
-		q.int_ready <= r.int_ready;
 		q.etval <= r.etval;
 		q.ecause <= r.ecause;
 		q.exc <= r.exc;

@@ -247,7 +247,6 @@ package wire is
 		address     : std_logic_vector(63 downto 0);
 		byteenable  : std_logic_vector(7 downto 0);
 		strobe      : std_logic_vector(7 downto 0);
-		int_ready   : std_logic;
 		etval       : std_logic_vector(63 downto 0);
 		ecause      : std_logic_vector(3 downto 0);
 		exc         : std_logic;
@@ -300,8 +299,8 @@ package wire is
 		address     : std_logic_vector(63 downto 0);
 		byteenable  : std_logic_vector(7 downto 0);
 		strobe      : std_logic_vector(7 downto 0);
-		int_enable  : std_logic;
-		int_ready   : std_logic;
+		enable      : std_logic;
+		ready       : std_logic;
 		etval       : std_logic_vector(63 downto 0);
 		ecause      : std_logic_vector(3 downto 0);
 		exc         : std_logic;
@@ -355,8 +354,8 @@ package wire is
 		address     => (others => '0'),
 		byteenable  => (others => '0'),
 		strobe      => (others => '0'),
-		int_enable  => '0',
-		int_ready   => '0',
+		enable      => '0',
+		ready       => '0',
 		etval       => (others => '0'),
 		ecause      => (others => '0'),
 		exc         => '0',

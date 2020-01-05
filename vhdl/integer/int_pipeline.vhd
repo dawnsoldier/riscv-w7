@@ -34,7 +34,7 @@ begin
 
 	process(int_pipeline_i, int_alu_o, int_bcu_o, int_agu_o, int_mul_o, int_div_o)
 		variable pc        : std_logic_vector(63 downto 0);
-		variable npc        : std_logic_vector(63 downto 0);
+		variable npc       : std_logic_vector(63 downto 0);
 		variable rs1       : std_logic_vector(63 downto 0);
 		variable rs2       : std_logic_vector(63 downto 0);
 		variable imm       : std_logic_vector(63 downto 0);
@@ -44,6 +44,8 @@ begin
 		variable load_op   : load_operation_type;
 		variable store_op  : store_operation_type;
 		variable int_op    : int_operation_type;
+		variable enable    : std_logic;
+		variable clear     : std_logic;
 		variable alu_data  : std_logic_vector(63 downto 0);
 		variable mul_data  : std_logic_vector(63 downto 0);
 		variable div_data  : std_logic_vector(63 downto 0);
@@ -61,7 +63,7 @@ begin
 
 	begin
 		result := (others => '0');
-		ready  := int_pipeline_i.enable;
+		ready  := '0';
 
 		pc       := int_pipeline_i.pc;
 		npc      := int_pipeline_i.npc;
@@ -74,6 +76,8 @@ begin
 		load_op  := int_pipeline_i.load_op;
 		store_op := int_pipeline_i.store_op;
 		int_op   := int_pipeline_i.int_op;
+		enable   := int_pipeline_i.enable;
+		clear    := int_pipeline_i.clear;
 
 		int_alu_i.rs1 <= rs1;
 		int_alu_i.rs2 <= rs2;
@@ -86,9 +90,9 @@ begin
 
 		int_bcu_i.rs1 <= rs1;
 		int_bcu_i.rs2 <= rs2;
-		int_bcu_i.jal <= int_op.jal and ready;
-		int_bcu_i.jalr <= int_op.jalr and ready;
-		int_bcu_i.branch <= int_op.branch and ready;
+		int_bcu_i.jal <= int_op.jal;
+		int_bcu_i.jalr <= int_op.jalr;
+		int_bcu_i.branch <= int_op.branch;
 		int_bcu_i.branch_op <= int_op.branch_op;
 
 		jump := int_bcu_o.jump;
@@ -115,7 +119,8 @@ begin
 		int_div_i.data2 <= rs2;
 		int_div_i.op <= int_op.div_op;
 		int_div_i.word <= int_op.word;
-		int_div_i.enable <= int_op.div and ready;
+		int_div_i.enable <= enable;
+		int_div_i.clear <= clear;
 
 		div_ready := int_div_o.ready;
 		div_data  := int_div_o.result;
@@ -124,7 +129,8 @@ begin
 		int_mul_i.data2 <= rs2;
 		int_mul_i.op <= int_op.mul_op;
 		int_mul_i.word <= int_op.word;
-		int_mul_i.enable <= int_op.mul and ready;
+		int_mul_i.enable <= enable;
+		int_mul_i.clear <= clear;
 
 		mul_ready := int_mul_o.ready;
 		mul_data  := int_mul_o.result;

@@ -199,6 +199,7 @@ package fp_wire is
 		fmt    : std_logic_vector(1 downto 0);
 		rm     : std_logic_vector(2 downto 0);
 		enable : std_logic;
+		clear  : std_logic;
 	end record;
 
 	type fp_fma_out_type is record
@@ -366,6 +367,7 @@ package fp_wire is
 		fmt    : std_logic_vector(1 downto 0);
 		rm     : std_logic_vector(2 downto 0);
 		enable : std_logic;
+		clear  : std_logic;
 	end record;
 
 	type fp_fdiv_out_type is record
@@ -697,6 +699,7 @@ package fp_wire is
 		fmt    : std_logic_vector(1 downto 0);
 		rm     : std_logic_vector(2 downto 0);
 		enable : std_logic;
+		clear  : std_logic;
 	end record;
 
 	type fp_exe_out_type is record
@@ -713,6 +716,8 @@ package fp_wire is
 		op      : fp_operation_type;
 		fmt     : std_logic_vector(1 downto 0);
 		rm      : std_logic_vector(2 downto 0);
+		enable  : std_logic;
+		clear   : std_logic;
 		fmt_ext : std_logic_vector(1 downto 0);
 		ext1    : std_logic_vector(64 downto 0);
 		ext2    : std_logic_vector(64 downto 0);
@@ -775,6 +780,7 @@ package fp_wire is
 		op     : fp_operation_type;
 		flags  : std_logic_vector(4 downto 0);
 		enable : std_logic;
+		clear  : std_logic;
 		ready  : std_logic;
 		stall  : std_logic;
 	end record;
@@ -794,6 +800,7 @@ package fp_wire is
 		op     => init_fp_operation,
 		flags  => (others => '0'),
 		enable => '0',
+		clear  => '0',
 		ready  => '0',
 		stall  => '0'
 	);

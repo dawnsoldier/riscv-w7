@@ -24,7 +24,7 @@ then
      [ ! "$3" = 'csmith' ] && \
      [ ! "$3" = 'verification' ]
   then
-    cp $3 work/bram_mem.dat
+    cp $3 $DIR/sim/work/bram_mem.dat
   fi
 fi
 

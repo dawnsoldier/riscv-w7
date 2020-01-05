@@ -53,9 +53,7 @@ begin
 
 		v.valid := not d.w.clear;
 		v.stall := pfetch_o.stall or d.d.stall or d.e.stall or d.m.stall or d.w.stall or d.w.clear;
-		v.clear := d.d.exc or d.e.exc or d.m.exc or d.w.exc or
-							d.d.mret or d.e.mret or d.m.mret or d.w.mret or
-							d.w.clear;
+		v.clear := csr_eo.exc or csr_eo.mret or d.w.clear;
 
 		if v.clear = '0' then
 			v.instr := pfetch_o.instr;

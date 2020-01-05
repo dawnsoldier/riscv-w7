@@ -303,6 +303,7 @@ package int_wire is
 		op     : mul_operation_type;
 		word   : std_logic;
 		enable : std_logic;
+		clear  : std_logic;
 	end record;
 
 	type int_mul_out_type is record
@@ -376,6 +377,7 @@ package int_wire is
 		op     : div_operation_type;
 		word   : std_logic;
 		enable : std_logic;
+		clear  : std_logic;
 	end record;
 
 	type int_div_out_type is record
@@ -437,6 +439,7 @@ package int_wire is
 		store_op : store_operation_type;
 		int_op   : int_operation_type;
 		enable   : std_logic;
+		clear    : std_logic;
 	end record;
 
 	type int_pipeline_out_type is record
