@@ -22,7 +22,7 @@ then
      [ ! "$3" = 'dhrystone' ] && \
      [ ! "$3" = 'coremark' ] && \
      [ ! "$3" = 'csmith' ] && \
-     [ ! "$3" = 'verification' ]
+     [ ! "$3" = 'torture' ]
   then
     cp $3 $DIR/sim/work/bram_mem.dat
   fi
@@ -230,13 +230,13 @@ then
   fi
   cp $DIR/build/csmith/dat/csmith.dat bram_mem.dat
   $SIMULA test_cpu --ieee-asserts=disable-at-0 --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
-elif [ "$3" = 'verification' ]
+elif [ "$3" = 'torture' ]
 then
   if [ "$5" = 'wave' ]
   then
-    WAVE="--wave=verification.ghw"
+    WAVE="--wave=torture.ghw"
   fi
-  cp $DIR/build/verification/dat/verification.dat bram_mem.dat
+  cp $DIR/build/torture/dat/torture.dat bram_mem.dat
   $SIMULA test_cpu --ieee-asserts=disable-at-0 --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
 elif [ "$3" = 'all' ]
 then

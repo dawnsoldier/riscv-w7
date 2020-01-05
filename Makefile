@@ -27,10 +27,10 @@ generate_coremark:
 generate_csmith:
 	soft/csmith.sh ${RISCV} ${MARCH} ${MABI} ${GCC} ${CSMITH} ${CSMITH_INCL} ${PYTHON} ${OFFSET} ${BASEDIR}
 
-generate_verification:
-	soft/verification.sh ${RISCV} ${MARCH} ${MABI} ${PYTHON} ${OFFSET} ${BASEDIR}
+generate_torture:
+	soft/torture.sh ${RISCV} ${MARCH} ${MABI} ${PYTHON} ${OFFSET} ${BASEDIR}
 
 simulate:
 	sim/run.sh ${BASEDIR} ${GHDL} ${TEST} ${CYCLES} ${WAVE}
 
-all: generate_isa generate_dhrystone generate_coremark generate_csmith generate_verification simulate
+all: generate_isa generate_dhrystone generate_coremark generate_csmith generate_torture simulate
