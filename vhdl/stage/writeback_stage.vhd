@@ -20,6 +20,8 @@ entity writeback_stage is
 		csr_wi     : out csr_write_in_type;
 		csr_ei     : out csr_exception_in_type;
 		csr_eo     : in  csr_exception_out_type;
+		time_irpt  : in  std_logic;
+		ext_irpt   : in  std_logic;
 		d          : in  writeback_in_type;
 		q          : out writeback_out_type
 	);
@@ -32,7 +34,7 @@ architecture behavior of writeback_stage is
 
 begin
 
-	combinational : process(d, r, csr_eo)
+	combinational : process(d, r, csr_eo, time_irpt, ext_irpt)
 
 		variable v : writeback_reg_type;
 
@@ -116,6 +118,8 @@ begin
 		csr_ei.ebreak <= v.ebreak;
 		csr_ei.mret <= v.mret;
 		csr_ei.flags <= v.flags;
+		csr_ei.time_irpt <= time_irpt;
+		csr_ei.ext_irpt <= ext_irpt;
 
 		rin <= v;
 

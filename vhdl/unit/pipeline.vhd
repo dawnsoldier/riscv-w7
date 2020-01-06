@@ -17,16 +17,18 @@ entity pipeline is
 		fpu_performance : boolean := fpu_performance
 	);
 	port(
-		reset    : in  std_logic;
-		clock    : in  std_logic;
-		imem_o   : in  mem_out_type;
-		imem_i   : out mem_in_type;
-		dmem_o   : in  mem_out_type;
-		dmem_i   : out mem_in_type;
-		ipmp_o   : in  pmp_out_type;
-		ipmp_i   : out pmp_in_type;
-		dpmp_o   : in  pmp_out_type;
-		dpmp_i   : out pmp_in_type
+		reset     : in  std_logic;
+		clock     : in  std_logic;
+		imem_o    : in  mem_out_type;
+		imem_i    : out mem_in_type;
+		dmem_o    : in  mem_out_type;
+		dmem_i    : out mem_in_type;
+		ipmp_o    : in  pmp_out_type;
+		ipmp_i    : out pmp_in_type;
+		dpmp_o    : in  pmp_out_type;
+		dpmp_i    : out pmp_in_type;
+		time_irpt : in  std_logic;
+		ext_irpt  : in  std_logic
 	);
 end pipeline;
 
@@ -116,6 +118,8 @@ architecture behavior of pipeline is
 			csr_wi     : out csr_write_in_type;
 			csr_ei     : out csr_exception_in_type;
 			csr_eo     : in  csr_exception_out_type;
+			time_irpt  : in  std_logic;
+			ext_irpt   : in  std_logic;
 			d          : in  writeback_in_type;
 			q          : out writeback_out_type
 		);
@@ -300,6 +304,8 @@ begin
 			csr_wi     => csr_unit_i.csr_wi,
 			csr_ei     => csr_unit_i.csr_ei,
 			csr_eo     => csr_unit_o.csr_eo,
+			time_irpt  => time_irpt,
+			ext_irpt   => ext_irpt,
 			d.f        => fetch_q,
 			d.d        => decode_q,
 			d.e        => execute_q,

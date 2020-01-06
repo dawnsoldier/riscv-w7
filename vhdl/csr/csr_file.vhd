@@ -5,19 +5,24 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.std_logic_misc.all;
 
+use work.configure.all;
 use work.csr_constants.all;
 use work.csr_wire.all;
 use work.csr_functions.all;
 
 entity csr_file is
+	generic(
+		pmp_enable  : boolean := pmp_enable;
+		pmp_regions : integer := pmp_regions
+	);
 	port(
-		reset     : in  std_logic;
-		clock     : in  std_logic;
-		csr_ri    : in  csr_read_in_type;
-		csr_wi    : in  csr_write_in_type;
-		csr_o     : out csr_out_type;
-		csr_ei    : in  csr_exception_in_type;
-		csr_eo    : out csr_exception_out_type
+		reset  : in  std_logic;
+		clock  : in  std_logic;
+		csr_ri : in  csr_read_in_type;
+		csr_wi : in  csr_write_in_type;
+		csr_o  : out csr_out_type;
+		csr_ei : in  csr_exception_in_type;
+		csr_eo : out csr_exception_out_type
 	);
 end csr_file;
 
@@ -264,7 +269,28 @@ begin
 					priv_mode <= m_mode;
 					mcsr.mepc <= csr_ei.epc;
 					mcsr.mtval <= csr_ei.etval;
+					mcsr.mcause.irpt <= "0";
 					mcsr.mcause.code <= X"00000000000000" & "000" & csr_ei.ecause;
+					exc <= '1';
+				elsif csr_ei.time_irpt = '1' and mcsr.mstatus.mie = "1" and mcsr.mie.mtie = "1" then
+					mcsr.mstatus.mpie <= mcsr.mstatus.mie;
+					mcsr.mstatus.mpp <= priv_mode;
+					mcsr.mstatus.mie <= "0";
+					priv_mode <= m_mode;
+					mcsr.mepc <= csr_ei.epc;
+					mcsr.mtval <= X"0000000000000000";
+					mcsr.mcause.irpt <= "1";
+					mcsr.mcause.code <= X"00000000000000" & "000" & interrupt_mach_timer;
+					exc <= '1';
+				elsif csr_ei.ext_irpt = '1' and mcsr.mstatus.mie = "1" and mcsr.mie.meie = "1" then
+					mcsr.mstatus.mpie <= mcsr.mstatus.mie;
+					mcsr.mstatus.mpp <= priv_mode;
+					mcsr.mstatus.mie <= "0";
+					priv_mode <= m_mode;
+					mcsr.mepc <= csr_ei.epc;
+					mcsr.mtval <= X"0000000000000000";
+					mcsr.mcause.irpt <= "1";
+					mcsr.mcause.code <= X"00000000000000" & "000" & interrupt_mach_extern;
 					exc <= '1';
 				else
 					exc <= '0';

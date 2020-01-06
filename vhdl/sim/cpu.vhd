@@ -33,16 +33,18 @@ architecture behavior of cpu is
 
 	component pipeline
 		port(
-			reset    : in  std_logic;
-			clock    : in  std_logic;
-			imem_o   : in  mem_out_type;
-			imem_i   : out mem_in_type;
-			dmem_o   : in  mem_out_type;
-			dmem_i   : out mem_in_type;
-			ipmp_o   : in  pmp_out_type;
-			ipmp_i   : out pmp_in_type;
-			dpmp_o   : in  pmp_out_type;
-			dpmp_i   : out pmp_in_type
+			reset     : in  std_logic;
+			clock     : in  std_logic;
+			imem_o    : in  mem_out_type;
+			imem_i    : out mem_in_type;
+			dmem_o    : in  mem_out_type;
+			dmem_i    : out mem_in_type;
+			ipmp_o    : in  pmp_out_type;
+			ipmp_i    : out pmp_in_type;
+			dpmp_o    : in  pmp_out_type;
+			dpmp_i    : out pmp_in_type;
+			time_irpt : in  std_logic;
+			ext_irpt  : in  std_logic
 		);
 	end component;
 
@@ -59,7 +61,6 @@ architecture behavior of cpu is
 		port(
 			reset      : in  std_logic;
 			clock      : in  std_logic;
-			-- Memory Interface
 			bram_valid : in  std_logic;
 			bram_ready : out std_logic;
 			bram_instr : in  std_logic;
@@ -73,6 +74,7 @@ architecture behavior of cpu is
 	component time
 		port(
 			reset      : in  std_logic;
+			clock      : in  std_logic;
 			clock_rtc  : in  std_logic;
 			time_valid : in  std_logic;
 			time_instr : in  std_logic;
@@ -196,16 +198,18 @@ begin
 
 	pipeline_comp : pipeline
 		port map(
-			reset  => reset,
-			clock  => clock,
-			imem_o => imem_o,
-			imem_i => imem_i,
-			dmem_o => dmem_o,
-			dmem_i => dmem_i,
-			ipmp_o => ipmp_o,
-			ipmp_i => ipmp_i,
-			dpmp_o => dpmp_o,
-			dpmp_i => dpmp_i
+			reset     => reset,
+			clock     => clock,
+			imem_o    => imem_o,
+			imem_i    => imem_i,
+			dmem_o    => dmem_o,
+			dmem_i    => dmem_i,
+			ipmp_o    => ipmp_o,
+			ipmp_i    => ipmp_i,
+			dpmp_o    => dpmp_o,
+			dpmp_i    => dpmp_i,
+			time_irpt => time_mem_irpt,
+			ext_irpt  => '0'
 		);
 
 	ipmp_comp : pmp
@@ -240,6 +244,7 @@ begin
 	time_comp : time
 		port map(
 			reset      => reset,
+			clock      => clock,
 			clock_rtc  => clock_rtc,
 			time_valid => time_mem_valid,
 			time_instr => time_mem_instr,

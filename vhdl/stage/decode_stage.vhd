@@ -170,6 +170,12 @@ begin
 			v.valid := fp_dec_o.valid;
 		end if;
 
+		if csr_eo.fs = "00" then
+			v.fpu_wren := '0';
+			v.fpu_load := '0';
+			v.fpu_store := '0';
+		end if;
+
 		fpu_i.instr <= v.instr;
 		fpu_i.rden1 <= v.fpu_rden1;
 		fpu_i.rden2 <= v.fpu_rden2;

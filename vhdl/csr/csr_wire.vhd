@@ -49,21 +49,23 @@ package csr_wire is
 	end record;
 
 	type csr_exception_in_type is record
-		epc    : std_logic_vector(63 downto 0);
-		etval  : std_logic_vector(63 downto 0);
-		ecause : std_logic_vector(3 downto 0);
-		exc    : std_logic;
-		ecall  : std_logic;
-		ebreak : std_logic;
-		mret   : std_logic;
-		flags  : std_logic_vector(4 downto 0);
-		int_op : int_operation_type;
-		fpu_op : fp_operation_type;
-		int    : std_logic;
-		fpu    : std_logic;
-		csr    : std_logic;
-		load   : std_logic;
-		store  : std_logic;
+		epc       : std_logic_vector(63 downto 0);
+		etval     : std_logic_vector(63 downto 0);
+		ecause    : std_logic_vector(3 downto 0);
+		exc       : std_logic;
+		ecall     : std_logic;
+		ebreak    : std_logic;
+		mret      : std_logic;
+		flags     : std_logic_vector(4 downto 0);
+		int_op    : int_operation_type;
+		fpu_op    : fp_operation_type;
+		int       : std_logic;
+		fpu       : std_logic;
+		csr       : std_logic;
+		load      : std_logic;
+		store     : std_logic;
+		time_irpt : std_logic;
+		ext_irpt  : std_logic;
 	end record;
 
 	type csr_exception_out_type is record
@@ -135,10 +137,10 @@ package csr_wire is
 	constant init_csr_isa_reg : csr_isa_type := (
 		a   => "0",
 		b   => "0",
-		c   => "0",
-		d   => "0",
+		c   => "1",
+		d   => "1",
 		e   => "0",
-		f   => "0",
+		f   => "1",
 		g   => "0",
 		h   => "0",
 		i   => "1",
