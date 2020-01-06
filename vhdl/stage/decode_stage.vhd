@@ -244,6 +244,12 @@ begin
 			elsif v.ebreak = '1' then
 				v.exc := '1';
 				v.ecause := except_breakpoint;
+			elsif v.csr = '1' then
+				if unsigned(v.caddr(9 downto 8)) > unsigned(csr_eo.priv_mode) then
+					v.exc := '1';
+					v.etval := X"00000000" & v.instr;
+					v.ecause := except_illegal_instruction;
+				end if;
 			end if;
 		end if;
 
