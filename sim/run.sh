@@ -105,12 +105,16 @@ $ANALYS $DIR/vhdl/bus/wishbone/wishbone_master.vhd
 $SYNTAX $DIR/vhdl/bus/avalon/avalon_master.vhd
 $ANALYS $DIR/vhdl/bus/avalon/avalon_master.vhd
 
+$SYNTAX $DIR/vhdl/memory/fifo.vhd
+$ANALYS $DIR/vhdl/memory/fifo.vhd
 $SYNTAX $DIR/vhdl/memory/interconnect.vhd
 $ANALYS $DIR/vhdl/memory/interconnect.vhd
 $SYNTAX $DIR/vhdl/memory/pmp.vhd
 $ANALYS $DIR/vhdl/memory/pmp.vhd
 $SYNTAX $DIR/vhdl/memory/time.vhd
 $ANALYS $DIR/vhdl/memory/time.vhd
+$SYNTAX $DIR/vhdl/memory/uart.vhd
+$ANALYS $DIR/vhdl/memory/uart.vhd
 
 $SYNTAX $DIR/vhdl/speedup/prefetch.vhd
 $ANALYS $DIR/vhdl/speedup/prefetch.vhd

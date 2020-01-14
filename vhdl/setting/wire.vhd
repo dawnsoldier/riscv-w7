@@ -651,4 +651,15 @@ package wire is
 		mem_rdata : std_logic_vector(63 downto 0);
 	end record;
 
+	type fifo_in_type is record
+		we    : std_logic;
+		re    : std_logic;
+		wdata : std_logic_vector(7 downto 0);
+	end record;
+
+	type fifo_out_type is record
+		rdata : std_logic_vector(7 downto 0);
+		ready : std_logic;
+	end record;
+
 end package;
