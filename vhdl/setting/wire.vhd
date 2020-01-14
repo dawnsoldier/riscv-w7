@@ -128,6 +128,7 @@ package wire is
 		fpu             : std_logic;
 		csr             : std_logic;
 		comp            : std_logic;
+		csr_mode        : std_logic_vector(1 downto 0);
 		load_op         : load_operation_type;
 		store_op        : store_operation_type;
 		int_op          : int_operation_type;
@@ -187,6 +188,7 @@ package wire is
 		fpu             => '0',
 		csr             => '0',
 		comp            => '0',
+		csr_mode        => (others => '0'),
 		load_op         => init_load_operation,
 		store_op        => init_store_operation,
 		int_op          => init_int_operation,

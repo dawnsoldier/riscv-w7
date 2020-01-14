@@ -94,6 +94,8 @@ begin
 		v.waddr := v.instr(11 downto 7);
 		v.caddr := v.instr(31 downto 20);
 
+		v.csr_mode := v.instr(29 downto 28);
+
 		int_decode_i.instr <= v.instr;
 
 		v.imm := int_decode_o.imm;
@@ -245,7 +247,7 @@ begin
 				v.exc := '1';
 				v.ecause := except_breakpoint;
 			elsif v.csr = '1' then
-				if unsigned(v.caddr(9 downto 8)) > unsigned(csr_eo.priv_mode) then
+				if unsigned(v.csr_mode) > unsigned(csr_eo.priv_mode) then
 					v.exc := '1';
 					v.etval := X"00000000" & v.instr;
 					v.ecause := except_illegal_instruction;
