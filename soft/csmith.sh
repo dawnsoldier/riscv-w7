@@ -35,10 +35,21 @@ mkdir ${BASEDIR}/build/csmith/mif
 mkdir ${BASEDIR}/build/csmith/hex
 mkdir ${BASEDIR}/build/csmith/checksum
 
-make -f ${BASEDIR}/soft/src/csmith/Makefile || exit
+RED='\033[0;31m'
+NC='\033[0m'
+
+make -f ${BASEDIR}/soft/src/csmith/Makefile > /tmp/csmith 2>&1
+if [ "$?" -ne 0 ]; then
+  echo -e "${RED}Build failed.Please run again!${NC}"
+  exit 0
+fi
 
 chmod +x ${BASEDIR}/soft/src/csmith/csmith.o
-${BASEDIR}/soft/src/csmith/csmith.o >> ${BASEDIR}/build/csmith/checksum/csmith.checksum
+timeout 10 ${BASEDIR}/soft/src/csmith/csmith.o >> ${BASEDIR}/build/csmith/checksum/csmith.checksum
+if [ "$?" -ne 0 ]; then
+  echo -e "${RED}Timeout.Please run again!${NC}"
+  exit 0
+fi
 
 shopt -s nullglob
 for filename in ${BASEDIR}/build/csmith/elf/*.elf; do
