@@ -3,6 +3,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use ieee.std_logic_misc.all;
 
 use work.configure.all;
 use work.wire.all;
@@ -104,13 +105,13 @@ begin
 	bram_mem_wdata <= bram_wdata;
 	bram_mem_wstrb <= bram_wstrb;
 
-	time_mem_valid <= dmem_valid;
+	time_mem_valid <= dmem_valid when nor_reduce(dmem_addr xor time_base_addr) = '1' else '0';
 	time_mem_instr <= dmem_instr;
 	time_mem_addr  <= dmem_addr xor time_base_addr;
 	time_mem_wdata <= dmem_wdata;
 	time_mem_wstrb <= dmem_wstrb;
 
-	bus_mem_valid <= dmem_valid;
+	bus_mem_valid <= dmem_valid when nor_reduce(dmem_addr xor bus_base_addr) = '1' else '0';
 	bus_mem_instr <= dmem_instr;
 	bus_mem_addr  <= dmem_addr xor bus_base_addr;
 	bus_mem_wdata <= dmem_wdata;

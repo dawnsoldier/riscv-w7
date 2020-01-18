@@ -105,6 +105,9 @@ $ANALYS $DIR/vhdl/bus/wishbone/wishbone_master.vhd
 $SYNTAX $DIR/vhdl/bus/avalon/avalon_master.vhd
 $ANALYS $DIR/vhdl/bus/avalon/avalon_master.vhd
 
+$SYNTAX $DIR/vhdl/bus/axi/axi_master.vhd
+$ANALYS $DIR/vhdl/bus/axi/axi_master.vhd
+
 $SYNTAX $DIR/vhdl/memory/fifo.vhd
 $ANALYS $DIR/vhdl/memory/fifo.vhd
 $SYNTAX $DIR/vhdl/memory/interconnect.vhd

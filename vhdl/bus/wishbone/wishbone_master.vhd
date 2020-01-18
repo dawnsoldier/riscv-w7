@@ -35,34 +35,36 @@ end wishbone_master;
 
 architecture behavior of wishbone_master is
 
-	type bus_state_type is (idle, active, busy);
+	type bus_state_type is (idle, busy, complete);
 
 	type reg_type is record
-		bus_state        : bus_state_type;
-		bus_valid        : std_logic;
-		bus_instr        : std_logic;
-		bus_addr         : std_logic_vector(63 downto 0);
-		bus_wdata        : std_logic_vector(63 downto 0);
-		bus_wstrb        : std_logic_vector(7 downto 0);
+		bus_state : bus_state_type;
+		bus_valid : std_logic;
+		bus_instr : std_logic;
+		bus_addr  : std_logic_vector(63 downto 0);
+		bus_wdata : std_logic_vector(63 downto 0);
+		bus_wstrb : std_logic_vector(7 downto 0);
+		bus_we    : std_logic;
 	end record;
 
 	constant init_reg : reg_type := (
 		bus_state => idle,
 		bus_valid => '0',
 		bus_instr => '0',
-		bus_addr => (others => '0'),
+		bus_addr  => (others => '0'),
 		bus_wdata => (others => '0'),
-		bus_wstrb => (others => '0')
+		bus_wstrb => (others => '0'),
+		bus_we    => '0'
 	);
 
-	signal r, rin     : reg_type := init_reg;
+	signal r, rin : reg_type := init_reg;
 
 begin
 
 	process(wbm_dat_i,wbm_ack_i,wbm_stall_i,wbm_err_i,wbm_rty_i,
 					bus_valid,bus_instr,bus_addr,bus_wdata,bus_wstrb)
 
-		variable v       : reg_type;
+		variable v : reg_type;
 
 	begin
 
@@ -71,62 +73,65 @@ begin
 		case r.bus_state is
 			when idle =>
 				if bus_valid = '1' then
-					v.bus_state := active;
-				end if;
-			when active =>
-				if wbm_ack_i = '0' then
-					v.bus_state := busy;
+					v.bus_state := complete;
 				end if;
 			when busy =>
-				if wbm_ack_i = '1' then
-					if bus_valid = '1' then
-						v.bus_state := active;
-					elsif bus_valid = '0' then
-						v.bus_state := idle;
-					end if;
+				if wbm_stall_i = '0' then
+					v.bus_state := complete;
+				end if;
+			when complete =>
+				if wbm_stall_i = '1' then
+					v.bus_state := busy;
+				else
+					v.bus_state := idle;
 				end if;
 		end case;
 
-		v.bus_valid := bus_valid;
-		v.bus_instr := bus_instr;
-		v.bus_addr := bus_addr;
-		v.bus_wdata := bus_wdata;
-		v.bus_wstrb := bus_wstrb;
-
 		case r.bus_state is
 			when idle =>
-				wbm_adr_o <= bus_addr;
-				wbm_sel_o <= bus_wstrb;
-				wbm_dat_o <= bus_wdata;
-				wbm_cyc_o <= bus_valid;
-				wbm_stb_o <= bus_valid;
-				wbm_we_o <= bus_valid and or_reduce(bus_wstrb);
 				----------------------------------------------------
-				bus_rdata <= wbm_dat_i;
-				bus_ready <= wbm_ack_i;
-			when active =>
 				v.bus_valid := bus_valid;
 				v.bus_instr := bus_instr;
 				v.bus_addr := bus_addr;
-				v.bus_wstrb := bus_wstrb;
 				v.bus_wdata := bus_wdata;
+				v.bus_wstrb := bus_wstrb;
+				v.bus_we := bus_valid and or_reduce(bus_wstrb);
 				----------------------------------------------------
 				wbm_adr_o <= v.bus_addr;
 				wbm_sel_o <= v.bus_wstrb;
 				wbm_dat_o <= v.bus_wdata;
 				wbm_cyc_o <= v.bus_valid;
 				wbm_stb_o <= v.bus_valid;
-				wbm_we_o <= v.bus_valid and or_reduce(v.bus_wstrb);
+				wbm_we_o <= v.bus_we;
 				----------------------------------------------------
-				bus_rdata <= wbm_dat_i;
-				bus_ready <= wbm_ack_i;
+				bus_rdata <= (others => '0');
+				bus_ready <= '0';
 			when busy =>
+				----------------------------------------------------
 				wbm_adr_o <= r.bus_addr;
 				wbm_sel_o <= r.bus_wstrb;
 				wbm_dat_o <= r.bus_wdata;
 				wbm_cyc_o <= r.bus_valid;
 				wbm_stb_o <= r.bus_valid;
-				wbm_we_o <= r.bus_valid and or_reduce(r.bus_wstrb);
+				wbm_we_o <= r.bus_we;
+				----------------------------------------------------
+				bus_rdata <= (others => '0');
+				bus_ready <= '0';
+			when complete =>
+				----------------------------------------------------
+				v.bus_valid := bus_valid;
+				v.bus_instr := bus_instr;
+				v.bus_addr := bus_addr;
+				v.bus_wdata := bus_wdata;
+				v.bus_wstrb := bus_wstrb;
+				v.bus_we := bus_valid and or_reduce(bus_wstrb);
+				----------------------------------------------------
+				wbm_adr_o <= v.bus_addr;
+				wbm_sel_o <= v.bus_wstrb;
+				wbm_dat_o <= v.bus_wdata;
+				wbm_cyc_o <= v.bus_valid;
+				wbm_stb_o <= v.bus_valid;
+				wbm_we_o <= v.bus_we;
 				----------------------------------------------------
 				bus_rdata <= wbm_dat_i;
 				bus_ready <= wbm_ack_i;
