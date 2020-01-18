@@ -15,14 +15,14 @@ use work.fp_wire.all;
 
 entity memory_stage is
 	port(
-		reset      : in  std_logic;
-		clock      : in  std_logic;
-		csr_eo     : in  csr_exception_out_type;
-		fpu_o      : in  fpu_out_type;
-		fpu_i      : out fpu_in_type;
-		dmem_o     : in  mem_out_type;
-		d          : in  memory_in_type;
-		q          : out memory_out_type
+		reset  : in  std_logic;
+		clock  : in  std_logic;
+		csr_eo : in  csr_exception_out_type;
+		fpu_o  : in  fpu_out_type;
+		fpu_i  : out fpu_in_type;
+		dmem_o : in  mem_out_type;
+		d      : in  memory_in_type;
+		q      : out memory_out_type
 	);
 end memory_stage;
 
@@ -76,7 +76,7 @@ begin
 
 		v.stall := '0';
 
-		v.clear := csr_eo.exc or csr_eo.mret or d.w.clear;
+		v.clear := d.w.clear;
 
 		if (v.load or v.fpu_load) = '1' then
 			v.wdata := load_data(dmem_o.mem_rdata, v.byteenable, v.load_op);

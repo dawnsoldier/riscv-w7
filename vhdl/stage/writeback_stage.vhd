@@ -20,8 +20,6 @@ entity writeback_stage is
 		csr_wi     : out csr_write_in_type;
 		csr_ei     : out csr_exception_in_type;
 		csr_eo     : in  csr_exception_out_type;
-		time_irpt  : in  std_logic;
-		ext_irpt   : in  std_logic;
 		d          : in  writeback_in_type;
 		q          : out writeback_out_type
 	);
@@ -34,7 +32,7 @@ architecture behavior of writeback_stage is
 
 begin
 
-	combinational : process(d, r, csr_eo, time_irpt, ext_irpt)
+	combinational : process(d, r, csr_eo)
 
 		variable v : writeback_reg_type;
 
@@ -76,7 +74,7 @@ begin
 
 		v.stall := '0';
 
-		v.clear := csr_eo.exc or csr_eo.mret or d.w.clear;
+		v.clear := d.w.clear;
 
 		if (v.stall or v.clear) = '1' then
 			v.int_wren := '0';
@@ -103,7 +101,6 @@ begin
 		csr_wi.waddr <= v.caddr;
 		csr_wi.wdata <= v.cdata;
 
-		csr_ei.epc <= v.pc;
 		csr_ei.load <= v.load;
 		csr_ei.store <= v.store;
 		csr_ei.int <= v.int;
@@ -111,15 +108,7 @@ begin
 		csr_ei.csr <= v.csr;
 		csr_ei.int_op <= v.int_op;
 		csr_ei.fpu_op <= v.fpu_op;
-		csr_ei.exc <= v.exc;
-		csr_ei.etval <= v.etval;
-		csr_ei.ecause <= v.ecause;
-		csr_ei.ecall <= v.ecall;
-		csr_ei.ebreak <= v.ebreak;
-		csr_ei.mret <= v.mret;
 		csr_ei.flags <= v.flags;
-		csr_ei.time_irpt <= time_irpt;
-		csr_ei.ext_irpt <= ext_irpt;
 
 		rin <= v;
 

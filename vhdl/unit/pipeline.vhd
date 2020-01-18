@@ -81,6 +81,7 @@ architecture behavior of pipeline is
 			int_for_o      : in  int_forward_out_type;
 			int_reg_o      : in  int_register_out_type;
 			csr_ri         : out csr_read_in_type;
+			csr_ei         : out csr_exception_in_type;
 			csr_o          : in  csr_out_type;
 			int_pipeline_i : out int_pipeline_in_type;
 			int_pipeline_o : in  int_pipeline_out_type;
@@ -92,6 +93,8 @@ architecture behavior of pipeline is
 			dmem_i         : out mem_in_type;
 			dpmp_o         : in  pmp_out_type;
 			dpmp_i         : out pmp_in_type;
+			time_irpt      : in  std_logic;
+			ext_irpt       : in  std_logic;
 			d              : in  execute_in_type;
 			q              : out execute_out_type
 		);
@@ -99,14 +102,14 @@ architecture behavior of pipeline is
 
 	component memory_stage
 		port(
-			reset      : in  std_logic;
-			clock      : in  std_logic;
-			csr_eo     : in  csr_exception_out_type;
-			fpu_o      : in  fpu_out_type;
-			fpu_i      : out fpu_in_type;
-			dmem_o     : in  mem_out_type;
-			d          : in  memory_in_type;
-			q          : out memory_out_type
+			reset  : in  std_logic;
+			clock  : in  std_logic;
+			csr_eo : in  csr_exception_out_type;
+			fpu_o  : in  fpu_out_type;
+			fpu_i  : out fpu_in_type;
+			dmem_o : in  mem_out_type;
+			d      : in  memory_in_type;
+			q      : out memory_out_type
 		);
 	end component;
 
@@ -118,8 +121,6 @@ architecture behavior of pipeline is
 			csr_wi     : out csr_write_in_type;
 			csr_ei     : out csr_exception_in_type;
 			csr_eo     : in  csr_exception_out_type;
-			time_irpt  : in  std_logic;
-			ext_irpt   : in  std_logic;
 			d          : in  writeback_in_type;
 			q          : out writeback_out_type
 		);
@@ -261,6 +262,7 @@ begin
 			int_for_o      => int_unit_o.int_for_o,
 			int_reg_o      => int_unit_o.int_reg_o,
 			csr_ri         => csr_unit_i.csr_ri,
+			csr_ei         => csr_unit_i.csr_ei,
 			csr_o          => csr_unit_o.csr_o,
 			int_pipeline_i => int_unit_i.int_pipeline_i,
 			int_pipeline_o => int_unit_o.int_pipeline_o,
@@ -272,6 +274,8 @@ begin
 			dmem_i         => dmem_i,
 			dpmp_o         => dpmp_o,
 			dpmp_i         => dpmp_i,
+			time_irpt      => time_irpt,
+			ext_irpt       => ext_irpt,
 			d.f            => fetch_q,
 			d.d            => decode_q,
 			d.e            => execute_q,
@@ -282,18 +286,18 @@ begin
 
 	memory_stage_comp : memory_stage
 		port map(
-			reset      => reset,
-			clock      => clock,
-			csr_eo     => csr_unit_o.csr_eo,
-			fpu_o      => fpu_o,
-			fpu_i      => fpu_i,
-			dmem_o     => dmem_o,
-			d.f        => fetch_q,
-			d.d        => decode_q,
-			d.e        => execute_q,
-			d.m        => memory_q,
-			d.w        => writeback_q,
-			q          => memory_q
+			reset  => reset,
+			clock  => clock,
+			csr_eo => csr_unit_o.csr_eo,
+			fpu_o  => fpu_o,
+			fpu_i  => fpu_i,
+			dmem_o => dmem_o,
+			d.f    => fetch_q,
+			d.d    => decode_q,
+			d.e    => execute_q,
+			d.m    => memory_q,
+			d.w    => writeback_q,
+			q      => memory_q
 		);
 
 	writeback_stage_comp : writeback_stage
@@ -304,8 +308,6 @@ begin
 			csr_wi     => csr_unit_i.csr_wi,
 			csr_ei     => csr_unit_i.csr_ei,
 			csr_eo     => csr_unit_o.csr_eo,
-			time_irpt  => time_irpt,
-			ext_irpt   => ext_irpt,
 			d.f        => fetch_q,
 			d.d        => decode_q,
 			d.e        => execute_q,

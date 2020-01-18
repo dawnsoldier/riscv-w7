@@ -22,6 +22,7 @@ entity execute_stage is
 		int_for_o      : in  int_forward_out_type;
 		int_reg_o      : in  int_register_out_type;
 		csr_ri         : out csr_read_in_type;
+		csr_ei         : out csr_exception_in_type;
 		csr_o          : in  csr_out_type;
 		int_pipeline_i : out int_pipeline_in_type;
 		int_pipeline_o : in  int_pipeline_out_type;
@@ -33,6 +34,8 @@ entity execute_stage is
 		dmem_i         : out mem_in_type;
 		dpmp_o         : in  pmp_out_type;
 		dpmp_i         : out pmp_in_type;
+		time_irpt      : in  std_logic;
+		ext_irpt       : in  std_logic;
 		d              : in  execute_in_type;
 		q              : out execute_out_type
 	);
@@ -45,7 +48,7 @@ architecture behavior of execute_stage is
 
 begin
 
-	combinational : process(d, r, int_for_o, int_reg_o, csr_o, csr_eo, int_pipeline_o, csr_alu_o, fpu_o, dpmp_o)
+	combinational : process(d, r, int_for_o, int_reg_o, csr_o, csr_eo, int_pipeline_o, csr_alu_o, fpu_o, dpmp_o, time_irpt, ext_irpt)
 
 		variable v : execute_reg_type;
 
@@ -123,7 +126,7 @@ begin
 
 		v.stall := '0';
 
-		v.clear := csr_eo.exc or csr_eo.mret or d.e.jump or d.w.clear;
+		v.clear := csr_eo.exc or csr_eo.mret or time_irpt or ext_irpt or d.e.jump or d.w.clear;
 
 		v.enable := not(d.e.stall or d.m.stall or d.w.stall);
 
@@ -263,6 +266,17 @@ begin
 		dmem_i.mem_addr <= v.address;
 		dmem_i.mem_wdata <= store_data(v.sdata, v.store_op);
 		dmem_i.mem_wstrb <= v.strobe;
+
+		csr_ei.epc <= v.pc;
+		csr_ei.exc <= v.exc;
+		csr_ei.etval <= v.etval;
+		csr_ei.ecause <= v.ecause;
+		csr_ei.ecall <= v.ecall;
+		csr_ei.ebreak <= v.ebreak;
+		csr_ei.mret <= v.mret;
+
+		csr_ei.time_irpt <= time_irpt;
+		csr_ei.ext_irpt <= ext_irpt;
 
 		rin <= v;
 

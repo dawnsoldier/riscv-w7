@@ -273,6 +273,8 @@ begin
 					mcsr.mcause.code <= X"00000000000000" & "000" & csr_ei.ecause;
 					exc <= '1';
 				elsif csr_ei.time_irpt = '1' and mcsr.mstatus.mie = "1" and mcsr.mie.mtie = "1" then
+					mcsr.mip.mtip <= mcsr.mie.mtie;
+					mcsr.mie.mtie <= "0";
 					mcsr.mstatus.mpie <= mcsr.mstatus.mie;
 					mcsr.mstatus.mpp <= priv_mode;
 					mcsr.mstatus.mie <= "0";
@@ -283,6 +285,8 @@ begin
 					mcsr.mcause.code <= X"00000000000000" & "000" & interrupt_mach_timer;
 					exc <= '1';
 				elsif csr_ei.ext_irpt = '1' and mcsr.mstatus.mie = "1" and mcsr.mie.meie = "1" then
+					mcsr.mip.meip <= mcsr.mie.meie;
+					mcsr.mie.meie <= "0";
 					mcsr.mstatus.mpie <= mcsr.mstatus.mie;
 					mcsr.mstatus.mpp <= priv_mode;
 					mcsr.mstatus.mie <= "0";
@@ -298,8 +302,12 @@ begin
 
 				if csr_ei.mret = '1' then
 					priv_mode <= mcsr.mstatus.mpp;
+					mcsr.mie.mtie <= mcsr.mip.mtip;
+					mcsr.mip.mtip <= "0";
+					mcsr.mie.meie <= mcsr.mip.meip;
+					mcsr.mip.meip <= "0";
 					mcsr.mstatus.mie <= mcsr.mstatus.mpie;
-					mcsr.mstatus.mpie <= "1";
+					mcsr.mstatus.mpie <= "0";
 					mcsr.mstatus.mpp <= u_mode;
 					mret <= '1';
 				else

@@ -151,33 +151,6 @@ begin
 
 				mtime <= mtime + 1;
 
-				if rin.mtime_we = '1' then
-					if time_wstrb(0) = '1' then
-						mtime(7 downto 0) <= unsigned(time_wdata(7 downto 0));
-					end if;
-					if time_wstrb(1) = '1' then
-						mtime(15 downto 8) <= unsigned(time_wdata(15 downto 8));
-					end if;
-					if time_wstrb(2) = '1' then
-						mtime(23 downto 16) <= unsigned(time_wdata(23 downto 16));
-					end if;
-					if time_wstrb(3) = '1' then
-						mtime(31 downto 24) <= unsigned(time_wdata(31 downto 24));
-					end if;
-					if time_wstrb(4) = '1' then
-						mtime(39 downto 32) <= unsigned(time_wdata(39 downto 32));
-					end if;
-					if time_wstrb(5) = '1' then
-						mtime(47 downto 40) <= unsigned(time_wdata(47 downto 40));
-					end if;
-					if time_wstrb(6) = '1' then
-						mtime(55 downto 48) <= unsigned(time_wdata(55 downto 48));
-					end if;
-					if time_wstrb(7) = '1' then
-						mtime(63 downto 56) <= unsigned(time_wdata(63 downto 56));
-					end if;
-				end if;
-
 			end if;
 
 		end if;
