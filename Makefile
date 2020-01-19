@@ -16,7 +16,7 @@ CYCLES ?= 10000000
 WAVE ?= "" # "wave" for saving dump file
 
 generate_isa:
-	soft/isa.sh ${RISCV} ${PYTHON} ${OFFSET} ${BASEDIR}
+	soft/isa.sh ${RISCV} ${MARCH} ${MABI} ${PYTHON} ${OFFSET} ${BASEDIR}
 
 generate_dhrystone:
 	soft/dhrystone.sh ${RISCV} ${MARCH} ${MABI} ${ITER} ${PYTHON} ${OFFSET} ${BASEDIR}

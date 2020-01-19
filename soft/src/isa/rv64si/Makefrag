@@ -5,6 +5,7 @@
 rv64si_test = \
 	csr \
 	dirty \
+	icache-alias \
 	ma_fetch \
 	scall \
 	wfi \

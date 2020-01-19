@@ -49,8 +49,8 @@ if __name__ == '__main__':
 
     lines = len(content)
 
-    output.writelines("DEPTH = 2048;\n")
-    output.writelines("WIDTH = 32;\n")
+    output.writelines("DEPTH = {:d};\n".format(offset/8))
+    output.writelines("WIDTH = 64;\n")
     output.writelines("ADDRESS_RADIX = HEX;\n")
     output.writelines("string_RADIX = HEX;\n")
     output.writelines("CONTENT;\n")

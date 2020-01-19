@@ -1,9 +1,11 @@
 #!/bin/bash
 
 export RISCV=$1
-export PYTHON=$2
-export OFFSET=$3
-export BASEDIR=$4
+export MARCH=$2
+export MABI=$3
+export PYTHON=$4
+export OFFSET=$5
+export BASEDIR=$6
 
 ELF2COE=$BASEDIR/soft/py/elf2coe.py
 ELF2DAT=$BASEDIR/soft/py/elf2dat.py
