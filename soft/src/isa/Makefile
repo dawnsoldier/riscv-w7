@@ -10,12 +10,12 @@ include $(src_dir)/rv64uf/Makefrag
 include $(src_dir)/rv64ud/Makefrag
 include $(src_dir)/rv64mi/Makefrag
 
-RISCV_GCC ?= /opt/riscv/bin/riscv64-unknown-elf-gcc
+RISCV_GCC ?= $(RISCV)/riscv64-unknown-elf-gcc
 RISCV_GCC_OPTS ?= -march=$(MARCH) -mabi=$(MABI) -static -mcmodel=medany -fvisibility=hidden -nostdlib -nostartfiles
 RISCV_INCL ?= -I $(src_dir)/../env -I $(src_dir)/../common -I $(src_dir)/macros/scalar
 RISCV_LINK_OPTS ?= -T $(src_dir)/../env/link.ld
-RISCV_OBJDUMP ?= /opt/riscv/bin/riscv64-unknown-elf-objdump -Mnumeric,no-aliases --disassemble-all --disassemble-zeroes
-RISCV_OBJCOPY ?= /opt/riscv/bin/riscv64-unknown-elf-objcopy -O binary
+RISCV_OBJDUMP ?= $(RISCV)/riscv64-unknown-elf-objdump -Mnumeric,no-aliases --disassemble-all --disassemble-zeroes
+RISCV_OBJCOPY ?= $(RISCV)/riscv64-unknown-elf-objcopy -O binary
 
 vpath %.S $(src_dir)
 

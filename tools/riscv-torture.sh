@@ -21,7 +21,7 @@ fi
 
 cd riscv-torture
 
-git checkout .
+git checkout 59b0f0f
 
 patch -p1 < ../riscv-torture.diff
 
