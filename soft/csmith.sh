@@ -45,7 +45,7 @@ if [ "$?" -ne 0 ]; then
 fi
 
 chmod +x ${BASEDIR}/soft/src/csmith/csmith.o
-timeout 10 ${BASEDIR}/soft/src/csmith/csmith.o >> ${BASEDIR}/build/csmith/checksum/csmith.checksum
+timeout 10 ${BASEDIR}/soft/src/csmith/csmith.o | tee ${BASEDIR}/build/csmith/checksum/csmith.checksum
 if [ "$?" -ne 0 ]; then
   echo -e "${RED}Timeout.Please run again!${NC}"
   exit 0

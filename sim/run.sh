@@ -37,6 +37,8 @@ fi
 
 cd $DIR/sim/work
 
+start=`date +%s`
+
 $SYNTAX $DIR/vhdl/sim/configure.vhd
 $ANALYS $DIR/vhdl/sim/configure.vhd
 
@@ -99,25 +101,10 @@ $ANALYS $DIR/vhdl/setting/wire.vhd
 $SYNTAX $DIR/vhdl/setting/functions.vhd
 $ANALYS $DIR/vhdl/setting/functions.vhd
 
-$SYNTAX $DIR/vhdl/bus/wishbone/wishbone_master.vhd
-$ANALYS $DIR/vhdl/bus/wishbone/wishbone_master.vhd
-
-$SYNTAX $DIR/vhdl/bus/avalon/avalon_master.vhd
-$ANALYS $DIR/vhdl/bus/avalon/avalon_master.vhd
-
-$SYNTAX $DIR/vhdl/bus/axi/axi_master.vhd
-$ANALYS $DIR/vhdl/bus/axi/axi_master.vhd
-
-$SYNTAX $DIR/vhdl/memory/fifo.vhd
-$ANALYS $DIR/vhdl/memory/fifo.vhd
-$SYNTAX $DIR/vhdl/memory/interconnect.vhd
-$ANALYS $DIR/vhdl/memory/interconnect.vhd
+$SYNTAX $DIR/vhdl/memory/arbiter.vhd
+$ANALYS $DIR/vhdl/memory/arbiter.vhd
 $SYNTAX $DIR/vhdl/memory/pmp.vhd
 $ANALYS $DIR/vhdl/memory/pmp.vhd
-$SYNTAX $DIR/vhdl/memory/time.vhd
-$ANALYS $DIR/vhdl/memory/time.vhd
-$SYNTAX $DIR/vhdl/memory/uart.vhd
-$ANALYS $DIR/vhdl/memory/uart.vhd
 
 $SYNTAX $DIR/vhdl/speedup/prefetch.vhd
 $ANALYS $DIR/vhdl/speedup/prefetch.vhd
@@ -347,3 +334,5 @@ else
   echo "${filename}"
   $SIMULA test_cpu --ieee-asserts=disable-at-0 --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
 fi
+end=`date +%s`
+echo Execution time was `expr $end - $start` seconds.

@@ -11,21 +11,7 @@ use work.wire.all;
 entity cpu is
 	port(
 		reset       : in  std_logic;
-		clock       : in  std_logic;
-		clock_rtc   : in  std_logic;
-		-- Wishbone Master Interface
-		wbm_dat_i   : in  std_logic_vector(63 downto 0);
-		wbm_dat_o   : out std_logic_vector(63 downto 0);
-		wbm_ack_i   : in  std_logic;
-		wbm_adr_o   : out std_logic_vector(63 downto 0);
-		wbm_cyc_o   : out std_logic;
-		wbm_stall_i : in  std_logic;
-		wbm_err_i   : in  std_logic;
-		wbm_lock_o  : out std_logic;
-		wbm_rty_i   : in  std_logic;
-		wbm_sel_o   : out std_logic_vector(7 downto 0);
-		wbm_stb_o   : out std_logic;
-		wbm_we_o    : out std_logic
+		clock       : in  std_logic
 	);
 end entity cpu;
 
@@ -57,6 +43,24 @@ architecture behavior of cpu is
 		);
 	end component;
 
+	component arbiter
+		port(
+			reset        : in  std_logic;
+			clock        : in  std_logic;
+			imem_i       : in  mem_in_type;
+			imem_o       : out mem_out_type;
+			dmem_i       : in  mem_in_type;
+			dmem_o       : out mem_out_type;
+			memory_valid : out std_logic;
+			memory_ready : in  std_logic;
+			memory_instr : out std_logic;
+			memory_addr  : out std_logic_vector(63 downto 0);
+			memory_wdata : out std_logic_vector(63 downto 0);
+			memory_wstrb : out std_logic_vector(7 downto 0);
+			memory_rdata : in  std_logic_vector(63 downto 0)
+		);
+	end component;
+
 	component bram_mem
 		port(
 			reset      : in  std_logic;
@@ -71,84 +75,6 @@ architecture behavior of cpu is
 		);
 	end component;
 
-	component time
-		port(
-			reset      : in  std_logic;
-			clock      : in  std_logic;
-			clock_rtc  : in  std_logic;
-			time_valid : in  std_logic;
-			time_instr : in  std_logic;
-			time_ready : out std_logic;
-			time_addr  : in  std_logic_vector(63 downto 0);
-			time_wdata : in  std_logic_vector(63 downto 0);
-			time_wstrb : in  std_logic_vector(7 downto 0);
-			time_rdata : out std_logic_vector(63 downto 0);
-			time_irpt  : out std_logic
-		);
-	end component;
-
-	component interconnect
-		port(
-			reset           : in  std_logic;
-			clock           : in  std_logic;
-			-- MEMORY
-			imem_i          : in  mem_in_type;
-			imem_o          : out mem_out_type;
-			dmem_i          : in  mem_in_type;
-			dmem_o          : out mem_out_type;
-			-- BRAM
-			bram_mem_valid  : out std_logic;
-			bram_mem_ready  : in  std_logic;
-			bram_mem_instr  : out std_logic;
-			bram_mem_addr   : out std_logic_vector(63 downto 0);
-			bram_mem_wdata  : out std_logic_vector(63 downto 0);
-			bram_mem_wstrb  : out std_logic_vector(7 downto 0);
-			bram_mem_rdata  : in  std_logic_vector(63 downto 0);
-			-- TIMER
-			time_mem_valid  : out std_logic;
-			time_mem_instr  : out std_logic;
-			time_mem_ready  : in  std_logic;
-			time_mem_addr   : out std_logic_vector(63 downto 0);
-			time_mem_wdata  : out std_logic_vector(63 downto 0);
-			time_mem_wstrb  : out std_logic_vector(7 downto 0);
-			time_mem_rdata  : in  std_logic_vector(63 downto 0);
-			-- BUS
-			bus_mem_valid   : out std_logic;
-			bus_mem_ready   : in  std_logic;
-			bus_mem_instr   : out std_logic;
-			bus_mem_addr    : out std_logic_vector(63 downto 0);
-			bus_mem_wdata   : out std_logic_vector(63 downto 0);
-			bus_mem_wstrb   : out std_logic_vector(7 downto 0);
-			bus_mem_rdata   : in  std_logic_vector(63 downto 0)
-		);
-	end component;
-
-	component wishbone_master
-		port(
-			reset       : in  std_logic;
-			clock       : in  std_logic;
-			wbm_dat_i   : in  std_logic_vector(63 downto 0);
-			wbm_dat_o   : out std_logic_vector(63 downto 0);
-			wbm_ack_i   : in  std_logic;
-			wbm_adr_o   : out std_logic_vector(63 downto 0);
-			wbm_cyc_o   : out std_logic;
-			wbm_stall_i : in  std_logic;
-			wbm_err_i   : in  std_logic;
-			wbm_lock_o  : out std_logic;
-			wbm_rty_i   : in  std_logic;
-			wbm_sel_o   : out std_logic_vector(7 downto 0);
-			wbm_stb_o   : out std_logic;
-			wbm_we_o    : out std_logic;
-			bus_valid   : in  std_logic;
-			bus_ready   : out std_logic;
-			bus_instr   : in  std_logic;
-			bus_addr    : in  std_logic_vector(63 downto 0);
-			bus_wdata   : in  std_logic_vector(63 downto 0);
-			bus_wstrb   : in  std_logic_vector(7 downto 0);
-			bus_rdata   : out std_logic_vector(63 downto 0)
-		);
-	end component;
-
 	signal imem_i : mem_in_type;
 	signal imem_o : mem_out_type;
 
@@ -160,39 +86,13 @@ architecture behavior of cpu is
 	signal dpmp_i : pmp_in_type;
 	signal dpmp_o : pmp_out_type;
 
-	signal mem_valid : std_logic;
-	signal mem_ready : std_logic;
-	signal mem_instr : std_logic;
-	signal mem_addr  : std_logic_vector(63 downto 0);
-	signal mem_wdata : std_logic_vector(63 downto 0);
-	signal mem_wstrb : std_logic_vector(7 downto 0);
-	signal mem_rdata : std_logic_vector(63 downto 0);
-
-	signal bram_mem_valid : std_logic;
-	signal bram_mem_ready : std_logic;
-	signal bram_mem_instr : std_logic;
-	signal bram_mem_addr  : std_logic_vector(63 downto 0);
-	signal bram_mem_wdata : std_logic_vector(63 downto 0);
-	signal bram_mem_wstrb : std_logic_vector(7 downto 0);
-	signal bram_mem_rdata : std_logic_vector(63 downto 0);
-
-	signal time_mem_valid : std_logic;
-	signal time_mem_instr : std_logic;
-	signal time_mem_ready : std_logic;
-	signal time_mem_addr  : std_logic_vector(63 downto 0);
-	signal time_mem_wdata : std_logic_vector(63 downto 0);
-	signal time_mem_wstrb : std_logic_vector(7 downto 0);
-	signal time_mem_rdata : std_logic_vector(63 downto 0);
-
-	signal time_mem_irpt  : std_logic;
-
-	signal bus_mem_valid : std_logic;
-	signal bus_mem_ready : std_logic;
-	signal bus_mem_instr : std_logic;
-	signal bus_mem_addr  : std_logic_vector(63 downto 0);
-	signal bus_mem_wdata : std_logic_vector(63 downto 0);
-	signal bus_mem_wstrb : std_logic_vector(7 downto 0);
-	signal bus_mem_rdata : std_logic_vector(63 downto 0);
+	signal memory_valid : std_logic;
+	signal memory_ready : std_logic;
+	signal memory_instr : std_logic;
+	signal memory_addr  : std_logic_vector(63 downto 0);
+	signal memory_wdata : std_logic_vector(63 downto 0);
+	signal memory_wstrb : std_logic_vector(7 downto 0);
+	signal memory_rdata : std_logic_vector(63 downto 0);
 
 begin
 
@@ -208,7 +108,7 @@ begin
 			ipmp_i    => ipmp_i,
 			dpmp_o    => dpmp_o,
 			dpmp_i    => dpmp_i,
-			time_irpt => time_mem_irpt,
+			time_irpt => '0',
 			ext_irpt  => '0'
 		);
 
@@ -228,88 +128,34 @@ begin
 			pmp_o  => dpmp_o
 		);
 
+	arbiter_comp : arbiter
+		port map(
+			reset         => reset,
+			clock         => clock,
+			imem_i        => imem_i,
+			imem_o        => imem_o,
+			dmem_i        => dmem_i,
+			dmem_o        => dmem_o,
+			memory_valid  => memory_valid,
+			memory_ready  => memory_ready,
+			memory_instr  => memory_instr,
+			memory_addr   => memory_addr,
+			memory_wdata  => memory_wdata,
+			memory_wstrb  => memory_wstrb,
+			memory_rdata  => memory_rdata
+		);
+
 	bram_comp : bram_mem
 		port map(
 			reset      => reset,
 			clock      => clock,
-			bram_valid => bram_mem_valid,
-			bram_ready => bram_mem_ready,
-			bram_instr => bram_mem_instr,
-			bram_addr  => bram_mem_addr,
-			bram_wdata => bram_mem_wdata,
-			bram_wstrb => bram_mem_wstrb,
-			bram_rdata => bram_mem_rdata
+			bram_valid => memory_valid,
+			bram_ready => memory_ready,
+			bram_instr => memory_instr,
+			bram_addr  => memory_addr,
+			bram_wdata => memory_wdata,
+			bram_wstrb => memory_wstrb,
+			bram_rdata => memory_rdata
 	);
-
-	time_comp : time
-		port map(
-			reset      => reset,
-			clock      => clock,
-			clock_rtc  => clock_rtc,
-			time_valid => time_mem_valid,
-			time_instr => time_mem_instr,
-			time_ready => time_mem_ready,
-			time_addr  => time_mem_addr,
-			time_wdata => time_mem_wdata,
-			time_wstrb => time_mem_wstrb,
-			time_rdata => time_mem_rdata,
-			time_irpt  => time_mem_irpt
-		);
-
-	interconnect_comp : interconnect
-		port map(
-			reset           => reset,
-			clock           => clock,
-			imem_i          => imem_i,
-			imem_o          => imem_o,
-			dmem_i          => dmem_i,
-			dmem_o          => dmem_o,
-			bram_mem_valid  => bram_mem_valid,
-			bram_mem_ready  => bram_mem_ready,
-			bram_mem_instr  => bram_mem_instr,
-			bram_mem_addr   => bram_mem_addr,
-			bram_mem_wdata  => bram_mem_wdata,
-			bram_mem_wstrb  => bram_mem_wstrb,
-			bram_mem_rdata  => bram_mem_rdata,
-			time_mem_valid  => time_mem_valid,
-			time_mem_instr  => time_mem_instr,
-			time_mem_ready  => time_mem_ready,
-			time_mem_addr   => time_mem_addr,
-			time_mem_wdata  => time_mem_wdata,
-			time_mem_wstrb  => time_mem_wstrb,
-			time_mem_rdata  => time_mem_rdata,
-			bus_mem_valid   => bus_mem_valid,
-			bus_mem_ready   => bus_mem_ready,
-			bus_mem_instr   => bus_mem_instr,
-			bus_mem_addr    => bus_mem_addr,
-			bus_mem_wdata   => bus_mem_wdata,
-			bus_mem_wstrb   => bus_mem_wstrb,
-			bus_mem_rdata   => bus_mem_rdata
-		);
-
-	wishbone_master_comp : wishbone_master
-		port map(
-			reset            => reset,
-			clock            => clock,
-			wbm_dat_i        => wbm_dat_i,
-			wbm_dat_o        => wbm_dat_o,
-			wbm_ack_i        => wbm_ack_i,
-			wbm_adr_o        => wbm_adr_o,
-			wbm_cyc_o        => wbm_cyc_o,
-			wbm_stall_i      => wbm_stall_i,
-			wbm_err_i        => wbm_err_i,
-			wbm_lock_o       => wbm_lock_o,
-			wbm_rty_i        => wbm_rty_i,
-			wbm_sel_o        => wbm_sel_o,
-			wbm_stb_o        => wbm_stb_o,
-			wbm_we_o         => wbm_we_o,
-			bus_valid        => bus_mem_valid,
-			bus_ready        => bus_mem_ready,
-			bus_instr        => bus_mem_instr,
-			bus_addr         => bus_mem_addr,
-			bus_wdata        => bus_mem_wdata,
-			bus_wstrb        => bus_mem_wstrb,
-			bus_rdata        => bus_mem_rdata
-		);
 
 end architecture;

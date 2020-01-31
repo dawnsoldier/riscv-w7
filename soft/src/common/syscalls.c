@@ -176,7 +176,7 @@ static inline void printnum(void (*putch)(int, void**), void **putdat,
     putch(padc, putdat);
 
   while (pos-- > 0)
-    putch(digs[pos] + (digs[pos] >= 10 ? 'a' - 10 : '0'), putdat);
+    putch(digs[pos] + (digs[pos] >= 10 ? 'A' - 10 : '0'), putdat);
 }
 
 static inline void printdouble(void (*putch)(int, void**), void **putdat, double num, int width)
@@ -196,7 +196,7 @@ static inline void printdouble(void (*putch)(int, void**), void **putdat, double
   while (width--)
   {
     num *= 10.0;
-    putch((unsigned long long) num + ((unsigned long long) num >= 10 ? 'a' - 10 : '0'), putdat);
+    putch((unsigned long long) num + ((unsigned long long) num >= 10 ? 'A' - 10 : '0'), putdat);
     num -= (unsigned long long) num;
   }
 }

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-RISCV_PATH=/opt/riscv
+RISCV_PATH=/opt/riscv64
 FLAG="--with-arch=rv64imfdc --with-abi=lp64d"
 
 if [ -d "$RISCV_PATH" ]

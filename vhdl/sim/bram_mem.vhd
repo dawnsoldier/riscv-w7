@@ -80,6 +80,35 @@ architecture behavior of bram_mem is
 		end if;
 	end procedure check;
 
+	procedure exceed is
+		variable buf : line;
+		constant exc : string := "ADDRESS EXCEEDS MEMORY";
+	begin
+		write(buf, exc);
+		writeline(output, buf);
+		finish;
+	end procedure exceed;
+
+	procedure print(
+		signal info        : inout string(1 to 255);
+		signal counter     : inout natural range 1 to 255;
+		signal data        : in std_logic_vector(7 downto 0)) is
+		variable buf       : line;
+	begin
+		if data = X"0A" then
+			write(buf, info);
+			writeline(output, buf);
+			info <= (others => character'val(0));
+			counter <= 1;
+		else
+			info(counter) <= character'val(to_integer(unsigned(data)));
+			counter <= counter + 1;
+		end if;
+	end procedure print;
+
+	signal massage      : string(1 to 255) := (others => character'val(0));
+	signal index        : natural range 1 to 255 := 1;
+
 	signal memory_block : memory_type := init_memory("bram_mem.dat");
 
 	attribute ram_style : string;
@@ -100,37 +129,49 @@ begin
 
 			if bram_valid = '1' then
 
-				maddr := to_integer(unsigned(bram_addr(27 downto 3)));
+				if nor_reduce(bram_addr xor uart_addr) = '1' and or_reduce(bram_wstrb) = '1' then
 
-				check(memory_block,maddr,bram_wstrb,bram_wdata);
+					print(massage,index,bram_wdata(7 downto 0));
 
-				if bram_wstrb(7) = '1' then
-					memory_block(maddr)(63 downto 56) <= bram_wdata(63 downto 56);
-				end if;
-				if bram_wstrb(6) = '1' then
-					memory_block(maddr)(55 downto 48) <= bram_wdata(55 downto 48);
-				end if;
-				if bram_wstrb(5) = '1' then
-					memory_block(maddr)(47 downto 40) <= bram_wdata(47 downto 40);
-				end if;
-				if bram_wstrb(4) = '1' then
-					memory_block(maddr)(39 downto 32) <= bram_wdata(39 downto 32);
-				end if;
-				if bram_wstrb(3) = '1' then
-					memory_block(maddr)(31 downto 24) <= bram_wdata(31 downto 24);
-				end if;
-				if bram_wstrb(2) = '1' then
-					memory_block(maddr)(23 downto 16) <= bram_wdata(23 downto 16);
-				end if;
-				if bram_wstrb(1) = '1' then
-					memory_block(maddr)(15 downto 8) <= bram_wdata(15 downto 8);
-				end if;
-				if bram_wstrb(0) = '1' then
-					memory_block(maddr)(7 downto 0) <= bram_wdata(7 downto 0);
-				end if;
+				elsif unsigned(bram_addr(63 downto 3)) > (2**bram_depth-1) then
 
-				rdata <= memory_block(maddr);
-				ready <= '1';
+					exceed;
+
+				else
+
+					maddr := to_integer(unsigned(bram_addr(27 downto 3)));
+
+					check(memory_block,maddr,bram_wstrb,bram_wdata);
+
+					if bram_wstrb(7) = '1' then
+						memory_block(maddr)(63 downto 56) <= bram_wdata(63 downto 56);
+					end if;
+					if bram_wstrb(6) = '1' then
+						memory_block(maddr)(55 downto 48) <= bram_wdata(55 downto 48);
+					end if;
+					if bram_wstrb(5) = '1' then
+						memory_block(maddr)(47 downto 40) <= bram_wdata(47 downto 40);
+					end if;
+					if bram_wstrb(4) = '1' then
+						memory_block(maddr)(39 downto 32) <= bram_wdata(39 downto 32);
+					end if;
+					if bram_wstrb(3) = '1' then
+						memory_block(maddr)(31 downto 24) <= bram_wdata(31 downto 24);
+					end if;
+					if bram_wstrb(2) = '1' then
+						memory_block(maddr)(23 downto 16) <= bram_wdata(23 downto 16);
+					end if;
+					if bram_wstrb(1) = '1' then
+						memory_block(maddr)(15 downto 8) <= bram_wdata(15 downto 8);
+					end if;
+					if bram_wstrb(0) = '1' then
+						memory_block(maddr)(7 downto 0) <= bram_wdata(7 downto 0);
+					end if;
+
+					rdata <= memory_block(maddr);
+					ready <= '1';
+
+				end if;
 
 			else
 
