@@ -90,8 +90,8 @@ architecture behavior of bram_mem is
 	end procedure exceed;
 
 	procedure print(
-		signal info        : inout string(1 to 255);
-		signal counter     : inout natural range 1 to 255;
+		signal info        : inout string(1 to 511);
+		signal counter     : inout natural range 1 to 511;
 		signal data        : in std_logic_vector(7 downto 0)) is
 		variable buf       : line;
 	begin
@@ -106,8 +106,8 @@ architecture behavior of bram_mem is
 		end if;
 	end procedure print;
 
-	signal massage      : string(1 to 255) := (others => character'val(0));
-	signal index        : natural range 1 to 255 := 1;
+	signal massage      : string(1 to 511) := (others => character'val(0));
+	signal index        : natural range 1 to 511 := 1;
 
 	signal memory_block : memory_type := init_memory("bram_mem.dat");
 
