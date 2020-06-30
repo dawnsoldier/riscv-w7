@@ -2,8 +2,8 @@
 
 DIR=$1
 
-if [ ! -d "$DIR/sim/work" ]; then
-  mkdir $DIR/sim/work
+if [ ! -d "$DIR/tb/work" ]; then
+  mkdir $DIR/tb/work
 fi
 
 GHDL=$2
@@ -24,7 +24,7 @@ then
      [ ! "$3" = 'csmith' ] && \
      [ ! "$3" = 'torture' ]
   then
-    cp $3 $DIR/sim/work/bram_mem.dat
+    cp $3 $DIR/tb/work/bram_mem.dat
   fi
 fi
 
@@ -35,12 +35,12 @@ else
   CYCLES=10000000
 fi
 
-cd $DIR/sim/work
+cd $DIR/tb/work
 
 start=`date +%s`
 
-$SYNTAX $DIR/vhdl/sim/configure.vhd
-$ANALYS $DIR/vhdl/sim/configure.vhd
+$SYNTAX $DIR/vhdl/tb/configure.vhd
+$ANALYS $DIR/vhdl/tb/configure.vhd
 
 $SYNTAX $DIR/vhdl/lzc/lzc_wire.vhd
 $ANALYS $DIR/vhdl/lzc/lzc_wire.vhd
@@ -111,8 +111,8 @@ $ANALYS $DIR/vhdl/speedup/prefetch.vhd
 $SYNTAX $DIR/vhdl/speedup/btb.vhd
 $ANALYS $DIR/vhdl/speedup/btb.vhd
 
-$SYNTAX $DIR/vhdl/sim/bram_mem.vhd
-$ANALYS $DIR/vhdl/sim/bram_mem.vhd
+$SYNTAX $DIR/vhdl/tb/bram_mem.vhd
+$ANALYS $DIR/vhdl/tb/bram_mem.vhd
 
 $SYNTAX $DIR/vhdl/integer/int_library.vhd
 $ANALYS $DIR/vhdl/integer/int_library.vhd
@@ -191,8 +191,8 @@ $ANALYS $DIR/vhdl/stage/writeback_stage.vhd
 $SYNTAX $DIR/vhdl/unit/pipeline.vhd
 $ANALYS $DIR/vhdl/unit/pipeline.vhd
 
-$SYNTAX $DIR/vhdl/sim/cpu.vhd
-$ANALYS $DIR/vhdl/sim/cpu.vhd
+$SYNTAX $DIR/vhdl/tb/cpu.vhd
+$ANALYS $DIR/vhdl/tb/cpu.vhd
 
 $SYNTAX $DIR/vhdl/tb/test_cpu.vhd
 $ANALYS $DIR/vhdl/tb/test_cpu.vhd
