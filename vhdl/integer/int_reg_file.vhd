@@ -48,7 +48,7 @@ begin
 
 		if rising_edge(clock) then
 
-			if int_reg_wi.wren = '1' then
+			if int_reg_wi.wren = '1' and int_reg_wi.waddr /= "00000" then
 				int_regfile(to_integer(unsigned(int_reg_wi.waddr))) <= int_reg_wi.wdata;
 			end if;
 
