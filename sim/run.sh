@@ -2,8 +2,8 @@
 
 DIR=$1
 
-if [ ! -d "$DIR/tb/work" ]; then
-  mkdir $DIR/tb/work
+if [ ! -d "$DIR/sim/work" ]; then
+  mkdir $DIR/sim/work
 fi
 
 GHDL=$2
@@ -24,7 +24,7 @@ then
      [ ! "$3" = 'csmith' ] && \
      [ ! "$3" = 'torture' ]
   then
-    cp $3 $DIR/tb/work/bram_mem.dat
+    cp $3 $DIR/sim/work/bram_mem.dat
   fi
 fi
 
@@ -35,7 +35,7 @@ else
   CYCLES=10000000
 fi
 
-cd $DIR/tb/work
+cd $DIR/sim/work
 
 start=`date +%s`
 
