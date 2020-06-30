@@ -83,10 +83,10 @@ begin
 			rin_1.neg <= neg;
 			rin_1.aa <= aa;
 			rin_1.bb <= bb;
-			if int_mul_i.clear = '0' then
-				rin_1.ready <= ready;
-			elsif int_mul_i.clear = '1' then
+			if int_mul_i.clear = '1' then
 				rin_1.ready <= '0';
+			else
+				rin_1.ready <= ready;
 			end if;
 
 		end process;
@@ -114,10 +114,10 @@ begin
 			rin_2.word <= word;
 			rin_2.neg <= neg;
 			rin_2.rr <= rr;
-			if int_mul_i.clear = '0' then
-				rin_2.ready <= ready;
-			elsif int_mul_i.clear = '1' then
+			if int_mul_i.clear = '1' then
 				rin_2.ready <= '0';
+			else
+				rin_2.ready <= ready;
 			end if;
 
 		end process;
@@ -152,10 +152,10 @@ begin
 			end if;
 
 			int_mul_o.result <= result;
-			if int_mul_i.clear = '0' then
-				int_mul_o.ready <= ready;
-			elsif int_mul_i.clear = '1' then
+			if int_mul_i.clear = '1' then
 				int_mul_o.ready <= '0';
+			else
+				int_mul_o.ready <= ready;
 			end if;
 
 		end process;

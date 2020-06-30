@@ -129,7 +129,7 @@ begin
 
 			if bram_valid = '1' then
 
-				if nor_reduce(bram_addr xor uart_addr) = '1' and or_reduce(bram_wstrb) = '1' then
+				if nor_reduce(bram_addr xor uart_base_addr) = '1' and or_reduce(bram_wstrb) = '1' then
 
 					print(massage,index,bram_wdata(7 downto 0));
 

@@ -6,7 +6,7 @@ use ieee.numeric_std.all;
 
 package configure is
 
-	constant bram_depth      : integer := 13;
+	constant bram_depth      : integer := 11;
 
 	constant btb_depth       : integer := 6;
 	constant bht_depth       : integer := 6;
@@ -29,6 +29,11 @@ package configure is
 	constant timer_base_addr : std_logic_vector(63 downto 0) := X"0000000000200000";
 	constant timer_top_addr  : std_logic_vector(63 downto 0) := X"0000000000200010";
 
-	constant clks_per_bit    : integer := 1;
+	constant clk_freq        : integer := 25000000;
+	constant rtc_freq        : integer := 32768;
+	constant baudrate        : integer := 115200;
+
+	constant clks_per_bit    : integer := clk_freq/baudrate;
+	constant clk_divider_rtc : integer := clk_freq/rtc_freq;
 
 end configure;

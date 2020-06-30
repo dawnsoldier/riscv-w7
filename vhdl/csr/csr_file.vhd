@@ -262,6 +262,18 @@ begin
 					mcsr.minstret <= std_logic_vector(unsigned(mcsr.minstret) + 1);
 				end if;
 
+				if csr_ei.time_irpt = '1' then
+					mcsr.mip.mtip <= "1";
+				else
+					mcsr.mip.mtip <= "0";
+				end if;
+
+				if csr_ei.ext_irpt = '1' then
+					mcsr.mip.meip <= "1";
+				else
+					mcsr.mip.meip <= "0";
+				end if;
+
 				if csr_ei.exc = '1' then
 					mcsr.mstatus.mpie <= mcsr.mstatus.mie;
 					mcsr.mstatus.mpp <= priv_mode;
@@ -272,9 +284,7 @@ begin
 					mcsr.mcause.irpt <= "0";
 					mcsr.mcause.code <= X"00000000000000" & "000" & csr_ei.ecause;
 					exc <= '1';
-				elsif csr_ei.time_irpt = '1' and mcsr.mstatus.mie = "1" and mcsr.mie.mtie = "1" then
-					mcsr.mip.mtip <= mcsr.mie.mtie;
-					mcsr.mie.mtie <= "0";
+				elsif mcsr.mstatus.mie = "1" and mcsr.mie.mtie = "1" and mcsr.mip.mtip = "1" then
 					mcsr.mstatus.mpie <= mcsr.mstatus.mie;
 					mcsr.mstatus.mpp <= priv_mode;
 					mcsr.mstatus.mie <= "0";
@@ -284,9 +294,7 @@ begin
 					mcsr.mcause.irpt <= "1";
 					mcsr.mcause.code <= X"00000000000000" & "000" & interrupt_mach_timer;
 					exc <= '1';
-				elsif csr_ei.ext_irpt = '1' and mcsr.mstatus.mie = "1" and mcsr.mie.meie = "1" then
-					mcsr.mip.meip <= mcsr.mie.meie;
-					mcsr.mie.meie <= "0";
+				elsif mcsr.mstatus.mie = "1" and mcsr.mie.meie = "1" and mcsr.mip.meip = "1" then
 					mcsr.mstatus.mpie <= mcsr.mstatus.mie;
 					mcsr.mstatus.mpp <= priv_mode;
 					mcsr.mstatus.mie <= "0";
@@ -302,10 +310,6 @@ begin
 
 				if csr_ei.mret = '1' then
 					priv_mode <= mcsr.mstatus.mpp;
-					mcsr.mie.mtie <= mcsr.mip.mtip;
-					mcsr.mip.mtip <= "0";
-					mcsr.mie.meie <= mcsr.mip.meip;
-					mcsr.mip.meip <= "0";
 					mcsr.mstatus.mie <= mcsr.mstatus.mpie;
 					mcsr.mstatus.mpie <= "0";
 					mcsr.mstatus.mpp <= u_mode;
@@ -327,13 +331,10 @@ begin
 							mcsr.mstatus.upie <= csr_wi.wdata(4 downto 4);
 							mcsr.mstatus.mie  <= csr_wi.wdata(3 downto 3);
 							mcsr.mstatus.uie  <= csr_wi.wdata(0 downto 0);
-						when csr_mip =>
-							mcsr.mip.ueip <= csr_wi.wdata(8 downto 8);
-							mcsr.mip.utip <= csr_wi.wdata(4 downto 4);
-							mcsr.mip.msip <= csr_wi.wdata(3 downto 3);
-							mcsr.mip.usip <= csr_wi.wdata(0 downto 0);
 						when csr_mie =>
+							mcsr.mie.meie <= csr_wi.wdata(11 downto 11);
 							mcsr.mie.ueie <= csr_wi.wdata(8 downto 8);
+							mcsr.mie.mtie <= csr_wi.wdata(7 downto 7);
 							mcsr.mie.utie <= csr_wi.wdata(4 downto 4);
 							mcsr.mie.msie <= csr_wi.wdata(3 downto 3);
 							mcsr.mie.usie <= csr_wi.wdata(0 downto 0);

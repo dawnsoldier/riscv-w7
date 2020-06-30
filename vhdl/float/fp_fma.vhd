@@ -139,10 +139,10 @@ begin
 		rin_1.sign_c <= sign_c;
 		rin_1.exponent_c <= exponent_c;
 		rin_1.mantissa_c <= mantissa_c;
-		if fp_fma_i.clear = '0' then
-			rin_1.ready <= ready;
-		elsif fp_fma_i.clear = '1' then
+		if fp_fma_i.clear = '1' then
 			rin_1.ready <= '0';
+		else
+			rin_1.ready <= ready;
 		end if;
 
 	end process;
@@ -265,10 +265,10 @@ begin
 		rin_2.exponent_add <= exponent_add;
 		rin_2.mantissa_add <= mantissa_add;
 		rin_2.exponent_neg <= exponent_neg;
-		if fp_fma_i.clear = '0' then
-			rin_2.ready <= ready;
-		elsif fp_fma_i.clear = '1' then
+		if fp_fma_i.clear = '1' then
 			rin_2.ready <= '0';
+		else
+			rin_2.ready <= ready;
 		end if;
 
 	end process;
@@ -358,10 +358,10 @@ begin
 		rin_3.sign_mac <= sign_mac;
 		rin_3.exponent_mac <= exponent_mac;
 		rin_3.mantissa_mac <= mantissa_mac;
-		if fp_fma_i.clear = '0' then
-			rin_3.ready <= ready;
-		elsif fp_fma_i.clear = '1' then
+		if fp_fma_i.clear = '1' then
 			rin_3.ready <= '0';
+		else
+			rin_3.ready <= ready;
 		end if;
 
 	end process;
@@ -449,10 +449,10 @@ begin
 		rin_4.dbz <= dbz;
 		rin_4.inf <= inf;
 		rin_4.zero <= zero;
-		if fp_fma_i.clear = '0' then
-			rin_4.ready <= ready;
-		elsif fp_fma_i.clear = '1' then
+		if fp_fma_i.clear = '1' then
 			rin_4.ready <= '0';
+		else
+			rin_4.ready <= ready;
 		end if;
 
 	end process;
@@ -472,10 +472,10 @@ begin
 		fp_fma_o.fp_rnd.inf <= r_4.inf;
 		fp_fma_o.fp_rnd.zero <= r_4.zero;
 		fp_fma_o.ready <= r_4.ready;
-		if fp_fma_i.clear = '0' then
-			fp_fma_o.ready <= r_4.ready;
-		elsif fp_fma_i.clear = '1' then
+		if fp_fma_i.clear = '1' then
 			fp_fma_o.ready <= '0';
+		else
+			fp_fma_o.ready <= r_4.ready;
 		end if;
 
 	end process;

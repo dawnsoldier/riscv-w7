@@ -36,7 +36,7 @@ package wire is
 	end record;
 
 	constant init_fetch_reg : fetch_reg_type := (
-		pc     => start_addr,
+		pc     => start_base_addr,
 		instr  => (others => '0'),
 		taken  => '0',
 		spec   => '0',

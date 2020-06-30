@@ -44,9 +44,9 @@ architecture behavior of prefetch is
 	end record;
 
 	constant init_reg : reg_type := (
-		pc     => start_addr,
-		npc    => start_addr,
-		fpc    => start_addr,
+		pc     => start_base_addr,
+		npc    => start_base_addr,
+		fpc    => start_base_addr,
 		instr  => nop,
 		wren   => '0',
 		rden   => '0',
@@ -173,7 +173,7 @@ begin
 				r <= init_reg;
 
 			else
-				
+
 				if rin.wrbuf = '1' then
 					prefetch_buffer(rin.wid) <= pfetch_i.mem_rdata(15 downto 0);
 					prefetch_buffer(rin.wid+1) <= pfetch_i.mem_rdata(31 downto 16);

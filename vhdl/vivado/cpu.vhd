@@ -12,7 +12,9 @@ entity cpu is
 	port(
 		reset : in  std_logic;
 		clock : in  std_logic;
-		rtc   : in  std_logic
+		rtc   : in  std_logic;
+		rx    : in  std_logic;
+		tx    : out std_logic
 	);
 end entity cpu;
 
@@ -168,6 +170,11 @@ begin
 			bram_valid <= '0';
 			uart_valid <= '0';
 			timer_valid <= memory_valid;
+		elsif (unsigned(memory_addr) >= unsigned(uart_base_addr) and
+				unsigned(memory_addr) < unsigned(uart_top_addr)) then
+			bram_valid <= '0';
+			uart_valid <= memory_valid;
+			timer_valid <= '0';
 		else
 			bram_valid <= memory_valid;
 			uart_valid <= '0';
@@ -179,6 +186,11 @@ begin
 		bram_wdata <= memory_wdata;
 		bram_wstrb <= memory_wstrb;
 
+		uart_instr <= memory_instr;
+		uart_addr <= memory_addr xor uart_base_addr;
+		uart_wdata <= memory_wdata;
+		uart_wstrb <= memory_wstrb;
+
 		timer_instr <= memory_instr;
 		timer_addr <= memory_addr xor timer_base_addr;
 		timer_wdata <= memory_wdata;
@@ -187,6 +199,9 @@ begin
 		if (bram_ready = '1') then
 			memory_rdata <= bram_rdata;
 			memory_ready <= bram_ready;
+		elsif (uart_ready = '1') then
+			memory_rdata <= uart_rdata;
+			memory_ready <= uart_ready;
 		elsif (timer_ready = '1') then
 			memory_rdata <= timer_rdata;
 			memory_ready <= timer_ready;
@@ -257,6 +272,21 @@ begin
 			bram_wdata => bram_wdata,
 			bram_wstrb => bram_wstrb,
 			bram_rdata => bram_rdata
+		);
+
+	uart_comp : uart
+		port map(
+			reset      => reset,
+			clock      => clock,
+			uart_valid => uart_valid,
+			uart_ready => uart_ready,
+			uart_instr => uart_instr,
+			uart_addr  => uart_addr,
+			uart_wdata => uart_wdata,
+			uart_wstrb => uart_wstrb,
+			uart_rdata => uart_rdata,
+			uart_rx    => rx,
+			uart_tx    => tx
 		);
 
 	timer_comp : timer

@@ -272,7 +272,10 @@ begin
 								v.r1 := v.r0;
 							end if;
 						when others =>
-							null;
+							fp_mac_i.a <= (others => '0');
+							fp_mac_i.b <= (others => '0');
+							fp_mac_i.c <= (others => '0');
+							fp_mac_i.op <= '0';
 					end case;
 				when F2 =>
 					case r.istate is
@@ -369,7 +372,10 @@ begin
 								v.r1 := v.r0;
 							end if;
 						when others =>
-							null;
+							fp_mac_i.a <= (others => '0');
+							fp_mac_i.b <= (others => '0');
+							fp_mac_i.c <= (others => '0');
+							fp_mac_i.op <= '0';
 					end case;
 				when F3 =>
 					fp_mac_i.a <= (others => '0');
