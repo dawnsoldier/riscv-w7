@@ -68,10 +68,10 @@ begin
 
 		if fmt = "00" then
 			result(64) := data(31);
-			if and_reduce(data(30 downto 23)) then
+			if and_reduce(data(30 downto 23)) = '1' then
 				result(63 downto 52) := (others => '1');
 				result(51 downto 29) := data(22 downto 0);
-			elsif or_reduce(data(30 downto 23)) then
+			elsif or_reduce(data(30 downto 23)) = '1' then
 				result(63 downto 52) := std_logic_vector(resize(unsigned(data(30 downto 23)), 12) + 1920);
 				result(51 downto 29) := data(22 downto 0);
 			elsif counter < 24 then
@@ -81,10 +81,10 @@ begin
 			result(28 downto 0) := (others => '0');
 		elsif fmt = "01" then
 			result(64) := data(63);
-			if and_reduce(data(62 downto 52)) then
+			if and_reduce(data(62 downto 52)) = '1' then
 				result(63 downto 52) := (others => '1');
 				result(51 downto 0) := data(51 downto 0);
-			elsif or_reduce(data(62 downto 52)) then
+			elsif or_reduce(data(62 downto 52)) = '1' then
 				result(63 downto 52) := std_logic_vector(resize(unsigned(data(62 downto 52)), 12) + 1024);
 				result(51 downto 0) := data(51 downto 0);
 			elsif counter < 53 then
@@ -93,17 +93,17 @@ begin
 			end if;
 		end if;
 
-		if result(64) then
-			if exponent_ones then
-				if mantissa_zero then
+		if result(64) = '1' then
+			if exponent_ones = '1' then
+				if mantissa_zero = '1' then
 					class(0) := '1';
-				elsif not result(51) then
+				elsif result(51) = '0' then
 					class(8) := '1';
 				else
 					class(9) := '1';
 				end if;
-			elsif exponent_zero then
-				if mantissa_zero then
+			elsif exponent_zero = '1' then
+				if mantissa_zero = '1' then
 					class(3) := '1';
 				else
 					class(2) := '1';
@@ -112,16 +112,16 @@ begin
 				class(1) := '1';
 			end if;
 		else
-			if exponent_ones then
-				if mantissa_zero then
+			if exponent_ones = '1' then
+				if mantissa_zero = '1' then
 					class(7) := '1';
-				elsif not result(51) then
+				elsif result(51) = '0' then
 					class(8) := '1';
 				else
 					class(9) := '1';
 				end if;
-			elsif exponent_zero then
-				if mantissa_zero then
+			elsif exponent_zero = '1' then
+				if mantissa_zero = '1' then
 					class(4) := '1';
 				else
 					class(5) := '1';

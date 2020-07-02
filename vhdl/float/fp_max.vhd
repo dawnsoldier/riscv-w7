@@ -62,36 +62,36 @@ begin
 
 		if rm = "000" then
 
-			if class1(8) and class2(8) then
+			if (class1(8) and class2(8)) = '1' then
 				result := nan;
 				flags(4)        := '1';
-			elsif class1(8) then
+			elsif class1(8) = '1' then
 				result := data2;
 				flags(4)        := '1';
-			elsif class2(8) then
+			elsif class2(8) = '1' then
 				result := data1;
 				flags(4)        := '1';
-			elsif class1(9) and class2(9) then
+			elsif (class1(9) and class2(9)) = '1' then
 				result := nan;
-			elsif class1(9) then
+			elsif class1(9) = '1' then
 				result := data2;
-			elsif class2(9) then
+			elsif class2(9) = '1' then
 				result := data1;
-			elsif (ext1(64) xor ext2(64)) then
-				if ext1(64) then
+			elsif (ext1(64) xor ext2(64)) = '1' then
+				if ext1(64) = '1' then
 					result := data1;
 				else
 					result := data2;
 				end if;
 			else
-				if ext1(64) then
-					if comp then
+				if ext1(64) = '1' then
+					if comp = '1' then
 						result := data1;
 					else
 						result := data2;
 					end if;
 				else
-					if comp then
+					if comp = '1' then
 						result := data2;
 					else
 						result := data1;
@@ -101,36 +101,36 @@ begin
 
 		elsif rm = "001" then
 
-			if class1(8) and class2(8) then
+			if (class1(8) and class2(8)) = '1' then
 				result := nan;
 				flags(4)        := '1';
-			elsif class1(8) then
+			elsif class1(8) = '1' then
 				result := data2;
 				flags(4)        := '1';
-			elsif class2(8) then
+			elsif class2(8) = '1' then
 				result := data1;
 				flags(4)        := '1';
-			elsif class1(9) and class2(9) then
+			elsif (class1(9) and class2(9)) = '1' then
 				result := nan;
-			elsif class1(9) then
+			elsif class1(9) = '1' then
 				result := data2;
-			elsif class2(9) then
+			elsif class2(9) = '1' then
 				result := data1;
-			elsif (ext1(64) xor ext2(64)) then
-				if ext1(64) then
+			elsif (ext1(64) xor ext2(64)) = '1' then
+				if ext1(64) = '1' then
 					result := data2;
 				else
 					result := data1;
 				end if;
 			else
-				if ext1(64) then
-					if comp then
+				if ext1(64) = '1' then
+					if comp = '1' then
 						result := data2;
 					else
 						result := data1;
 					end if;
 				else
-					if comp then
+					if comp = '1' then
 						result := data1;
 					else
 						result := data2;

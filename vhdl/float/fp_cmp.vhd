@@ -54,11 +54,11 @@ begin
 		--FEQ
 		if rm = "010" then
 
-			if class1(8) or class2(8) then
+			if (class1(8) or class2(8)) = '1' then
 				flags(4) := '1';
-			elsif class1(9) or class2(9) then
+			elsif (class1(9) or class2(9)) = '1' then
 				flags(4) := '0';
-			elsif (class1(3) or class1(4)) and (class2(3) or class2(4)) then
+			elsif ((class1(3) or class1(4)) and (class2(3) or class2(4))) = '1' then
 				result(0) := '1';
 			elsif data1 = data2 then
 				result(0) := '1';
@@ -67,14 +67,14 @@ begin
 		--FLT
 		elsif rm = "001" then
 
-			if class1(8) or class2(8) or class1(9) or class2(9) then
+			if (class1(8) or class2(8) or class1(9) or class2(9)) = '1' then
 				flags(4) := '1';
-			elsif (class1(3) or class1(4)) and (class2(3) or class2(4)) then
+			elsif ((class1(3) or class1(4)) and (class2(3) or class2(4))) = '1' then
 				result(0) := '0';
-			elsif (data1(64) xor data2(64)) then
+			elsif (data1(64) xor data2(64)) = '1' then
 				result(0) := data1(64);
 			else
-				if data1(64) then
+				if data1(64) = '1' then
 					result(0) := not cmp_le;
 				else
 					result(0) := cmp_lt;
@@ -84,14 +84,14 @@ begin
 		--FLE
 		elsif rm = "000" then
 
-			if class1(8) or class2(8) or class1(9) or class2(9) then
+			if (class1(8) or class2(8) or class1(9) or class2(9)) = '1' then
 				flags(4) := '1';
-			elsif (class1(3) or class1(4)) and (class2(3) or class2(4)) then
+			elsif ((class1(3) or class1(4)) and (class2(3) or class2(4))) = '1' then
 				result(0) := '1';
-			elsif (data1(64) xor data2(64)) then
+			elsif (data1(64) xor data2(64)) = '1' then
 				result(0) := data1(64);
 			else
-				if data1(64) then
+				if data1(64) = '1' then
 					result(0) := not cmp_lt;
 				else
 					result(0) := cmp_le;

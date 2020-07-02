@@ -88,7 +88,7 @@ begin
 		end if;
 		-------------------------------------------------
 
-		if v.op.fcvt_f2f then
+		if v.op.fcvt_f2f = '1' then
 			v.fmt_ext := fp_exe_i.op.fcvt_op;
 		else
 			v.fmt_ext := fp_exe_i.fmt;

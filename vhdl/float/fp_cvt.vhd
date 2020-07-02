@@ -191,21 +191,21 @@ begin
 
 		case rm is
 			when "000" =>               --rne--
-				if grs(2) and odd then
+				if (grs(2) and odd) = '1' then
 					rnded := 1;
 				end if;
 			when "001" =>               --rtz--
 				null;
 			when "010" =>               --rdn--
-				if sign_cvt and flags(0) then
+				if (sign_cvt and flags(0)) = '1' then
 					rnded := 1;
 				end if;
 			when "011" =>               --rup--
-				if not sign_cvt and flags(0) then
+				if (not(sign_cvt) and flags(0)) = '1' then
 					rnded := 1;
 				end if;
 			when "100" =>               --rmm--
-				if flags(0) then
+				if flags(0) = '1' then
 					rnded := 1;
 				end if;
 			when others =>
@@ -227,7 +227,7 @@ begin
 		oor_32u := or_1 or or_2 or or_3;
 		oor_32s := or_1 or or_2 or or_3;
 
-		if sign_cvt then
+		if sign_cvt = '1' then
 			if op = "00" then
 				oor_32s := oor_32s or (or_4 and or_5);
 			elsif op = "01" then
@@ -247,7 +247,7 @@ begin
 		oor_32u := to_std_logic(op = "01") and (oor_32u or oor or inf or snan or qnan);
 		oor_32s := to_std_logic(op = "00") and (oor_32s or oor or inf or snan or qnan);
 
-		if sign_cvt then
+		if sign_cvt = '1' then
 			mantissa_uint := std_logic_vector(-signed(mantissa_uint));
 		end if;
 
@@ -255,40 +255,40 @@ begin
 
 		if op = "00" then
 			result := x"00000000" & mantissa_uint(31 downto 0);
-			if oor_32s then
+			if oor_32s = '1' then
 				result := x"00000000" & x"7FFFFFFF";
 				flags  := "10000";
-				if sign_cvt then        -- RISCV Overflow
+				if sign_cvt = '1' then        -- RISCV Overflow
 					result := x"00000000" & x"80000000";
 				end if;
 			end if;
 			result(63 downto 32) := (others => result(31));
 		elsif op = "01" then
 			result := x"00000000" & mantissa_uint(31 downto 0);
-			if oor_32u then
+			if oor_32u = '1' then
 				result := x"00000000" & x"FFFFFFFF";
 				flags  := "10000";
 			end if;
-			if sign_cvt then            -- RISCV Overflow
+			if sign_cvt = '1' then            -- RISCV Overflow
 				result := x"00000000" & x"00000000";
 			end if;
 			result(63 downto 32) := (others => result(31));
 		elsif op = "10" then
 			result := mantissa_uint(63 downto 0);
-			if oor_64s then
+			if oor_64s = '1' then
 				result := x"7FFFFFFFFFFFFFFF";
 				flags  := "10000";
-				if sign_cvt then        -- RISCV Overflow
+				if sign_cvt = '1' then        -- RISCV Overflow
 					result := x"8000000000000000";
 				end if;
 			end if;
 		elsif op = "11" then
 			result := mantissa_uint(63 downto 0);
-			if oor_64u then
+			if oor_64u = '1' then
 				result := x"FFFFFFFFFFFFFFFF";
 				flags  := "10000";
 			end if;
-			if sign_cvt then            -- RISCV Overflow
+			if sign_cvt = '1' then            -- RISCV Overflow
 				result := x"0000000000000000";
 			end if;
 		end if;
@@ -346,16 +346,16 @@ begin
 			sign_uint := data(63);
 		end if;
 
-		if sign_uint then
+		if sign_uint = '1' then
 			data := std_logic_vector(-signed(data));
 		end if;
 
 		mantissa_uint := 64X"FFFFFFFFFFFFFFFF";
 		exponent_uint := 0;
-		if not (op(1)) then
+		if op(1) = '0' then
 			mantissa_uint := data(31 downto 0) & 32X"0";
 			exponent_uint := 31;
-		elsif op(1) then
+		elsif op(1) = '1' then
 			mantissa_uint := data(63 downto 0);
 			exponent_uint := 63;
 		end if;

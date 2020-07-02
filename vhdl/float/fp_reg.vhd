@@ -29,17 +29,17 @@ begin
 
 	begin
 
-		if fp_reg_ri.rden1 then
+		if fp_reg_ri.rden1 = '1' then
 			fp_reg_o.data1 <= fp_regfile(to_integer(unsigned(fp_reg_ri.raddr1)));
 		else
 			fp_reg_o.data1 <= (others => '0');
 		end if;
-		if fp_reg_ri.rden2 then
+		if fp_reg_ri.rden2 = '1' then
 			fp_reg_o.data2 <= fp_regfile(to_integer(unsigned(fp_reg_ri.raddr2)));
 		else
 			fp_reg_o.data2 <= (others => '0');
 		end if;
-		if fp_reg_ri.rden3 then
+		if fp_reg_ri.rden3 = '1' then
 			fp_reg_o.data3 <= fp_regfile(to_integer(unsigned(fp_reg_ri.raddr3)));
 		else
 			fp_reg_o.data3 <= (others => '0');
@@ -53,7 +53,7 @@ begin
 
 		if rising_edge(clock) then
 
-			if fp_reg_wi.wren then
+			if fp_reg_wi.wren = '1' then
 				fp_regfile(to_integer(unsigned(fp_reg_wi.waddr))) <= fp_reg_wi.wdata;
 			end if;
 

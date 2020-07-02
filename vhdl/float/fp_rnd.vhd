@@ -65,21 +65,21 @@ begin
 		rnded := 0;
 		case rm is
 			when "000" =>               --rne--
-				if grs(2) and odd then
+				if (grs(2) and odd) = '1' then
 					rnded := 1;
 				end if;
 			when "001" =>               --rtz--
 				null;
 			when "010" =>               --rdn--
-				if sig and flags(0) then
+				if (sig and flags(0)) = '1' then
 					rnded := 1;
 				end if;
 			when "011" =>               --rup--
-				if not sig and flags(0) then
+				if (not(sig) and flags(0)) = '1' then
 					rnded := 1;
 				end if;
 			when "100" =>               --rmm--
-				if flags(0) then
+				if flags(0) = '1' then
 					rnded := 1;
 				end if;
 			when others =>
@@ -94,9 +94,9 @@ begin
 
 		rnded := 0;
 		if fmt = "00" then
-			if mant(24) then
+			if mant(24) = '1' then
 				rnded := 1;
-			elsif mant(23) then
+			elsif mant(23) = '1' then
 				if expo = 0 then
 					expo := 1;
 					if expo = 1 then
@@ -105,9 +105,9 @@ begin
 				end if;
 			end if;
 		elsif fmt = "01" then
-			if mant(53) then
+			if mant(53) = '1' then
 				rnded := 1;
-			elsif mant(52) then
+			elsif mant(52) = '1' then
 				if expo = 0 then
 					expo := 1;
 					if expo = 1 then
@@ -120,24 +120,24 @@ begin
 		expo := expo + rnded;
 		mant := std_logic_vector(shift_right(unsigned(mant),rnded));
 
-		if snan then
+		if snan = '1' then
 			flags := "10000";
-		elsif qnan then
+		elsif qnan = '1' then
 			flags := "00000";
-		elsif dbz then
+		elsif dbz = '1' then
 			flags := "01000";
-		elsif inf then
+		elsif inf = '1' then
 			flags := "00000";
-		elsif zero then
+		elsif zero = '1' then
 			flags := "00000";
 		end if;
 
 		if fmt = "00" then
-			if snan or qnan then
+			if (snan or qnan) = '1' then
 				result := 32X"FFFFFFFF" & '0' & 9X"1FF" & 22x"000000";
-			elsif dbz or inf then
+			elsif (dbz or inf) = '1' then
 				result := 32X"FFFFFFFF" & sig & 8X"FF" & 23x"000000";
-			elsif zero then
+			elsif zero = '1' then
 				result := 32X"FFFFFFFF" & sig & 8X"00" & 23x"000000";
 			elsif expo = 0 then
 				result := 32X"FFFFFFFF" & sig & 8X"00" & mant(22 downto 0);
@@ -148,11 +148,11 @@ begin
 				result := 32X"FFFFFFFF" & sig & std_logic_vector(to_unsigned(expo, 8)) & mant(22 downto 0);
 			end if;
 		elsif fmt = "01" then
-			if snan or qnan then
+			if (snan or qnan) = '1' then
 				result := '0' & 12X"FFF" & 51X"0000000000000";
-			elsif dbz or inf then
+			elsif (dbz or inf) = '1' then
 				result := sig & 11X"7FF" & 52X"0000000000000";
-			elsif zero then
+			elsif zero = '1' then
 				result := sig & 11X"000" & 52X"0000000000000";
 			elsif expo = 0 then
 				result := sig & 11X"000" & mant(51 downto 0);

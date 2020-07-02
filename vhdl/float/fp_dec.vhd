@@ -63,7 +63,7 @@ begin
 			when opcode_fload | opcode_fstore =>
 
 				v.int_rden1 := '1';
-				if v.opcode(5) then
+				if v.opcode(5) = '1' then
 					v.imm := v.imm_s;
 					v.fpu_rden2 := '1';
 					v.fpu := '1';
@@ -73,7 +73,7 @@ begin
 						when funct_sd  => v.store_op.mem_sd := '1';
 						when others     => null;
 					end case;
-				elsif not v.opcode(5) then
+				elsif v.opcode(5) = '0' then
 					v.imm := v.imm_i;
 					v.fpu_wren := '1';
 					v.fpu := '1';
@@ -149,7 +149,7 @@ begin
 
 					when funct_fmv_f2i | funct_fmv_i2f =>
 
-						if v.funct7(3) then
+						if v.funct7(3) = '1' then
 
 							v.int_rden1 := '1';
 							v.fpu_wren := '1';
@@ -157,7 +157,7 @@ begin
 							v.fpu_op.fmv_i2f := '1';
 							v.valid := '1';
 
-						elsif not v.funct7(3) then
+						elsif v.funct7(3) = '0' then
 
 							v.int_wren := '1';
 							v.fpu_rden1 := '1';
@@ -179,11 +179,11 @@ begin
 
 					when funct_fcvt_f2i | funct_fcvt_i2f =>
 
-						if v.funct7(3) then
+						if v.funct7(3) = '1' then
 							v.int_rden1 := '1';
 							v.fpu_wren := '1';
 							v.fpu_op.fcvt_i2f := '1';
-						elsif not v.funct7(3) then
+						elsif v.funct7(3) = '0' then
 							v.int_wren := '1';
 							v.fpu_rden1 := '1';
 							v.fpu_op.fcvt_f2i := '1';

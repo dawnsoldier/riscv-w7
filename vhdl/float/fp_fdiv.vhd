@@ -81,9 +81,9 @@ begin
 
 			case r.state is
 				when F0 =>
-					if fp_fdiv_i.enable and fp_fdiv_i.op.fdiv then
+					if (fp_fdiv_i.enable and fp_fdiv_i.op.fdiv) = '1' then
 						v.state := F1;
-					elsif fp_fdiv_i.enable and fp_fdiv_i.op.fsqrt then
+					elsif (fp_fdiv_i.enable and fp_fdiv_i.op.fsqrt) = '1' then
 						v.state := F2;
 					end if;
 					v.istate := 0;
@@ -138,33 +138,33 @@ begin
 					v.inf := '0';
 					v.zero := '0';
 
-					if fp_fdiv_i.op.fsqrt then
+					if fp_fdiv_i.op.fsqrt = '1' then
 						v.b := (62 downto 52 => '1', others => '0');
 						v.class_b := (others => '0');
 					end if;
 
-					if ((v.class_a(8) or v.class_b(8))) then
+					if ((v.class_a(8) or v.class_b(8))) = '1' then
 						v.snan := '1';
-					elsif ((v.class_a(3) or v.class_a(4))) and ((v.class_b(3) or v.class_b(4))) then
+					elsif (((v.class_a(3) or v.class_a(4))) and ((v.class_b(3) or v.class_b(4)))) = '1' then
 						v.snan := '1';
-					elsif ((v.class_a(0) or v.class_a(7))) and ((v.class_b(0) or v.class_b(7))) then
+					elsif (((v.class_a(0) or v.class_a(7))) and ((v.class_b(0) or v.class_b(7)))) = '1' then
 						v.snan := '1';
-					elsif ((v.class_a(9) or v.class_b(9))) then
+					elsif ((v.class_a(9) or v.class_b(9))) = '1' then
 						v.qnan := '1';
 					end if;
 
-					if ((v.class_a(0) or v.class_a(7))) and ((v.class_b(1) or v.class_b(2) or v.class_b(3) or v.class_b(4) or v.class_b(5) or v.class_b(6))) then
+					if (((v.class_a(0) or v.class_a(7))) and ((v.class_b(1) or v.class_b(2) or v.class_b(3) or v.class_b(4) or v.class_b(5) or v.class_b(6)))) = '1' then
 						v.inf := '1';
-					elsif ((v.class_b(3) or v.class_b(4))) and ((v.class_a(1) or v.class_a(2) or v.class_a(5) or v.class_a(6))) then
+					elsif (((v.class_b(3) or v.class_b(4))) and ((v.class_a(1) or v.class_a(2) or v.class_a(5) or v.class_a(6)))) = '1' then
 						v.dbz := '1';
 					end if;
 
-					if ((v.class_a(3) or v.class_a(4))) or ((v.class_b(0) or v.class_b(7))) then
+					if (((v.class_a(3) or v.class_a(4))) or ((v.class_b(0) or v.class_b(7)))) = '1' then
 						v.zero := '1';
 					end if;
 
-					if fp_fdiv_i.op.fsqrt then
-						if v.class_a(7) then
+					if fp_fdiv_i.op.fsqrt = '1' then
+						if v.class_a(7) = '1' then
 							v.inf := '1';
 						end if;
 						if ((v.class_a(0) or v.class_a(1) or v.class_a(2)) = '1') then
@@ -180,9 +180,9 @@ begin
 					v.y := 1X"0" & nor_reduce(v.b(51 downto 45)) & reciprocal_lut(to_integer(unsigned(v.b(51 downto 45)))) & 46X"0";
 					v.op := '0';
 
-					if fp_fdiv_i.op.fsqrt then
+					if fp_fdiv_i.op.fsqrt = '1' then
 						v.qa := 2X"1" & signed(v.a(51 downto 0)) & 2X"0";
-						if not v.a(52) then
+						if v.a(52) = '0' then
 							v.qa := v.qa srl 1;
 						end if;
 						v.index := to_integer(unsigned(v.qa(54 downto 48)) - 32);
@@ -487,11 +487,11 @@ begin
 
 			case r_fix.state is
 				when F0 =>
-					if fp_fdiv_i.enable and fp_fdiv_i.op.fdiv then
+					if (fp_fdiv_i.enable and fp_fdiv_i.op.fdiv) = '1' then
 						v.state := F1;
 						v.istate := 54;
 					end if;
-					if fp_fdiv_i.enable and fp_fdiv_i.op.fsqrt then
+					if (fp_fdiv_i.enable and fp_fdiv_i.op.fsqrt) = '1' then
 						v.state := F1;
 						v.istate := 53;
 					end if;
@@ -529,33 +529,33 @@ begin
 					v.inf := '0';
 					v.zero := '0';
 
-					if fp_fdiv_i.op.fsqrt then
+					if fp_fdiv_i.op.fsqrt = '1' then
 						v.b := (62 downto 52 => '1', others => '0');
 						v.class_b := (others => '0');
 					end if;
 
-					if ((v.class_a(8) or v.class_b(8))) then
+					if ((v.class_a(8) or v.class_b(8))) = '1' then
 						v.snan := '1';
-					elsif ((v.class_a(3) or v.class_a(4))) and ((v.class_b(3) or v.class_b(4))) then
+					elsif (((v.class_a(3) or v.class_a(4))) and ((v.class_b(3) or v.class_b(4)))) = '1' then
 						v.snan := '1';
-					elsif ((v.class_a(0) or v.class_a(7))) and ((v.class_b(0) or v.class_b(7))) then
+					elsif (((v.class_a(0) or v.class_a(7))) and ((v.class_b(0) or v.class_b(7)))) = '1' then
 						v.snan := '1';
-					elsif ((v.class_a(9) or v.class_b(9))) then
+					elsif ((v.class_a(9) or v.class_b(9))) = '1' then
 						v.qnan := '1';
 					end if;
 
-					if ((v.class_a(0) or v.class_a(7))) and ((v.class_b(1) or v.class_b(2) or v.class_b(3) or v.class_b(4) or v.class_b(5) or v.class_b(6))) then
+					if (((v.class_a(0) or v.class_a(7))) and ((v.class_b(1) or v.class_b(2) or v.class_b(3) or v.class_b(4) or v.class_b(5) or v.class_b(6)))) = '1' then
 						v.inf := '1';
-					elsif ((v.class_b(3) or v.class_b(4))) and ((v.class_a(1) or v.class_a(2) or v.class_a(5) or v.class_a(6))) then
+					elsif (((v.class_b(3) or v.class_b(4))) and ((v.class_a(1) or v.class_a(2) or v.class_a(5) or v.class_a(6)))) = '1' then
 						v.dbz := '1';
 					end if;
 
-					if ((v.class_a(3) or v.class_a(4))) or ((v.class_b(0) or v.class_b(7))) then
+					if (((v.class_a(3) or v.class_a(4))) or ((v.class_b(0) or v.class_b(7)))) = '1' then
 						v.zero := '1';
 					end if;
 
-					if fp_fdiv_i.op.fsqrt then
-						if v.class_a(7) then
+					if fp_fdiv_i.op.fsqrt = '1' then
+						if v.class_a(7) = '1' then
 							v.inf := '1';
 						end if;
 						if ((v.class_a(0) or v.class_a(1) or v.class_a(2)) = '1') then
@@ -566,7 +566,7 @@ begin
 					v.sign_fdiv := v.a(64) xor v.b(64);
 
 					v.exponent_fdiv := to_integer(signed("0" & v.a(63 downto 52)) - signed("0" & v.b(63 downto 52)));
-					if fp_fdiv_i.op.fsqrt then
+					if fp_fdiv_i.op.fsqrt = '1' then
 						v.exponent_fdiv := to_integer(shift_right((signed("0" & v.a(63 downto 52)) - 2045), 1));
 					end if;
 
@@ -575,7 +575,7 @@ begin
 					v.m := 4X"1" & v.b(51 downto 0) & 1X"0";
 					v.r := 5X"1" & v.a(51 downto 0);
 					v.op := '0';
-					if fp_fdiv_i.op.fsqrt then
+					if fp_fdiv_i.op.fsqrt = '1' then
 						v.m := (others => '0');
 						if v.a(52) = '0' then
 							v.r := v.r(55 downto 0) & '0';

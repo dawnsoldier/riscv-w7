@@ -40,7 +40,11 @@ begin
 
 	begin
 
-		access_type <= data_access when dmem_i.mem_valid = '1' else instr_access;
+		if dmem_i.mem_valid = '1' then
+			access_type <= data_access;
+		else
+			access_type <= instr_access;
+		end if;
 
 		if release_type = data_access and memory_ready = '0' then
 			memory_valid <= '0';
@@ -49,18 +53,36 @@ begin
 			memory_wdata <= (others => '0');
 			memory_wstrb <= (others => '0');
 		else
-			memory_valid <= imem_i.mem_valid when access_type = instr_access else dmem_i.mem_valid;
-			memory_instr <= imem_i.mem_instr when access_type = instr_access else dmem_i.mem_instr;
-			memory_addr <= imem_i.mem_addr when access_type = instr_access else dmem_i.mem_addr;
-			memory_wdata <= imem_i.mem_wdata when access_type = instr_access else dmem_i.mem_wdata;
-			memory_wstrb <= imem_i.mem_wstrb when access_type = instr_access else dmem_i.mem_wstrb;
+			if access_type = instr_access then
+				memory_valid <= imem_i.mem_valid;
+				memory_instr <= imem_i.mem_instr;
+				memory_addr <= imem_i.mem_addr;
+				memory_wdata <= imem_i.mem_wdata;
+				memory_wstrb <= imem_i.mem_wstrb;
+			else
+				memory_valid <= dmem_i.mem_valid;
+				memory_instr <= dmem_i.mem_instr;
+				memory_addr <= dmem_i.mem_addr;
+				memory_wdata <= dmem_i.mem_wdata;
+				memory_wstrb <= dmem_i.mem_wstrb;
+			end if;
 		end if;
 
-		imem_o.mem_ready <= memory_ready when release_type = instr_access else '0';
-		imem_o.mem_rdata <= memory_rdata when release_type = instr_access else (others => '0');
+		if release_type = instr_access then
+			imem_o.mem_ready <= memory_ready;
+			imem_o.mem_rdata <= memory_rdata;
+		else
+			imem_o.mem_ready <= '0';
+			imem_o.mem_rdata <= (others => '0');
+		end if;
 
-		dmem_o.mem_ready <= memory_ready when release_type = data_access else '0';
-		dmem_o.mem_rdata <= memory_rdata when release_type = data_access else (others => '0');
+		if release_type = data_access then
+			dmem_o.mem_ready <= memory_ready;
+			dmem_o.mem_rdata <= memory_rdata;
+		else
+			dmem_o.mem_ready <= '0';
+			dmem_o.mem_rdata <= (others => '0');
+		end if;
 
 	end process;
 

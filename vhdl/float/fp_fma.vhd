@@ -82,18 +82,18 @@ begin
 										fp_fma_i.op.fadd or fp_fma_i.op.fsub or
 										fp_fma_i.op.fmul);
 
-		if fp_fma_i.op.fadd or fp_fma_i.op.fsub then
+		if (fp_fma_i.op.fadd or fp_fma_i.op.fsub) = '1' then
 			c       := b;
 			class_c := class_b;
 			b       := (62 downto 52 => '1', others => '0'); -- +1.0
 			class_b := (6 => '1', others => '0');
 		end if;
 
-		if fp_fma_i.op.fmsub or fp_fma_i.op.fnmsub or fp_fma_i.op.fsub then
+		if (fp_fma_i.op.fmsub or fp_fma_i.op.fnmsub or fp_fma_i.op.fsub) = '1' then
 			c(64) := not c(64);
 		end if;
 
-		if fp_fma_i.op.fmul then
+		if fp_fma_i.op.fmul = '1' then
 			c       := (64 => a(64) xor b(64), others => '0');
 			class_c := (others => '0');
 		end if;
@@ -110,15 +110,15 @@ begin
 		exponent_c := c(63 downto 52);
 		mantissa_c := or_reduce(exponent_c) & c(51 downto 0);
 
-		if class_a(8) or class_b(8) or class_c(8) then
+		if (class_a(8) or class_b(8) or class_c(8)) = '1' then
 			snan := '1';
-		elsif ((class_a(3) or class_a(4)) and (class_b(0) or class_b(7))) or ((class_b(3) or class_b(4)) and (class_a(0) or class_a(7))) then
+		elsif (((class_a(3) or class_a(4)) and (class_b(0) or class_b(7))) or ((class_b(3) or class_b(4)) and (class_a(0) or class_a(7)))) = '1' then
 			snan := '1';
-		elsif (class_a(9) or class_b(9) or class_c(9)) then
+		elsif (class_a(9) or class_b(9) or class_c(9)) = '1' then
 			qnan := '1';
-		elsif (((class_a(0) or class_a(7)) or (class_b(0) or class_b(7))) and ((class_c(0) or class_c(7)) and to_std_logic((a(64) xor b(64)) /= c(64)))) then
+		elsif (((class_a(0) or class_a(7)) or (class_b(0) or class_b(7))) and ((class_c(0) or class_c(7)) and to_std_logic((a(64) xor b(64)) /= c(64)))) = '1' then
 			snan := '1';
-		elsif (class_a(0) or class_a(7)) or (class_b(0) or class_b(7)) or (class_c(0) or class_c(7)) then
+		elsif ((class_a(0) or class_a(7)) or (class_b(0) or class_b(7)) or (class_c(0) or class_c(7))) = '1' then
 			inf := '1';
 		end if;
 
@@ -209,10 +209,10 @@ begin
 		exponent_add := signed("00" & exponent_c);
 		exponent_mul := signed("00" & exponent_a) + signed("00" & exponent_b) - 2047;
 
-		if and_reduce(exponent_c) then
+		if and_reduce(exponent_c) = '1' then
 			exponent_add := 14X"0FFF";
 		end if;
-		if and_reduce(exponent_a) or and_reduce(exponent_b) then
+		if (and_reduce(exponent_a) or and_reduce(exponent_b)) = '1' then
 			exponent_mul := 14X"0FFF";
 		end if;
 
@@ -224,7 +224,7 @@ begin
 
 		exponent_neg := exponent_dif(13);
 
-		if exponent_neg then
+		if exponent_neg = '1' then
 			counter_dif := 56;
 			if exponent_dif > -56 then
 				counter_dif := -to_integer(exponent_dif);
@@ -242,7 +242,7 @@ begin
 
 		mantissa_r := std_logic_vector(shift_right(unsigned(mantissa_r),counter_dif));
 
-		if exponent_neg then
+		if exponent_neg = '1' then
 			mantissa_add := mantissa_l;
 			mantissa_mul := mantissa_r;
 		else
@@ -317,19 +317,19 @@ begin
 		exponent_neg := r_2.exponent_neg;
 		ready        := r_2.ready;
 
-		if exponent_neg then
+		if exponent_neg = '1' then
 			exponent_mac := exponent_add;
 		else
 			exponent_mac := exponent_mul;
 		end if;
 
-		if sign_add then
+		if sign_add = '1' then
 			mantissa_add := not mantissa_add;
 			not_add := 1;
 		else
 			not_add := 0;
 		end if;
-		if sign_mul then
+		if sign_mul = '1' then
 			mantissa_mul := not mantissa_mul;
 			not_mul := 1;
 		else
@@ -341,9 +341,9 @@ begin
 
 		zero := nor_reduce(mantissa_mac);
 
-		if zero then
+		if zero = '1' then
 			sign_mac := sign_add and sign_mul;
-		elsif sign_mac then
+		elsif sign_mac = '1' then
 			mantissa_mac := std_logic_vector(-signed(mantissa_mac));
 		end if;
 
