@@ -6,7 +6,7 @@
 #define MTIMECMP 0x200000
 #define MTIME 0x200008
 
-#define TIMER_COUNT 1
+#define TIMER_COUNT 32768
 
 void putch(char ch)
 {

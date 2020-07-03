@@ -92,25 +92,6 @@ architecture behavior of cpu is
 		);
 	end component;
 
-	component uart
-		generic(
-			clks_per_bit : integer := clks_per_bit
-		);
-		port(
-			reset      : in  std_logic;
-			clock      : in  std_logic;
-			uart_valid : in  std_logic;
-			uart_ready : out std_logic;
-			uart_instr : in  std_logic;
-			uart_addr  : in  std_logic_vector(63 downto 0);
-			uart_wdata : in  std_logic_vector(63 downto 0);
-			uart_wstrb : in  std_logic_vector(7 downto 0);
-			uart_rdata : out std_logic_vector(63 downto 0);
-			uart_rx    : in  std_logic;
-			uart_tx    : out std_logic
-		);
-	end component;
-
 	signal imem_i : mem_in_type;
 	signal imem_o : mem_out_type;
 
