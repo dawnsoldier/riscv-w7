@@ -26,7 +26,8 @@ architecture behavior of csr_unit is
 			csr_wi : in  csr_write_in_type;
 			csr_o  : out csr_out_type;
 			csr_ei : in  csr_exception_in_type;
-			csr_eo : out csr_exception_out_type
+			csr_eo : out csr_exception_out_type;
+			csr_ci : in  csr_counter_in_type
 		);
 	end component;
 
@@ -47,7 +48,8 @@ begin
 			csr_wi => csr_unit_i.csr_wi,
 			csr_o  => csr_unit_o.csr_o,
 			csr_ei => csr_unit_i.csr_ei,
-			csr_eo => csr_unit_o.csr_eo
+			csr_eo => csr_unit_o.csr_eo,
+			csr_ci => csr_unit_i.csr_ci
 		);
 
 	csr_alu_comp : csr_alu

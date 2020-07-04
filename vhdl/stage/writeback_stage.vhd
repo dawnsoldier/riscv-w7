@@ -18,7 +18,7 @@ entity writeback_stage is
 		clock      : in  std_logic;
 		int_reg_wi : out int_register_write_in_type;
 		csr_wi     : out csr_write_in_type;
-		csr_ei     : out csr_exception_in_type;
+		csr_ci     : out csr_counter_in_type;
 		csr_eo     : in  csr_exception_out_type;
 		d          : in  writeback_in_type;
 		q          : out writeback_out_type
@@ -101,14 +101,14 @@ begin
 		csr_wi.waddr <= v.caddr;
 		csr_wi.wdata <= v.cdata;
 
-		csr_ei.load <= v.load;
-		csr_ei.store <= v.store;
-		csr_ei.int <= v.int;
-		csr_ei.fpu <= v.fpu;
-		csr_ei.csr <= v.csr;
-		csr_ei.int_op <= v.int_op;
-		csr_ei.fpu_op <= v.fpu_op;
-		csr_ei.flags <= v.flags;
+		csr_ci.load <= v.load;
+		csr_ci.store <= v.store;
+		csr_ci.int <= v.int;
+		csr_ci.fpu <= v.fpu;
+		csr_ci.csr <= v.csr;
+		csr_ci.int_op <= v.int_op;
+		csr_ci.fpu_op <= v.fpu_op;
+		csr_ci.flags <= v.flags;
 
 		rin <= v;
 

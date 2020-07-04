@@ -22,7 +22,8 @@ entity csr_file is
 		csr_wi : in  csr_write_in_type;
 		csr_o  : out csr_out_type;
 		csr_ei : in  csr_exception_in_type;
-		csr_eo : out csr_exception_out_type
+		csr_eo : out csr_exception_out_type;
+		csr_ci : in  csr_counter_in_type
 	);
 end csr_file;
 
@@ -210,8 +211,8 @@ begin
 
 			else
 
-				if (csr_ei.fpu and (csr_ei.fpu_op.fflag))= '1' then
-					ucsr.fflags <= csr_ei.flags;
+				if (csr_ci.fpu and (csr_ci.fpu_op.fflag)) = '1' then
+					ucsr.fflags <= csr_ci.flags;
 				end if;
 
 				if csr_wi.wren = '1' then
@@ -254,7 +255,7 @@ begin
 
 			else
 
-				instr_valid := csr_ei.int or csr_ei.fpu or csr_ei.csr;
+				instr_valid := csr_ci.int or csr_ci.fpu or csr_ci.csr;
 
 				mcsr.mcycle <= std_logic_vector(unsigned(mcsr.mcycle) + 1);
 

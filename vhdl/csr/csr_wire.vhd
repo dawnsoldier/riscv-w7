@@ -56,6 +56,11 @@ package csr_wire is
 		ecall     : std_logic;
 		ebreak    : std_logic;
 		mret      : std_logic;
+		time_irpt : std_logic;
+		ext_irpt  : std_logic;
+	end record;
+
+	type csr_counter_in_type is record
 		flags     : std_logic_vector(4 downto 0);
 		int_op    : int_operation_type;
 		fpu_op    : fp_operation_type;
@@ -64,8 +69,6 @@ package csr_wire is
 		csr       : std_logic;
 		load      : std_logic;
 		store     : std_logic;
-		time_irpt : std_logic;
-		ext_irpt  : std_logic;
 	end record;
 
 	type csr_exception_out_type is record
@@ -95,6 +98,7 @@ package csr_wire is
 		csr_ri       : csr_read_in_type;
 		csr_wi       : csr_write_in_type;
 		csr_ei       : csr_exception_in_type;
+		csr_ci       : csr_counter_in_type;
 		csr_alu_i    : csr_alu_in_type;
 	end record;
 
