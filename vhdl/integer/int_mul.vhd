@@ -89,6 +89,8 @@ begin
 				rin_1.ready <= ready;
 			end if;
 
+			lzc_i.a <= X"0000000000000000";
+
 		end process;
 
 		process(r_1, int_mul_i)
