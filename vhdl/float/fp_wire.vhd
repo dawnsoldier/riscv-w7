@@ -125,32 +125,41 @@ package fp_wire is
 		data3 : std_logic_vector(63 downto 0);
 	end record;
 
-	type fpu_in_type is record
-		instr  : std_logic_vector(31 downto 0);
-		rden1  : std_logic;
-		rden2  : std_logic;
-		rden3  : std_logic;
-		wren   : std_logic;
-		load   : std_logic;
-		op     : fp_operation_type;
-		frm    : std_logic_vector(2 downto 0);
-		idata  : std_logic_vector(63 downto 0);
-		wdata  : std_logic_vector(63 downto 0);
-		nbox   : std_logic;
-		dclear : std_logic;
-		eclear : std_logic;
-		mclear : std_logic;
-		dstall : std_logic;
-		estall : std_logic;
-		mstall : std_logic;
+	type fpu_dec_in_type is record
+		instr : std_logic_vector(31 downto 0);
+		rden1 : std_logic;
+		rden2 : std_logic;
+		rden3 : std_logic;
+		wren  : std_logic;
+		load  : std_logic;
+		op    : fp_operation_type;
+		frm   : std_logic_vector(2 downto 0);
+		clear : std_logic;
+		stall : std_logic;
 	end record;
 
-	type fpu_out_type is record
+	type fpu_exe_in_type is record
+		idata : std_logic_vector(63 downto 0);
+		clear : std_logic;
+		stall : std_logic;
+	end record;
+
+	type fpu_mem_in_type is record
+		wdata : std_logic_vector(63 downto 0);
+		nbox  : std_logic;
+		clear : std_logic;
+		stall : std_logic;
+	end record;
+
+	type fpu_dec_out_type is record
+		stall   : std_logic;
+	end record;
+
+	type fpu_exe_out_type is record
 		wdata    : std_logic_vector(63 downto 0);
 		sdata    : std_logic_vector(63 downto 0);
 		flags    : std_logic_vector(4 downto 0);
-		dstall   : std_logic;
-		estall   : std_logic;
+		stall   : std_logic;
 	end record;
 
 	type fp_rnd_in_type is record

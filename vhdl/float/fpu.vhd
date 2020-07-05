@@ -14,12 +14,15 @@ use work.fp_lib.all;
 
 entity fpu is
 	port(
-		reset    : in  std_logic;
-		clock    : in  std_logic;
-		fpu_i    : in  fpu_in_type;
-		fpu_o    : out fpu_out_type;
-		fp_dec_i : in  fp_dec_in_type;
-		fp_dec_o : out fp_dec_out_type
+		reset     : in  std_logic;
+		clock     : in  std_logic;
+		fpu_dec_i : in  fpu_dec_in_type;
+		fpu_dec_o : out fpu_dec_out_type;
+		fpu_exe_i : in  fpu_exe_in_type;
+		fpu_exe_o : out fpu_exe_out_type;
+		fpu_mem_i : in  fpu_mem_in_type;
+		fp_dec_i  : in  fp_dec_in_type;
+		fp_dec_o  : out fp_dec_out_type
 	);
 end fpu;
 
@@ -121,8 +124,11 @@ begin
 		port map(
 			reset     => reset,
 			clock     => clock,
-			fpu_i     => fpu_i,
-			fpu_o     => fpu_o,
+			fpu_dec_i => fpu_dec_i,
+			fpu_dec_o => fpu_dec_o,
+			fpu_exe_i => fpu_exe_i,
+			fpu_exe_o => fpu_exe_o,
+			fpu_mem_i => fpu_mem_i,
 			fp_exe_o  => fp_exe_o,
 			fp_exe_i  => fp_exe_i,
 			fp_reg_o  => fp_reg_o,

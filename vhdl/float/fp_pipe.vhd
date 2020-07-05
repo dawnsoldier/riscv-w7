@@ -15,8 +15,11 @@ entity fp_pipe is
 	port(
 		reset     : in  std_logic;
 		clock     : in  std_logic;
-		fpu_i     : in  fpu_in_type;
-		fpu_o     : out fpu_out_type;
+		fpu_dec_i : in  fpu_dec_in_type;
+		fpu_dec_o : out fpu_dec_out_type;
+		fpu_exe_i : in  fpu_exe_in_type;
+		fpu_exe_o : out fpu_exe_out_type;
+		fpu_mem_i : in  fpu_mem_in_type;
 		fp_exe_o  : in  fp_exe_out_type;
 		fp_exe_i  : out fp_exe_in_type;
 		fp_reg_o  : in  fp_reg_out_type;
@@ -44,13 +47,13 @@ signal rin_wrb : fp_writeback_reg_type := init_fp_writeback_reg;
 
 begin
 
-	decode : process(r_dec,r_exe,r_mem,fpu_i)
+	decode : process(r_dec,r_exe,r_mem,fpu_dec_i)
 
 		variable v : fp_decode_reg_type;
 
 	begin
 
-		v.instr := fpu_i.instr;
+		v.instr := fpu_dec_i.instr;
 
 		v.stall := '0';
 
@@ -61,15 +64,15 @@ begin
 		v.fmt := v.instr(26 downto 25);
 		v.rm := v.instr(14 downto 12);
 
-		v.rden1 := fpu_i.rden1;
-		v.rden2 := fpu_i.rden2;
-		v.rden3 := fpu_i.rden3;
-		v.wren := fpu_i.wren;
-		v.load := fpu_i.load;
-		v.op := fpu_i.op;
+		v.rden1 := fpu_dec_i.rden1;
+		v.rden2 := fpu_dec_i.rden2;
+		v.rden3 := fpu_dec_i.rden3;
+		v.wren := fpu_dec_i.wren;
+		v.load := fpu_dec_i.load;
+		v.op := fpu_dec_i.op;
 
 		if and_reduce(v.rm) = '1' then
-			v.rm := fpu_i.frm;
+			v.rm := fpu_dec_i.frm;
 		end if;
 
 		if r_dec.load = '1' then
@@ -86,19 +89,19 @@ begin
 			v.stall := '1';
 		end if;
 
-		fpu_o.dstall <= v.stall;
+		fpu_dec_o.stall <= v.stall;
 
-		if fpu_i.dstall = '1' then
-			v.stall := fpu_i.dstall;
+		if fpu_dec_i.stall = '1' then
+			v.stall := fpu_dec_i.stall;
 		end if;
 
-		if (v.stall or fpu_i.dclear) = '1' then
+		if (v.stall or fpu_dec_i.clear) = '1' then
 			v.wren := '0';
 			v.load := '0';
 			v.op := init_fp_operation;
 		end if;
 
-		if fpu_i.dclear = '1' then
+		if fpu_dec_i.clear = '1' then
 			v.stall := '0';
 		end if;
 
@@ -106,7 +109,7 @@ begin
 
 	end process;
 
-	execute : process(r_dec,r_exe,r_mem,fpu_i,fp_exe_o,fp_reg_o,fp_for_o)
+	execute : process(r_dec,r_exe,r_mem,fpu_exe_i,fp_exe_o,fp_reg_o,fp_for_o)
 
 		variable v : fp_execute_reg_type;
 
@@ -150,7 +153,7 @@ begin
 
 		v.sdata := v.rdata2;
 
-		v.idata := fpu_i.idata;
+		v.idata := fpu_exe_i.idata;
 
 		if (r_exe.stall or r_mem.stall) = '1' then
 			v := r_exe;
@@ -159,7 +162,7 @@ begin
 		v.stall := '0';
 
 		v.enable := not(r_exe.stall or r_mem.stall);
-		v.clear := fpu_i.eclear;
+		v.clear := fpu_exe_i.clear;
 
 		fp_exe_i.idata <= v.idata;
 		fp_exe_i.data1 <= v.rdata1;
@@ -183,30 +186,30 @@ begin
 			end if;
 		end if;
 
-		fpu_o.estall <= v.stall;
+		fpu_exe_o.stall <= v.stall;
 
-		if fpu_i.estall = '1' then
-			v.stall := fpu_i.estall;
+		if fpu_exe_i.stall = '1' then
+			v.stall := fpu_exe_i.stall;
 		end if;
 
-		if (v.stall or fpu_i.eclear) = '1' then
+		if (v.stall or fpu_exe_i.clear) = '1' then
 			v.wren := '0';
 			v.load := '0';
 		end if;
 
-		if fpu_i.eclear = '1' then
+		if fpu_exe_i.clear = '1' then
 			v.stall := '0';
 		end if;
 
 		rin_exe <= v;
 
-		fpu_o.wdata <= v.wdata;
-		fpu_o.sdata <= v.sdata;
-		fpu_o.flags <= v.flags;
+		fpu_exe_o.wdata <= v.wdata;
+		fpu_exe_o.sdata <= v.sdata;
+		fpu_exe_o.flags <= v.flags;
 
 	end process;
 
-	memory : process(r_exe,r_mem,fpu_i)
+	memory : process(r_exe,r_mem,fpu_mem_i)
 
 		variable v : fp_memory_reg_type;
 
@@ -225,18 +228,18 @@ begin
 		v.stall := '0';
 
 		if v.load = '1' then
-			v.wdata := nan_boxing(fpu_i.wdata,fpu_i.nbox);
+			v.wdata := nan_boxing(fpu_mem_i.wdata,fpu_mem_i.nbox);
 		end if;
 
-		if fpu_i.mstall = '1' then
-			v.stall := fpu_i.mstall;
+		if fpu_mem_i.stall = '1' then
+			v.stall := fpu_mem_i.stall;
 		end if;
 
-		if (v.stall or fpu_i.mclear) = '1' then
+		if (v.stall or fpu_mem_i.clear) = '1' then
 			v.wren := '0';
 		end if;
 
-		if fpu_i.mclear = '1' then
+		if fpu_mem_i.clear = '1' then
 			v.stall := '0';
 		end if;
 

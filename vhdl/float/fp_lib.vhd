@@ -55,8 +55,11 @@ package fp_lib is
 		port(
 			reset     : in  std_logic;
 			clock     : in  std_logic;
-			fpu_i     : in  fpu_in_type;
-			fpu_o     : out fpu_out_type;
+			fpu_dec_i : in  fpu_dec_in_type;
+			fpu_dec_o : out fpu_dec_out_type;
+			fpu_exe_i : in  fpu_exe_in_type;
+			fpu_exe_o : out fpu_exe_out_type;
+			fpu_mem_i : in  fpu_mem_in_type;
 			fp_exe_o  : in  fp_exe_out_type;
 			fp_exe_i  : out fp_exe_in_type;
 			fp_reg_o  : in  fp_reg_out_type;

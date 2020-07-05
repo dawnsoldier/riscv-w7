@@ -18,8 +18,6 @@ entity fetch_stage is
 		reset    : in  std_logic;
 		clock    : in  std_logic;
 		csr_eo   : in  csr_exception_out_type;
-		fpu_o    : in  fpu_out_type;
-		fpu_i    : out fpu_in_type;
 		btb_o    : in  btb_out_type;
 		btb_i    : out btb_in_type;
 		pfetch_o : in  prefetch_out_type;

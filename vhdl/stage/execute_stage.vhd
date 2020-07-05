@@ -29,8 +29,8 @@ entity execute_stage is
 		csr_alu_i      : out csr_alu_in_type;
 		csr_alu_o      : in  csr_alu_out_type;
 		csr_eo         : in  csr_exception_out_type;
-		fpu_o          : in  fpu_out_type;
-		fpu_i          : out fpu_in_type;
+		fpu_exe_o      : in  fpu_exe_out_type;
+		fpu_exe_i      : out fpu_exe_in_type;
 		dmem_i         : out mem_in_type;
 		dpmp_o         : in  pmp_out_type;
 		dpmp_i         : out pmp_in_type;
@@ -48,7 +48,7 @@ architecture behavior of execute_stage is
 
 begin
 
-	combinational : process(d, r, int_for_o, int_reg_o, csr_o, csr_eo, int_pipeline_o, csr_alu_o, fpu_o, dpmp_o, time_irpt, ext_irpt)
+	combinational : process(d, r, int_for_o, int_reg_o, csr_o, csr_eo, int_pipeline_o, csr_alu_o, fpu_exe_o, dpmp_o, time_irpt, ext_irpt)
 
 		variable v : execute_reg_type;
 
@@ -130,15 +130,15 @@ begin
 
 		v.enable := not(d.e.stall or d.m.stall or d.w.stall);
 
-		fpu_i.idata <= v.rdata1;
+		fpu_exe_i.idata <= v.rdata1;
 
 		if v.fpu_store = '1' then
-			v.sdata := fpu_o.sdata;
+			v.sdata := fpu_exe_o.sdata;
 		else
 			v.sdata := v.rdata2;
 		end if;
 
-		v.flags := fpu_o.flags;
+		v.flags := fpu_exe_o.flags;
 
 		int_pipeline_i.pc <= v.pc;
 		int_pipeline_i.npc <= v.npc;
@@ -166,7 +166,7 @@ begin
 		elsif v.int = '1' then
 			v.wdata := v.idata;
 		elsif v.fpu = '1' then
-			v.wdata := fpu_o.wdata;
+			v.wdata := fpu_exe_o.wdata;
 		end if;
 
 		csr_alu_i.rs1 <= v.rdata1;
@@ -223,14 +223,14 @@ begin
 			end if;
 		end if;
 
-		fpu_i.estall <= v.stall;
-		fpu_i.eclear <= v.clear;
+		fpu_exe_i.stall <= v.stall;
+		fpu_exe_i.clear <= v.clear;
 
 		if v.fpu_op.fmcycle = '1' then
-			if fpu_o.estall = '0' then
+			if fpu_exe_o.stall = '0' then
 				v.stall := '0';
 				v.fpu := '1';
-			elsif fpu_o.estall = '1' then
+			elsif fpu_exe_o.stall = '1' then
 				v.stall := '1';
 			end if;
 		end if;

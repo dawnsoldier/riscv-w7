@@ -25,8 +25,8 @@ entity decode_stage is
 		fp_dec_i      : out fp_dec_in_type;
 		fp_dec_o      : in  fp_dec_out_type;
 		csr_eo        : in  csr_exception_out_type;
-		fpu_o         : in  fpu_out_type;
-		fpu_i         : out fpu_in_type;
+		fpu_dec_o     : in  fpu_dec_out_type;
+		fpu_dec_i     : out fpu_dec_in_type;
 		d             : in  decode_in_type;
 		q             : out decode_out_type
 	);
@@ -39,7 +39,7 @@ architecture behavior of decode_stage is
 
 begin
 
-	combinational : process(d, r, int_decode_o, comp_decode_o, fp_dec_o, csr_eo, fpu_o)
+	combinational : process(d, r, int_decode_o, comp_decode_o, fp_dec_o, csr_eo, fpu_dec_o)
 
 		variable v : decode_reg_type;
 
@@ -178,14 +178,14 @@ begin
 			v.fpu_store := '0';
 		end if;
 
-		fpu_i.instr <= v.instr;
-		fpu_i.rden1 <= v.fpu_rden1;
-		fpu_i.rden2 <= v.fpu_rden2;
-		fpu_i.rden3 <= v.fpu_rden3;
-		fpu_i.wren <= v.fpu_wren;
-		fpu_i.load <= v.fpu_load;
-		fpu_i.op <= v.fpu_op;
-		fpu_i.frm <= csr_eo.frm;
+		fpu_dec_i.instr <= v.instr;
+		fpu_dec_i.rden1 <= v.fpu_rden1;
+		fpu_dec_i.rden2 <= v.fpu_rden2;
+		fpu_dec_i.rden3 <= v.fpu_rden3;
+		fpu_dec_i.wren <= v.fpu_wren;
+		fpu_dec_i.load <= v.fpu_load;
+		fpu_dec_i.op <= v.fpu_op;
+		fpu_dec_i.frm <= csr_eo.frm;
 
 		v.link_waddr := (v.waddr = "00001") or (v.waddr = "00101");
 		v.link_raddr1 := (v.raddr1 = "00001") or (v.raddr1 = "00101");
@@ -282,10 +282,10 @@ begin
 			v.stall := '1';
 		end if;
 
-		fpu_i.dstall <= v.stall;
-		fpu_i.dclear <= v.clear;
+		fpu_dec_i.stall <= v.stall;
+		fpu_dec_i.clear <= v.clear;
 
-		if (fpu_o.dstall) = '1' then
+		if (fpu_dec_o.stall) = '1' then
 			v.stall := '1';
 		end if;
 

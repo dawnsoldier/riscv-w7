@@ -15,14 +15,13 @@ use work.fp_wire.all;
 
 entity memory_stage is
 	port(
-		reset  : in  std_logic;
-		clock  : in  std_logic;
-		csr_eo : in  csr_exception_out_type;
-		fpu_o  : in  fpu_out_type;
-		fpu_i  : out fpu_in_type;
-		dmem_o : in  mem_out_type;
-		d      : in  memory_in_type;
-		q      : out memory_out_type
+		reset     : in  std_logic;
+		clock     : in  std_logic;
+		csr_eo    : in  csr_exception_out_type;
+		fpu_mem_i : out fpu_mem_in_type;
+		dmem_o    : in  mem_out_type;
+		d         : in  memory_in_type;
+		q         : out memory_out_type
 	);
 end memory_stage;
 
@@ -33,7 +32,7 @@ architecture behavior of memory_stage is
 
 begin
 
-	combinational : process(d, r, csr_eo, fpu_o, dmem_o)
+	combinational : process(d, r, csr_eo, dmem_o)
 
 		variable v : memory_reg_type;
 
@@ -107,11 +106,11 @@ begin
 			end if;
 		end if;
 
-		fpu_i.wdata <= v.wdata;
-		fpu_i.nbox <= v.load_op.mem_lw;
+		fpu_mem_i.wdata <= v.wdata;
+		fpu_mem_i.nbox <= v.load_op.mem_lw;
 
-		fpu_i.mstall <= v.stall;
-		fpu_i.mclear <= v.clear;
+		fpu_mem_i.stall <= v.stall;
+		fpu_mem_i.clear <= v.clear;
 
 		if (v.stall or v.clear) = '1' then
 			v.int_wren := '0';
