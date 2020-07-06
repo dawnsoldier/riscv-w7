@@ -36,7 +36,9 @@ entity execute_stage is
 		dpmp_i         : out pmp_in_type;
 		time_irpt      : in  std_logic;
 		ext_irpt       : in  std_logic;
+		a              : in  execute_in_type;
 		d              : in  execute_in_type;
+		y              : out execute_out_type;
 		q              : out execute_out_type
 	);
 end execute_stage;
@@ -283,6 +285,46 @@ begin
 		csr_ei.ext_irpt <= ext_irpt;
 
 		rin <= v;
+
+		y.pc <= v.pc;
+		y.npc <= v.npc;
+		y.funct3 <= v.funct3;
+		y.int_wren <= v.int_wren;
+		y.fpu_wren <= v.fpu_wren;
+		y.csr_wren <= v.csr_wren;
+		y.waddr <= v.waddr;
+		y.caddr <= v.caddr;
+		y.wdata <= v.wdata;
+		y.cdata <= v.cdata;
+		y.sdata <= v.sdata;
+		y.flags <= v.flags;
+		y.load <= v.load;
+		y.store <= v.store;
+		y.fpu_load <= v.fpu_load;
+		y.fpu_store <= v.fpu_store;
+		y.int <= v.int;
+		y.fpu <= v.fpu;
+		y.csr <= v.csr;
+		y.load_op <= v.load_op;
+		y.store_op <= v.store_op;
+		y.int_op <= v.int_op;
+		y.fpu_op <= v.fpu_op;
+		y.return_pop <= v.return_pop;
+		y.return_push <= v.return_push;
+		y.jump_uncond <= v.jump_uncond;
+		y.jump_rest <= v.jump_rest;
+		y.taken <= v.taken;
+		y.jump <= v.jump;
+		y.address <= v.address;
+		y.byteenable <= v.byteenable;
+		y.strobe <= v.strobe;
+		y.etval <= v.etval;
+		y.ecause <= v.ecause;
+		y.exc <= v.exc;
+		y.ecall <= v.ecall;
+		y.ebreak <= v.ebreak;
+		y.mret <= v.mret;
+		y.stall <= v.stall;
 
 		q.pc <= r.pc;
 		q.npc <= r.npc;

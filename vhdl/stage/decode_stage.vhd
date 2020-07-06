@@ -27,7 +27,9 @@ entity decode_stage is
 		csr_eo        : in  csr_exception_out_type;
 		fpu_dec_o     : in  fpu_dec_out_type;
 		fpu_dec_i     : out fpu_dec_in_type;
+		a             : in  decode_in_type;
 		d             : in  decode_in_type;
+		y             : out decode_out_type;
 		q             : out decode_out_type
 	);
 end decode_stage;
@@ -318,6 +320,51 @@ begin
 		end if;
 
 		rin <= v;
+
+		y.pc <= v.pc;
+		y.npc <= v.npc;
+		y.funct3 <= v.funct3;
+		y.funct7 <= v.funct7;
+		y.fmt <= v.fmt;
+		y.rm <= v.rm;
+		y.imm <= v.imm;
+		y.int_rden1 <= v.int_rden1;
+		y.int_rden2 <= v.int_rden2;
+		y.csr_rden <= v.csr_rden;
+		y.int_wren <= v.int_wren;
+		y.fpu_wren <= v.fpu_wren;
+		y.csr_wren <= v.csr_wren;
+		y.raddr1 <= v.raddr1;
+		y.raddr2 <= v.raddr2;
+		y.raddr3 <= v.raddr3;
+		y.waddr <= v.waddr;
+		y.caddr <= v.caddr;
+		y.load <= v.load;
+		y.store <= v.store;
+		y.fpu_load <= v.fpu_load;
+		y.fpu_store <= v.fpu_store;
+		y.int <= v.int;
+		y.fpu <= v.fpu;
+		y.csr <= v.csr;
+		y.comp <= v.comp;
+		y.load_op <= v.load_op;
+		y.store_op <= v.store_op;
+		y.int_op <= v.int_op;
+		y.fpu_op <= v.fpu_op;
+		y.return_pop <= v.return_pop;
+		y.return_push <= v.return_push;
+		y.jump_uncond <= v.jump_uncond;
+		y.jump_rest <= v.jump_rest;
+		y.taken <= v.taken;
+		y.etval <= v.etval;
+		y.ecause <= v.ecause;
+		y.exc <= v.exc;
+		y.ecall <= v.ecall;
+		y.ebreak <= v.ebreak;
+		y.mret <= v.mret;
+		y.wfi <= v.wfi;
+		y.fence <= v.fence;
+		y.stall <= v.stall;
 
 		q.pc <= r.pc;
 		q.npc <= r.npc;

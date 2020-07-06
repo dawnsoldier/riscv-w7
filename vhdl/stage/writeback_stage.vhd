@@ -20,7 +20,9 @@ entity writeback_stage is
 		csr_wi     : out csr_write_in_type;
 		csr_ci     : out csr_counter_in_type;
 		csr_eo     : in  csr_exception_out_type;
+		a          : in  writeback_in_type;
 		d          : in  writeback_in_type;
+		y          : out writeback_out_type;
 		q          : out writeback_out_type
 	);
 end writeback_stage;
@@ -111,6 +113,13 @@ begin
 		csr_ci.flags <= v.flags;
 
 		rin <= v;
+
+		y.exc <= v.exc;
+		y.ecall <= v.ecall;
+		y.ebreak <= v.ebreak;
+		y.mret <= v.mret;
+		y.stall <= v.stall;
+		y.clear <= v.clear;
 
 		q.exc <= r.exc;
 		q.ecall <= r.ecall;

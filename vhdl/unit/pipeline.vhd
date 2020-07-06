@@ -47,7 +47,9 @@ architecture behavior of pipeline is
 			imem_i   : out mem_in_type;
 			ipmp_o   : in  pmp_out_type;
 			ipmp_i   : out pmp_in_type;
+			a        : in  fetch_in_type;
 			d        : in  fetch_in_type;
+			y        : out fetch_out_type;
 			q        : out fetch_out_type
 		);
 	end component;
@@ -65,7 +67,9 @@ architecture behavior of pipeline is
 			csr_eo        : in  csr_exception_out_type;
 			fpu_dec_o     : in  fpu_dec_out_type;
 			fpu_dec_i     : out fpu_dec_in_type;
+			a             : in  decode_in_type;
 			d             : in  decode_in_type;
+			y             : out decode_out_type;
 			q             : out decode_out_type
 		);
 	end component;
@@ -93,7 +97,9 @@ architecture behavior of pipeline is
 			dpmp_i         : out pmp_in_type;
 			time_irpt      : in  std_logic;
 			ext_irpt       : in  std_logic;
+			a              : in  execute_in_type;
 			d              : in  execute_in_type;
+			y              : out execute_out_type;
 			q              : out execute_out_type
 		);
 	end component;
@@ -105,7 +111,9 @@ architecture behavior of pipeline is
 			csr_eo    : in  csr_exception_out_type;
 			fpu_mem_i : out fpu_mem_in_type;
 			dmem_o    : in  mem_out_type;
+			a         : in  memory_in_type;
 			d         : in  memory_in_type;
+			y         : out memory_out_type;
 			q         : out memory_out_type
 		);
 	end component;
@@ -118,7 +126,9 @@ architecture behavior of pipeline is
 			csr_wi     : out csr_write_in_type;
 			csr_ci     : out csr_counter_in_type;
 			csr_eo     : in  csr_exception_out_type;
+			a          : in  writeback_in_type;
 			d          : in  writeback_in_type;
+			y          : out writeback_out_type;
 			q          : out writeback_out_type
 		);
 	end component;
@@ -180,6 +190,12 @@ architecture behavior of pipeline is
 		);
 	end component;
 
+	signal fetch_y     : fetch_out_type;
+	signal decode_y    : decode_out_type;
+	signal execute_y   : execute_out_type;
+	signal memory_y    : memory_out_type;
+	signal writeback_y : writeback_out_type;
+
 	signal fetch_q     : fetch_out_type;
 	signal decode_q    : decode_out_type;
 	signal execute_q   : execute_out_type;
@@ -227,11 +243,17 @@ begin
 			imem_i   => imem_i,
 			ipmp_o   => ipmp_o,
 			ipmp_i   => ipmp_i,
+			a.f      => fetch_y,
+			a.d      => decode_y,
+			a.e      => execute_y,
+			a.m      => memory_y,
+			a.w      => writeback_y,
 			d.f      => fetch_q,
 			d.d      => decode_q,
 			d.e      => execute_q,
 			d.m      => memory_q,
 			d.w      => writeback_q,
+			y        => fetch_y,
 			q        => fetch_q
 		);
 
@@ -248,11 +270,17 @@ begin
 			csr_eo        => csr_unit_o.csr_eo,
 			fpu_dec_o     => fpu_dec_o,
 			fpu_dec_i     => fpu_dec_i,
+			a.f           => fetch_y,
+			a.d           => decode_y,
+			a.e           => execute_y,
+			a.m           => memory_y,
+			a.w           => writeback_y,
 			d.f           => fetch_q,
 			d.d           => decode_q,
 			d.e           => execute_q,
 			d.m           => memory_q,
 			d.w           => writeback_q,
+			y             => decode_y,
 			q             => decode_q
 		);
 
@@ -279,11 +307,17 @@ begin
 			dpmp_i         => dpmp_i,
 			time_irpt      => time_irpt,
 			ext_irpt       => ext_irpt,
+			a.f            => fetch_y,
+			a.d            => decode_y,
+			a.e            => execute_y,
+			a.m            => memory_y,
+			a.w            => writeback_y,
 			d.f            => fetch_q,
 			d.d            => decode_q,
 			d.e            => execute_q,
 			d.m            => memory_q,
 			d.w            => writeback_q,
+			y              => execute_y,
 			q              => execute_q
 		);
 
@@ -294,11 +328,17 @@ begin
 			csr_eo    => csr_unit_o.csr_eo,
 			fpu_mem_i => fpu_mem_i,
 			dmem_o    => dmem_o,
+			a.f       => fetch_y,
+			a.d       => decode_y,
+			a.e       => execute_y,
+			a.m       => memory_y,
+			a.w       => writeback_y,
 			d.f       => fetch_q,
 			d.d       => decode_q,
 			d.e       => execute_q,
 			d.m       => memory_q,
 			d.w       => writeback_q,
+			y         => memory_y,
 			q         => memory_q
 		);
 
@@ -310,11 +350,17 @@ begin
 			csr_wi     => csr_unit_i.csr_wi,
 			csr_ci     => csr_unit_i.csr_ci,
 			csr_eo     => csr_unit_o.csr_eo,
+			a.f        => fetch_y,
+			a.d        => decode_y,
+			a.e        => execute_y,
+			a.m        => memory_y,
+			a.w        => writeback_y,
 			d.f        => fetch_q,
 			d.d        => decode_q,
 			d.e        => execute_q,
 			d.m        => memory_q,
 			d.w        => writeback_q,
+			y          => writeback_y,
 			q          => writeback_q
 		);
 

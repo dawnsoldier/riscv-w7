@@ -20,7 +20,9 @@ entity memory_stage is
 		csr_eo    : in  csr_exception_out_type;
 		fpu_mem_i : out fpu_mem_in_type;
 		dmem_o    : in  mem_out_type;
+		a         : in  memory_in_type;
 		d         : in  memory_in_type;
+		y         : out memory_out_type;
 		q         : out memory_out_type
 	);
 end memory_stage;
@@ -128,6 +130,35 @@ begin
 		end if;
 
 		rin <= v;
+
+		y.pc <= v.pc;
+		y.int_wren <= v.int_wren;
+		y.fpu_wren <= v.fpu_wren;
+		y.csr_wren <= v.csr_wren;
+		y.waddr <= v.waddr;
+		y.caddr <= v.caddr;
+		y.wdata <= v.wdata;
+		y.cdata <= v.cdata;
+		y.flags <= v.flags;
+		y.load <= v.load;
+		y.store <= v.store;
+		y.fpu_load <= v.fpu_load;
+		y.fpu_store <= v.fpu_store;
+		y.int <= v.int;
+		y.fpu <= v.fpu;
+		y.csr <= v.csr;
+		y.load_op <= v.load_op;
+		y.store_op <= v.store_op;
+		y.int_op <= v.int_op;
+		y.fpu_op <= v.fpu_op;
+		y.byteenable <= v.byteenable;
+		y.etval <= v.etval;
+		y.ecause <= v.ecause;
+		y.exc <= v.exc;
+		y.ecall <= v.ecall;
+		y.ebreak <= v.ebreak;
+		y.mret <= v.mret;
+		y.stall <= v.stall;
 
 		q.pc <= r.pc;
 		q.int_wren <= r.int_wren;

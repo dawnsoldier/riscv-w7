@@ -26,7 +26,9 @@ entity fetch_stage is
 		imem_i   : out mem_in_type;
 		ipmp_o   : in  pmp_out_type;
 		ipmp_i   : out pmp_in_type;
+		a        : in  fetch_in_type;
 		d        : in  fetch_in_type;
+		y        : out fetch_out_type;
 		q        : out fetch_out_type
 	);
 end fetch_stage;
@@ -140,6 +142,13 @@ begin
 		imem_i.mem_wstrb <= (others => '0');
 
 		rin <= v;
+
+		y.pc <= v.pc;
+		y.instr <= v.instr;
+		y.taken <= v.taken;
+		y.exc <= v.exc;
+		y.etval <= v.etval;
+		y.ecause <= v.ecause;
 
 		q.pc <= r.pc;
 		q.instr <= v.instr;
