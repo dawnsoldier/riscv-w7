@@ -89,26 +89,6 @@ architecture behavior of bram_mem is
 		finish;
 	end procedure exceed;
 
-	procedure print(
-		signal info        : inout string(1 to 511);
-		signal counter     : inout natural range 1 to 511;
-		signal data        : in std_logic_vector(7 downto 0)) is
-		variable buf       : line;
-	begin
-		if data = X"0A" then
-			write(buf, info);
-			writeline(output, buf);
-			info <= (others => character'val(0));
-			counter <= 1;
-		else
-			info(counter) <= character'val(to_integer(unsigned(data)));
-			counter <= counter + 1;
-		end if;
-	end procedure print;
-
-	signal massage      : string(1 to 511) := (others => character'val(0));
-	signal index        : natural range 1 to 511 := 1;
-
 	signal memory_block : memory_type := init_memory("bram_mem.dat");
 
 	attribute ram_style : string;
@@ -129,11 +109,7 @@ begin
 
 			if bram_valid = '1' then
 
-				if nor_reduce(bram_addr xor uart_base_addr) = '1' and or_reduce(bram_wstrb) = '1' then
-
-					print(massage,index,bram_wdata(7 downto 0));
-
-				elsif unsigned(bram_addr(63 downto 3)) > (2**bram_depth-1) then
+				if unsigned(bram_addr(63 downto 3)) > (2**bram_depth-1) then
 
 					exceed;
 

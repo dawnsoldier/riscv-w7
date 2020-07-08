@@ -19,25 +19,31 @@ architecture behavior of top_cpu is
 		port(
 			reset : in  std_logic;
 			clock : in  std_logic;
-			rtc   : in  std_logic
+			rtc   : in  std_logic;
+			rx    : in  std_logic;
+			tx    : out std_logic
 		);
 	end component;
 
 	signal reset : std_logic := '0';
 	signal clock : std_logic := '0';
 	signal rtc   : std_logic := '0';
+	signal rx    : std_logic := '0';
+	signal tx    : std_logic := '0';
 
 begin
 
-	reset <= '1' after 10 ns;
-	clock <= not clock after 1 ns;
+	reset <= '1' after 100 ns;
+	clock <= not clock after 20 ns;
 	rtc <= not rtc after 30517578.125 ps;
 
 	cpu_comp : cpu
 		port map(
 			reset => reset,
 			clock => clock,
-			rtc   => rtc
+			rtc   => rtc,
+			rx    => rx,
+			tx    => tx
 		);
 
 end architecture;

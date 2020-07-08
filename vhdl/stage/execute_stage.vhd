@@ -217,7 +217,13 @@ begin
 
 		if v.int_op.mcycle = '1' then
 			if v.ready = '0' then
-				v.stall := '1';
+				if (d.m.stall or d.w.stall) = '0' then
+					v.stall := '1';
+				else
+					v.int := '1';
+					v.int_wren := or_reduce(v.waddr);
+					v.wdata := r.wdata;
+				end if;
 			elsif v.ready = '1' then
 				v.int := '1';
 				v.int_wren := or_reduce(v.waddr);
@@ -233,7 +239,9 @@ begin
 				v.stall := '0';
 				v.fpu := '1';
 			elsif fpu_exe_o.stall = '1' then
-				v.stall := '1';
+				if (d.m.stall or d.w.stall) = '0' then
+					v.stall := '1';
+				end if;
 			end if;
 		end if;
 

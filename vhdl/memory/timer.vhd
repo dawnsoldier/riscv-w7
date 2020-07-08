@@ -26,7 +26,7 @@ end timer;
 
 architecture behavior of timer is
 
-	signal mtime     : std_logic_vector(63 downto 0) := (others => '0');
+	signal mtime    : std_logic_vector(63 downto 0) := (others => '0');
 	signal mtimecmp : std_logic_vector(63 downto 0) := (others => '0');
 
 	signal rdata : std_logic_vector(63 downto 0) := (others => '0');

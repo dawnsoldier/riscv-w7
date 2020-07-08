@@ -107,6 +107,8 @@ $SYNTAX $DIR/vhdl/memory/pmp.vhd
 $ANALYS $DIR/vhdl/memory/pmp.vhd
 $SYNTAX $DIR/vhdl/memory/timer.vhd
 $ANALYS $DIR/vhdl/memory/timer.vhd
+$SYNTAX $DIR/vhdl/memory/uart.vhd
+$ANALYS $DIR/vhdl/memory/uart.vhd
 
 $SYNTAX $DIR/vhdl/speedup/prefetch.vhd
 $ANALYS $DIR/vhdl/speedup/prefetch.vhd

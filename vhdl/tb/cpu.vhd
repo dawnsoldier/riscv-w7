@@ -3,16 +3,23 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use ieee.std_logic_misc.all;
 
 use work.configure.all;
 use work.constants.all;
 use work.wire.all;
 
+library std;
+use std.textio.all;
+use std.env.all;
+
 entity cpu is
 	port(
 		reset : in  std_logic;
 		clock : in  std_logic;
-		rtc   : in  std_logic
+		rtc   : in  std_logic;
+		rx    : in  std_logic;
+		tx    : out std_logic
 	);
 end entity cpu;
 
@@ -92,6 +99,25 @@ architecture behavior of cpu is
 		);
 	end component;
 
+	component uart
+		generic(
+			clks_per_bit : integer := clks_per_bit
+		);
+		port(
+			reset      : in  std_logic;
+			clock      : in  std_logic;
+			uart_valid : in  std_logic;
+			uart_ready : out std_logic;
+			uart_instr : in  std_logic;
+			uart_addr  : in  std_logic_vector(63 downto 0);
+			uart_wdata : in  std_logic_vector(63 downto 0);
+			uart_wstrb : in  std_logic_vector(7 downto 0);
+			uart_rdata : out std_logic_vector(63 downto 0);
+			uart_rx    : in  std_logic;
+			uart_tx    : out std_logic
+		);
+	end component;
+
 	signal imem_i : mem_in_type;
 	signal imem_o : mem_out_type;
 
@@ -137,6 +163,26 @@ architecture behavior of cpu is
 
 	signal timer_irpt : std_logic;
 
+	signal massage      : string(1 to 511) := (others => character'val(0));
+	signal index        : natural range 1 to 511 := 1;
+
+	procedure print(
+		signal info        : inout string(1 to 511);
+		signal counter     : inout natural range 1 to 511;
+		signal data        : in std_logic_vector(7 downto 0)) is
+		variable buf       : line;
+	begin
+		if data = X"0A" then
+			write(buf, info);
+			writeline(output, buf);
+			info <= (others => character'val(0));
+			counter <= 1;
+		else
+			info(counter) <= character'val(to_integer(unsigned(data)));
+			counter <= counter + 1;
+		end if;
+	end procedure print;
+
 begin
 
 	process(memory_valid,memory_instr,memory_addr,memory_wdata,memory_wstrb,
@@ -149,6 +195,11 @@ begin
 			bram_valid <= '0';
 			uart_valid <= '0';
 			timer_valid <= memory_valid;
+		elsif (unsigned(memory_addr) >= unsigned(uart_base_addr) and
+				unsigned(memory_addr) < unsigned(uart_top_addr)) then
+			bram_valid <= '0';
+			uart_valid <= memory_valid;
+			timer_valid <= '0';
 		else
 			bram_valid <= memory_valid;
 			uart_valid <= '0';
@@ -160,6 +211,11 @@ begin
 		bram_wdata <= memory_wdata;
 		bram_wstrb <= memory_wstrb;
 
+		uart_instr <= memory_instr;
+		uart_addr <= memory_addr xor uart_base_addr;
+		uart_wdata <= memory_wdata;
+		uart_wstrb <= memory_wstrb;
+
 		timer_instr <= memory_instr;
 		timer_addr <= memory_addr xor timer_base_addr;
 		timer_wdata <= memory_wdata;
@@ -168,12 +224,27 @@ begin
 		if (bram_ready = '1') then
 			memory_rdata <= bram_rdata;
 			memory_ready <= bram_ready;
+		elsif (uart_ready = '1') then
+			memory_rdata <= uart_rdata;
+			memory_ready <= uart_ready;
 		elsif (timer_ready = '1') then
 			memory_rdata <= timer_rdata;
 			memory_ready <= timer_ready;
 		else
 			memory_rdata <= (others => '0');
 			memory_ready <= '0';
+		end if;
+
+	end process;
+
+	process (clock)
+
+	begin
+
+		if rising_edge(clock) then
+			if uart_valid = '1' and or_reduce(uart_addr) = '0' and or_reduce(uart_wstrb) = '1' then
+				print(massage,index,memory_wdata(7 downto 0));
+			end if;
 		end if;
 
 	end process;
@@ -238,6 +309,21 @@ begin
 			bram_wdata => bram_wdata,
 			bram_wstrb => bram_wstrb,
 			bram_rdata => bram_rdata
+		);
+
+	uart_comp : uart
+		port map(
+			reset      => reset,
+			clock      => clock,
+			uart_valid => uart_valid,
+			uart_ready => uart_ready,
+			uart_instr => uart_instr,
+			uart_addr  => uart_addr,
+			uart_wdata => uart_wdata,
+			uart_wstrb => uart_wstrb,
+			uart_rdata => uart_rdata,
+			uart_rx    => rx,
+			uart_tx    => tx
 		);
 
 	timer_comp : timer
