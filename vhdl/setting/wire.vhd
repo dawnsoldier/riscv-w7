@@ -408,7 +408,6 @@ package wire is
 		waddr      : std_logic_vector(4 downto 0);
 		caddr      : std_logic_vector(11 downto 0);
 		wdata      : std_logic_vector(63 downto 0);
-		ldata      : std_logic_vector(63 downto 0);
 		cdata      : std_logic_vector(63 downto 0);
 		flags      : std_logic_vector(4 downto 0);
 		load       : std_logic;
@@ -444,7 +443,6 @@ package wire is
 		waddr      => (others => '0'),
 		caddr      => (others => '0'),
 		wdata      => (others => '0'),
-		ldata      => (others => '0'),
 		cdata      => (others => '0'),
 		flags      => (others => '0'),
 		load       => '0',
