@@ -284,6 +284,17 @@ begin
 			v.stall := '1';
 		end if;
 
+		if (d.m.stall or d.w.stall) = '1' then
+			if d.e.load = '1' then
+				if (nor_reduce(d.e.waddr xor d.d.raddr1) and ((d.e.int_wren and d.d.int_rden1))) = '1' then
+					v.stall := '1';
+				end if;
+				if (nor_reduce(d.e.waddr xor d.d.raddr2) and ((d.e.int_wren and d.d.int_rden2))) = '1' then
+					v.stall := '1';
+				end if;
+			end if;
+		end if;
+
 		fpu_dec_i.stall <= v.stall;
 		fpu_dec_i.clear <= v.clear;
 
