@@ -47,7 +47,7 @@ signal rin_wrb : fp_writeback_reg_type := init_fp_writeback_reg;
 
 begin
 
-	decode : process(r_dec,r_exe,r_mem,fpu_dec_i)
+	decode : process(r_dec,r_exe,r_mem,r_mem,fpu_dec_i)
 
 		variable v : fp_decode_reg_type;
 
@@ -87,6 +87,18 @@ begin
 			end if;
 		elsif r_dec.op.fmcycle = '1' then
 			v.stall := '1';
+		end if;
+
+		if r_mem.stall = '1' then
+			if (r_dec.rden1 and nor_reduce(r_exe.waddr xor r_dec.raddr1)) = '1' then
+				v.stall := '1';
+			end if;
+			if (r_dec.rden2 and nor_reduce(r_exe.waddr xor r_dec.raddr2)) = '1' then
+				v.stall := '1';
+			end if;
+			if (r_dec.rden3 and nor_reduce(r_exe.waddr xor r_dec.raddr3)) = '1' then
+				v.stall := '1';
+			end if;
 		end if;
 
 		fpu_dec_o.stall <= v.stall;
@@ -180,7 +192,11 @@ begin
 
 		if v.op.fmcycle = '1' then
 			if v.ready = '0' then
-				v.stall := '1';
+				if r_mem.stall = '0' then
+					v.stall := '1';
+				else
+					v.wren := '1';
+				end if;
 			elsif v.ready = '1' then
 				v.wren := '1';
 			end if;
