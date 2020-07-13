@@ -8,6 +8,8 @@
 #include <sys/signal.h>
 #include "util.h"
 
+#pragma GCC optimize ("no-inline")
+
 #define SYS_write 64
 
 #undef strcmp
@@ -196,7 +198,7 @@ static inline void printdouble(void (*putch)(int, void**), void **putdat, double
   while (width--)
   {
     num *= 10.0;
-    putch((unsigned long long) num + ((unsigned long long) num >= 10 ? 'A' - 10 : '0'), putdat);
+    printnum((void*)putchar, 0, num, 10, 0, ' ');
     num -= (unsigned long long) num;
   }
 }
