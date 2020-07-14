@@ -5,12 +5,12 @@ RISCV-Waise CPU supports riscv64-imfdc instruction set architecture and is imple
 ## Dhrystone Benchmark ##
 | Cycles | Dhrystone/s/MHz | DMIPS/s/MHz |
 | ------ | --------------- | ----------- |
-|    527 |            1897 |        1.08 |
+|    532 |            1897 |        1.08 |
 
 ## Coremark Benchmark ##
 | Cycles | Iteration/s/MHz |
 | ------ | --------------- |
-| 469272 |            2.13 |
+| 436917 |            2.28 |
 
 Documentation will be expanded in the future. 
 
