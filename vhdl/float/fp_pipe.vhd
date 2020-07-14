@@ -90,14 +90,16 @@ begin
 		end if;
 
 		if r_mem.stall = '1' then
-			if (r_dec.rden1 and nor_reduce(r_exe.waddr xor r_dec.raddr1)) = '1' then
-				v.stall := '1';
-			end if;
-			if (r_dec.rden2 and nor_reduce(r_exe.waddr xor r_dec.raddr2)) = '1' then
-				v.stall := '1';
-			end if;
-			if (r_dec.rden3 and nor_reduce(r_exe.waddr xor r_dec.raddr3)) = '1' then
-				v.stall := '1';
+			if r_exe.load = '1' then
+				if (r_dec.rden1 and nor_reduce(r_exe.waddr xor r_dec.raddr1)) = '1' then
+					v.stall := '1';
+				end if;
+				if (r_dec.rden2 and nor_reduce(r_exe.waddr xor r_dec.raddr2)) = '1' then
+					v.stall := '1';
+				end if;
+				if (r_dec.rden3 and nor_reduce(r_exe.waddr xor r_dec.raddr3)) = '1' then
+					v.stall := '1';
+				end if;
 			end if;
 		end if;
 
