@@ -50,7 +50,7 @@ architecture behavior of execute_stage is
 
 begin
 
-	combinational : process(d, r, int_for_o, int_reg_o, csr_o, csr_eo, int_pipeline_o, csr_alu_o, fpu_exe_o, dpmp_o, time_irpt, ext_irpt)
+	combinational : process(a, d, r, int_for_o, int_reg_o, csr_o, csr_eo, int_pipeline_o, csr_alu_o, fpu_exe_o, dpmp_o, time_irpt, ext_irpt)
 
 		variable v : execute_reg_type;
 

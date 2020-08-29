@@ -34,7 +34,7 @@ architecture behavior of writeback_stage is
 
 begin
 
-	combinational : process(d, r, csr_eo)
+	combinational : process(a, d, r, csr_eo)
 
 		variable v : writeback_reg_type;
 

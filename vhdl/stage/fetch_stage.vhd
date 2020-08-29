@@ -40,7 +40,7 @@ architecture behavior of fetch_stage is
 
 begin
 
-	combinational : process(d, r, csr_eo, btb_o, pfetch_o, imem_o, ipmp_o)
+	combinational : process(a, d, r, csr_eo, btb_o, pfetch_o, imem_o, ipmp_o)
 
 		variable v : fetch_reg_type;
 

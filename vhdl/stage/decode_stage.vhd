@@ -41,7 +41,7 @@ architecture behavior of decode_stage is
 
 begin
 
-	combinational : process(d, r, int_decode_o, comp_decode_o, fp_dec_o, csr_eo, fpu_dec_o)
+	combinational : process(a, d, r, int_decode_o, comp_decode_o, fp_dec_o, csr_eo, fpu_dec_o)
 
 		variable v : decode_reg_type;
 

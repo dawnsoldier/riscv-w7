@@ -112,7 +112,7 @@ begin
 									mask_inc := mask_inc + 1;
 								end if;
 							end loop;
-							mask := mask sll mask_inc;
+							mask := std_logic_vector(shift_left(unsigned(mask),mask_inc));
 							lowaddr := pmp_i.pmpaddr(i) and mask;
 							if nor_reduce((pmp_i.mem_addr(55 downto 2) and mask(53 downto 0)) xor lowaddr(53 downto 0)) = '1' then
 								if pmp_i.pmpcfg(i).L = "1" or pmp_i.priv_mode = u_mode then

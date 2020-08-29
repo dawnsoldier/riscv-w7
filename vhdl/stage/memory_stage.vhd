@@ -34,7 +34,7 @@ architecture behavior of memory_stage is
 
 begin
 
-	combinational : process(d, r, csr_eo, dmem_o)
+	combinational : process(a, d, r, csr_eo, dmem_o)
 
 		variable v : memory_reg_type;
 
