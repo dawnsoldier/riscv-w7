@@ -38,7 +38,6 @@ begin
 		variable rs1       : std_logic_vector(63 downto 0);
 		variable rs2       : std_logic_vector(63 downto 0);
 		variable imm       : std_logic_vector(63 downto 0);
-		variable comp      : std_logic;
 		variable load      : std_logic;
 		variable store     : std_logic;
 		variable load_op   : load_operation_type;
@@ -70,7 +69,6 @@ begin
 		rs1      := int_pipeline_i.rs1;
 		rs2      := int_pipeline_i.rs2;
 		imm      := int_pipeline_i.imm;
-		comp     := int_pipeline_i.comp;
 		load     := int_pipeline_i.load;
 		store    := int_pipeline_i.store;
 		load_op  := int_pipeline_i.load_op;

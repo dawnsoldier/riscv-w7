@@ -432,7 +432,6 @@ package int_wire is
 		rs2      : std_logic_vector(63 downto 0);
 		imm      : std_logic_vector(63 downto 0);
 		funct    : std_logic_vector(2 downto 0);
-		comp     : std_logic;
 		load     : std_logic;
 		store    : std_logic;
 		load_op  : load_operation_type;

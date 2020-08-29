@@ -148,7 +148,6 @@ begin
 		int_pipeline_i.rs2 <= v.rdata2;
 		int_pipeline_i.imm <= v.imm;
 		int_pipeline_i.funct <= v.funct3;
-		int_pipeline_i.comp <= v.comp;
 		int_pipeline_i.load <= v.load or v.fpu_load;
 		int_pipeline_i.store <= v.store or v.fpu_store;
 		int_pipeline_i.load_op <= v.load_op;
