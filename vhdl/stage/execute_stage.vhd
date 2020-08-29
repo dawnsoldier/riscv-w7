@@ -216,7 +216,7 @@ begin
 
 		if v.int_op.mcycle = '1' then
 			if v.ready = '0' then
-				if (a.m.stall or a.w.stall) = '0' then
+				if (d.m.stall or d.w.stall) = '0' then
 					v.stall := '1';
 				else
 					v.int := '1';
