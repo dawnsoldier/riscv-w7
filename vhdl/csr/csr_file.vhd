@@ -275,17 +275,7 @@ begin
 					mcsr.mip.meip <= "0";
 				end if;
 
-				if csr_ei.exc = '1' then
-					mcsr.mstatus.mpie <= mcsr.mstatus.mie;
-					mcsr.mstatus.mpp <= priv_mode;
-					mcsr.mstatus.mie <= "0";
-					priv_mode <= m_mode;
-					mcsr.mepc <= csr_ei.epc;
-					mcsr.mtval <= csr_ei.etval;
-					mcsr.mcause.irpt <= "0";
-					mcsr.mcause.code <= X"00000000000000" & "000" & csr_ei.ecause;
-					exc <= '1';
-				elsif mcsr.mstatus.mie = "1" and mcsr.mie.mtie = "1" and mcsr.mip.mtip = "1" then
+				if mcsr.mstatus.mie = "1" and mcsr.mie.mtie = "1" and mcsr.mip.mtip = "1" then
 					mcsr.mstatus.mpie <= mcsr.mstatus.mie;
 					mcsr.mstatus.mpp <= priv_mode;
 					mcsr.mstatus.mie <= "0";
@@ -304,6 +294,16 @@ begin
 					mcsr.mtval <= X"0000000000000000";
 					mcsr.mcause.irpt <= "1";
 					mcsr.mcause.code <= X"00000000000000" & "000" & interrupt_mach_extern;
+					exc <= '1';
+				elsif csr_ei.exc = '1' then
+					mcsr.mstatus.mpie <= mcsr.mstatus.mie;
+					mcsr.mstatus.mpp <= priv_mode;
+					mcsr.mstatus.mie <= "0";
+					priv_mode <= m_mode;
+					mcsr.mepc <= csr_ei.epc;
+					mcsr.mtval <= csr_ei.etval;
+					mcsr.mcause.irpt <= "0";
+					mcsr.mcause.code <= X"00000000000000" & "000" & csr_ei.ecause;
 					exc <= '1';
 				else
 					exc <= '0';

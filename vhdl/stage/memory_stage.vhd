@@ -69,6 +69,7 @@ begin
 		v.ecall := d.e.ecall;
 		v.ebreak := d.e.ebreak;
 		v.mret := d.e.mret;
+		v.valid := d.e.valid;
 		v.byteenable := d.e.byteenable;
 
 		if (d.m.stall or d.w.stall) = '1' then
@@ -158,6 +159,7 @@ begin
 		y.ecall <= v.ecall;
 		y.ebreak <= v.ebreak;
 		y.mret <= v.mret;
+		y.valid <= v.valid;
 		y.stall <= v.stall;
 
 		q.pc <= r.pc;
@@ -187,6 +189,7 @@ begin
 		q.ecall <= r.ecall;
 		q.ebreak <= r.ebreak;
 		q.mret <= r.mret;
+		q.valid <= r.valid;
 		q.stall <= r.stall;
 
 	end process;

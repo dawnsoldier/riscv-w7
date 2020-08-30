@@ -30,12 +30,34 @@ architecture behavior of top_cpu is
 	signal rtc   : std_logic := '0';
 	signal rx    : std_logic := '0';
 	signal tx    : std_logic := '0';
+	signal count : unsigned(31 downto 0) := (others => '0');
 
 begin
 
 	reset <= '1' after 100 ns;
 	clock <= not clock after 20 ns;
-	rtc <= not rtc after 30517578.125 ps;
+
+	process (clock)
+
+	begin
+
+		if (rising_edge(clock)) then
+
+			if reset = '0' then
+				count <= (others => '0');
+				rtc   <= '0';
+			else
+				if count = clk_divider_rtc then
+					rtc <= not rtc;
+					count <= (others => '0');
+				else
+					count <= count + 1;
+				end if;
+			end if;
+
+		end if;
+
+	end process;
 
 	cpu_comp : cpu
 		port map(

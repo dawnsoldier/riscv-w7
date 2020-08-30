@@ -93,6 +93,7 @@ package wire is
 		mret        : std_logic;
 		wfi         : std_logic;
 		fence       : std_logic;
+		valid       : std_logic;
 		stall       : std_logic;
 	end record;
 
@@ -255,6 +256,7 @@ package wire is
 		ecall       : std_logic;
 		ebreak      : std_logic;
 		mret        : std_logic;
+		valid       : std_logic;
 		stall       : std_logic;
 	end record;
 
@@ -309,6 +311,7 @@ package wire is
 		ecall       : std_logic;
 		ebreak      : std_logic;
 		mret        : std_logic;
+		valid       : std_logic;
 		clear       : std_logic;
 		stall       : std_logic;
 	end record;
@@ -364,6 +367,7 @@ package wire is
 		ecall       => '0',
 		ebreak      => '0',
 		mret        => '0',
+		valid       => '0',
 		clear       => '0',
 		stall       => '0'
 	);
@@ -396,6 +400,7 @@ package wire is
 		ecall      : std_logic;
 		ebreak     : std_logic;
 		mret       : std_logic;
+		valid      : std_logic;
 		stall      : std_logic;
 	end record;
 
@@ -428,6 +433,7 @@ package wire is
 		ecall      : std_logic;
 		ebreak     : std_logic;
 		mret       : std_logic;
+		valid      : std_logic;
 		clear      : std_logic;
 		fstall     : std_logic;
 		istall     : std_logic;
@@ -463,6 +469,7 @@ package wire is
 		ecall      => '0',
 		ebreak     => '0',
 		mret       => '0',
+		valid      => '0',
 		clear      => '0',
 		fstall     => '0',
 		istall     => '0',
@@ -470,10 +477,12 @@ package wire is
 	);
 
 	type writeback_out_type is record
+		pc     : std_logic_vector(63 downto 0);
 		exc    : std_logic;
 		ecall  : std_logic;
 		ebreak : std_logic;
 		mret   : std_logic;
+		valid  : std_logic;
 		stall  : std_logic;
 		clear  : std_logic;
 	end record;
@@ -506,6 +515,7 @@ package wire is
 		ecall      : std_logic;
 		ebreak     : std_logic;
 		mret       : std_logic;
+		valid      : std_logic;
 		clear      : std_logic;
 		stall      : std_logic;
 	end record;
@@ -538,6 +548,7 @@ package wire is
 		ecall      => '0',
 		ebreak     => '0',
 		mret       => '0',
+		valid      => '0',
 		clear      => '1',
 		stall      => '0'
 	);

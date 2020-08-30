@@ -95,6 +95,7 @@ begin
 		v.ecall := d.d.ecall;
 		v.ebreak := d.d.ebreak;
 		v.mret := d.d.mret;
+		v.valid := d.d.valid;
 
 		int_reg_ri.rden1 <= d.d.int_rden1;
 		int_reg_ri.rden2 <= d.d.int_rden2;
@@ -276,17 +277,25 @@ begin
 		dmem_i.mem_wdata <= store_data(v.sdata, v.store_op);
 		dmem_i.mem_wstrb <= v.strobe;
 
-		if r.jump = '1' then
-			csr_ei.epc <= r.pc;
-		else
-			csr_ei.epc <= v.pc;
-		end if;
+		csr_ei.epc <= v.pc;
 		csr_ei.exc <= v.exc;
 		csr_ei.etval <= v.etval;
 		csr_ei.ecause <= v.ecause;
 		csr_ei.ecall <= v.ecall;
 		csr_ei.ebreak <= v.ebreak;
 		csr_ei.mret <= v.mret;
+
+		if (time_irpt or ext_irpt) = '1' then
+			if v.valid = '0' then
+				if d.e.valid = '1' then
+					csr_ei.epc <= d.e.pc;
+				elsif d.m.valid = '1' then
+					csr_ei.epc <= d.m.pc;
+				elsif d.w.valid = '1' then
+					csr_ei.epc <= d.w.pc;
+				end if;
+			end if;
+		end if;
 
 		csr_ei.time_irpt <= time_irpt;
 		csr_ei.ext_irpt <= ext_irpt;
@@ -331,6 +340,7 @@ begin
 		y.ecall <= v.ecall;
 		y.ebreak <= v.ebreak;
 		y.mret <= v.mret;
+		y.valid <= v.valid;
 		y.stall <= v.stall;
 
 		q.pc <= r.pc;
@@ -371,6 +381,7 @@ begin
 		q.ecall <= r.ecall;
 		q.ebreak <= r.ebreak;
 		q.mret <= r.mret;
+		q.valid <= r.valid;
 		q.stall <= r.stall;
 
 	end process;

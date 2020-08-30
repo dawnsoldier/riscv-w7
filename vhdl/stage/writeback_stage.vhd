@@ -69,6 +69,7 @@ begin
 		v.mret := d.m.mret;
 		v.byteenable := d.m.byteenable;
 		v.flags := d.m.flags;
+		v.valid := d.m.valid;
 
 		if d.w.stall = '1' then
 			v := r;
@@ -114,17 +115,21 @@ begin
 
 		rin <= v;
 
+		y.pc <= v.pc;
 		y.exc <= v.exc;
 		y.ecall <= v.ecall;
 		y.ebreak <= v.ebreak;
 		y.mret <= v.mret;
+		y.valid <= v.valid;
 		y.stall <= v.stall;
 		y.clear <= v.clear;
 
+		q.pc <= r.pc;
 		q.exc <= r.exc;
 		q.ecall <= r.ecall;
 		q.ebreak <= r.ebreak;
 		q.mret <= r.mret;
+		q.valid <= r.valid;
 		q.stall <= r.stall;
 		q.clear <= r.clear;
 

@@ -375,6 +375,7 @@ begin
 		y.mret <= v.mret;
 		y.wfi <= v.wfi;
 		y.fence <= v.fence;
+		y.valid <= v.valid;
 		y.stall <= v.stall;
 
 		q.pc <= r.pc;
@@ -420,6 +421,7 @@ begin
 		q.mret <= r.mret;
 		q.wfi <= r.wfi;
 		q.fence <= r.fence;
+		q.valid <= r.valid;
 		q.stall <= r.stall;
 
 	end process;

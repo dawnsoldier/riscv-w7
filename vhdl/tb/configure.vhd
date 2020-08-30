@@ -30,5 +30,6 @@ package configure is
 	constant timer_top_addr  : std_logic_vector(63 downto 0) := X"0000000000200010";
 
 	constant clks_per_bit    : integer := 1;
+	constant clk_divider_rtc : integer := 1;
 
 end configure;
