@@ -56,11 +56,11 @@ begin
 		inf  := fp_rnd_i.inf;
 		zero := fp_rnd_i.zero;
 
-		result := 64X"0";
+		result := X"0000000000000000";
 		flags  := "00000";
 
-		odd := mant(0) or or_reduce(grs(1 downto 0)) or to_std_logic(rema = 2X"1");
-		flags(0)     := to_std_logic(rema /= 2X"0") or or_reduce(grs);
+		odd := mant(0) or or_reduce(grs(1 downto 0)) or to_std_logic(rema = "01");
+		flags(0)     := to_std_logic(rema /= "00") or or_reduce(grs);
 
 		rnded := 0;
 		case rm is
@@ -134,31 +134,31 @@ begin
 
 		if fmt = "00" then
 			if (snan or qnan) = '1' then
-				result := 32X"FFFFFFFF" & '0' & 9X"1FF" & 22x"000000";
+				result := X"FFFFFFFF" & '0' & "1" & X"FF" & "00" & X"00000";
 			elsif (dbz or inf) = '1' then
-				result := 32X"FFFFFFFF" & sig & 8X"FF" & 23x"000000";
+				result := X"FFFFFFFF" & sig & X"FF" & "000" & X"00000";
 			elsif zero = '1' then
-				result := 32X"FFFFFFFF" & sig & 8X"00" & 23x"000000";
+				result := X"FFFFFFFF" & sig & X"00" & "000" & X"00000";
 			elsif expo = 0 then
-				result := 32X"FFFFFFFF" & sig & 8X"00" & mant(22 downto 0);
+				result := X"FFFFFFFF" & sig & X"00" & mant(22 downto 0);
 			elsif expo > 254 then
 				flags  := "00101";
-				result := 32X"FFFFFFFF" & sig & 8X"FF" & 23x"000000";
+				result := X"FFFFFFFF" & sig & X"FF" & "000" & X"00000";
 			else
-				result := 32X"FFFFFFFF" & sig & std_logic_vector(to_unsigned(expo, 8)) & mant(22 downto 0);
+				result := X"FFFFFFFF" & sig & std_logic_vector(to_unsigned(expo, 8)) & mant(22 downto 0);
 			end if;
 		elsif fmt = "01" then
 			if (snan or qnan) = '1' then
-				result := '0' & 12X"FFF" & 51X"0000000000000";
+				result := '0' & X"FFF" & "000" & X"000000000000";
 			elsif (dbz or inf) = '1' then
-				result := sig & 11X"7FF" & 52X"0000000000000";
+				result := sig & "111" & X"FF" & X"0000000000000";
 			elsif zero = '1' then
-				result := sig & 11X"000" & 52X"0000000000000";
+				result := sig & "000" & X"00" & X"0000000000000";
 			elsif expo = 0 then
-				result := sig & 11X"000" & mant(51 downto 0);
+				result := sig & "000" & X"00" & mant(51 downto 0);
 			elsif expo > 2046 then
 				flags  := "00101";
-				result := sig & 11X"7FF" & 52X"0000000000000";
+				result := sig & "111" & X"FF" & X"0000000000000";
 			else
 				result := sig & std_logic_vector(to_unsigned(expo, 11)) & mant(51 downto 0);
 			end if;

@@ -41,13 +41,10 @@ signal rin_exe : fp_execute_reg_type := init_fp_execute_reg;
 signal r_mem   : fp_memory_reg_type := init_fp_memory_reg;
 signal rin_mem : fp_memory_reg_type := init_fp_memory_reg;
 
-signal r_wrb   : fp_writeback_reg_type := init_fp_writeback_reg;
-signal rin_wrb : fp_writeback_reg_type := init_fp_writeback_reg;
-
 
 begin
 
-	decode : process(r_dec,r_exe,r_mem,r_mem,fpu_dec_i)
+	decode : process(r_dec,r_exe,r_mem,fpu_dec_i)
 
 		variable v : fp_decode_reg_type;
 
@@ -275,8 +272,6 @@ begin
 		v.wdata := r_mem.wdata;
 		v.wren := r_mem.wren;
 
-		rin_wrb <= v;
-
 		fp_reg_wi.waddr <= v.waddr;
 		fp_reg_wi.wdata <= v.wdata;
 		fp_reg_wi.wren <= v.wren;
@@ -294,14 +289,12 @@ begin
 				r_dec <= init_fp_decode_reg;
 				r_exe <= init_fp_execute_reg;
 				r_mem <= init_fp_memory_reg;
-				r_wrb <= init_fp_writeback_reg;
 
 			else
 
 				r_dec <= rin_dec;
 				r_exe <= rin_exe;
 				r_mem <= rin_mem;
-				r_wrb <= rin_wrb;
 
 			end if;
 

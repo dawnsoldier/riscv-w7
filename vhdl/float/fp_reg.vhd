@@ -25,7 +25,7 @@ architecture behavior of fp_reg is
 
 begin
 
-	process(all)
+	process(fp_reg_ri,fp_regfile)
 
 	begin
 

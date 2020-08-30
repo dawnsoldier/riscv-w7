@@ -76,13 +76,13 @@ begin
 		if v.fmt = "00" then
 			if v.op.fnan = '1' then
 				if and_reduce(v.data1(63 downto 32)) = '0' then
-					v.data1 := 64X"000000007FC00000";
+					v.data1 := X"000000007FC00000";
 				end if;
 				if and_reduce(v.data2(63 downto 32)) = '0' then
-					v.data2 := 64X"000000007FC00000";
+					v.data2 := X"000000007FC00000";
 				end if;
 				if and_reduce(v.data3(63 downto 32)) = '0' then
-					v.data3 := 64X"000000007FC00000";
+					v.data3 := X"000000007FC00000";
 				end if;
 			end if;
 		end if;
@@ -206,7 +206,7 @@ begin
 			v.ready := '0';
 		elsif v.op.fsgnj = '1' then
 			v.result := fp_sgnj_o.result;
-			v.flags  := 5X"0";
+			v.flags  := "00000";
 		elsif v.op.fmax = '1' then
 			v.result := fp_max_o.result;
 			v.flags  := fp_max_o.flags;
@@ -214,20 +214,20 @@ begin
 			v.result := fp_cmp_o.result;
 			v.flags  := fp_cmp_o.flags;
 		elsif v.op.fclass = '1' then
-			v.result := 54X"0" & v.class1;
-			v.flags  := 5X"0";
+			v.result := "00" & X"0000000000000" & v.class1;
+			v.flags  := "00000";
 		elsif v.op.fmv_f2i = '1' then
 			v.result := v.data1;
 			if nor_reduce(v.fmt) = '1' then
 				v.result(63 downto 32) := (others => v.data1(31));
 			end if;
-			v.flags  := 5X"0";
+			v.flags  := "00000";
 		elsif v.op.fmv_i2f = '1' then
 			v.result := v.idata;
 			if nor_reduce(v.fmt) = '1' then
 				v.result(63 downto 32) := (others => '1');
 			end if;
-			v.flags  := 5X"0";
+			v.flags  := "00000";
 		elsif v.op.fcvt_f2f = '1' then
 			v.result := fp_rnd_o.result;
 			v.flags  := fp_rnd_o.flags;

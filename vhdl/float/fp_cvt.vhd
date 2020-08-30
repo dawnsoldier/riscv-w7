@@ -84,7 +84,7 @@ begin
 
 		mantissa_cvt := std_logic_vector(shift_right(unsigned(mantissa_cvt), counter_cvt));
 
-		mantissa_rnd := 29X"0" & mantissa_cvt(79 downto 55);
+		mantissa_rnd := "0" & X"0000000" & mantissa_cvt(79 downto 55);
 		grs          := mantissa_cvt(54 downto 53) & or_reduce(mantissa_cvt(52 downto 0));
 		if fmt = "01" then
 			mantissa_rnd := mantissa_cvt(79 downto 26);
@@ -94,7 +94,7 @@ begin
 		fp_cvt_f2f_o.fp_rnd.sig <= sign_rnd;
 		fp_cvt_f2f_o.fp_rnd.expo <= exponent_rnd;
 		fp_cvt_f2f_o.fp_rnd.mant <= mantissa_rnd;
-		fp_cvt_f2f_o.fp_rnd.rema <= 2X"0";
+		fp_cvt_f2f_o.fp_rnd.rema <= "00";
 		fp_cvt_f2f_o.fp_rnd.fmt <= fmt;
 		fp_cvt_f2f_o.fp_rnd.rm <= rm;
 		fp_cvt_f2f_o.fp_rnd.grs <= grs;
@@ -171,7 +171,7 @@ begin
 
 		sign_cvt     := data(64);
 		exponent_cvt := to_integer(unsigned(data(63 downto 52))) - 2044;
-		mantissa_cvt := 68X"1" & data(51 downto 0);
+		mantissa_cvt := X"00000000000000001" & data(51 downto 0);
 
 		oor := '0';
 
@@ -350,10 +350,10 @@ begin
 			data := std_logic_vector(-signed(data));
 		end if;
 
-		mantissa_uint := 64X"FFFFFFFFFFFFFFFF";
+		mantissa_uint := X"FFFFFFFFFFFFFFFF";
 		exponent_uint := 0;
 		if op(1) = '0' then
-			mantissa_uint := data(31 downto 0) & 32X"0";
+			mantissa_uint := data(31 downto 0) & X"00000000";
 			exponent_uint := 31;
 		elsif op(1) = '1' then
 			mantissa_uint := data(63 downto 0);
@@ -370,17 +370,17 @@ begin
 		sign_rnd     := sign_uint;
 		exponent_rnd := exponent_uint + exponent_bias - counter_uint;
 
-		mantissa_rnd := 30X"0" & mantissa_uint(63 downto 40);
+		mantissa_rnd := "00" & X"0000000" & mantissa_uint(63 downto 40);
 		grs          := mantissa_uint(39 downto 38) & or_reduce(mantissa_uint(37 downto 0));
 		if fmt = "01" then
-			mantissa_rnd := 1X"0" & mantissa_uint(63 downto 11);
+			mantissa_rnd := "0" & mantissa_uint(63 downto 11);
 			grs          := mantissa_uint(10 downto 9) & or_reduce(mantissa_uint(8 downto 0));
 		end if;
 
 		fp_cvt_i2f_o.fp_rnd.sig <= sign_rnd;
 		fp_cvt_i2f_o.fp_rnd.expo <= exponent_rnd;
 		fp_cvt_i2f_o.fp_rnd.mant <= mantissa_rnd;
-		fp_cvt_i2f_o.fp_rnd.rema <= 2X"0";
+		fp_cvt_i2f_o.fp_rnd.rema <= "00";
 		fp_cvt_i2f_o.fp_rnd.fmt <= fmt;
 		fp_cvt_i2f_o.fp_rnd.rm <= rm;
 		fp_cvt_i2f_o.fp_rnd.grs <= grs;

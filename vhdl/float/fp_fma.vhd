@@ -210,14 +210,14 @@ begin
 		exponent_mul := signed("00" & exponent_a) + signed("00" & exponent_b) - 2047;
 
 		if and_reduce(exponent_c) = '1' then
-			exponent_add := 14X"0FFF";
+			exponent_add := "00" & X"FFF";
 		end if;
 		if (and_reduce(exponent_a) or and_reduce(exponent_b)) = '1' then
-			exponent_mul := 14X"0FFF";
+			exponent_mul := "00" & X"FFF";
 		end if;
 
-		mantissa_add := 3X"0" & mantissa_c & 108X"0";
-		mantissa_mul := 2X"0" & std_logic_vector(unsigned(mantissa_a) * unsigned(mantissa_b)) & 56X"0";
+		mantissa_add := "000" & mantissa_c & X"000000000000000000000000000";
+		mantissa_mul := "00" & std_logic_vector(unsigned(mantissa_a) * unsigned(mantissa_b)) & X"00000000000000";
 
 		exponent_dif := exponent_mul - exponent_add;
 		counter_dif  := 0;
@@ -411,7 +411,7 @@ begin
 			bias := 1022;
 		end if;
 
-		mantissa_lzc := mantissa_mac(162 downto 0) & 93X"1FFFFFFFFFFFFFFFFFFFFFFF";
+		mantissa_lzc := mantissa_mac(162 downto 0) & "1" & X"FFFFFFFFFFFFFFFFFFFFFFF";
 
 		lzc_i.a      <= mantissa_lzc;
 		counter_mac  := to_integer(unsigned(not (lzc_o.c)));
@@ -431,10 +431,10 @@ begin
 
 		mantissa_mac := std_logic_vector(shift_right(unsigned(mantissa_mac),counter_sub));
 
-		mantissa_rnd := 30X"0" & mantissa_mac(162 downto 139);
+		mantissa_rnd := "00" & X"0000000" & mantissa_mac(162 downto 139);
 		grs          := mantissa_mac(138 downto 137) & or_reduce(mantissa_mac(136 downto 0));
 		if fmt = "01" then
-			mantissa_rnd := 1X"0" & mantissa_mac(162 downto 110);
+			mantissa_rnd := "0" & mantissa_mac(162 downto 110);
 			grs          := mantissa_mac(109 downto 108) & or_reduce(mantissa_mac(107 downto 0));
 		end if;
 
@@ -462,7 +462,7 @@ begin
 		fp_fma_o.fp_rnd.sig <= r_4.sign_rnd;
 		fp_fma_o.fp_rnd.expo <= r_4.exponent_rnd;
 		fp_fma_o.fp_rnd.mant <= r_4.mantissa_rnd;
-		fp_fma_o.fp_rnd.rema <= 2X"0";
+		fp_fma_o.fp_rnd.rema <= "00";
 		fp_fma_o.fp_rnd.fmt <= r_4.fmt;
 		fp_fma_o.fp_rnd.rm <= r_4.rm;
 		fp_fma_o.fp_rnd.grs <= r_4.grs;

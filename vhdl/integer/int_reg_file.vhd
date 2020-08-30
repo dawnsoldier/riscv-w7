@@ -24,7 +24,7 @@ architecture behavior of int_reg_file is
 
 begin
 
-	process(int_reg_ri,int_reg_wi,int_regfile)
+	process(int_reg_ri,int_regfile)
 
 	begin
 

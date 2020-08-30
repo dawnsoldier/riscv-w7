@@ -73,7 +73,7 @@ begin
 
 	FUNCTIONAL : if fpu_performance = true generate
 
-		process(r, fp_fdiv_i, fp_mac_o)
+		process(r, fp_fdiv_i, fp_mac_o, reciprocal_lut, reciprocal_root_lut)
 			variable v : fp_fdiv_functional_reg_type;
 
 		begin
@@ -172,22 +172,22 @@ begin
 						end if;
 					end if;
 
-					v.qa := 2X"1" & signed(v.a(51 downto 0)) & 2X"0";
-					v.qb := 2X"1" & signed(v.b(51 downto 0)) & 2X"0";
+					v.qa := "01" & signed(v.a(51 downto 0)) & "00";
+					v.qb := "01" & signed(v.b(51 downto 0)) & "00";
 
 					v.sign_fdiv := v.a(64) xor v.b(64);
 					v.exponent_fdiv := to_integer(signed("0" & v.a(63 downto 52)) - signed("0" & v.b(63 downto 52)));
-					v.y := 1X"0" & nor_reduce(v.b(51 downto 45)) & reciprocal_lut(to_integer(unsigned(v.b(51 downto 45)))) & 46X"0";
+					v.y := "0" & nor_reduce(v.b(51 downto 45)) & reciprocal_lut(to_integer(unsigned(v.b(51 downto 45)))) & "00" & X"00000000000";
 					v.op := '0';
 
 					if fp_fdiv_i.op.fsqrt = '1' then
-						v.qa := 2X"1" & signed(v.a(51 downto 0)) & 2X"0";
+						v.qa := "01" & signed(v.a(51 downto 0)) & "00";
 						if v.a(52) = '0' then
 							v.qa := v.qa srl 1;
 						end if;
 						v.index := to_integer(unsigned(v.qa(54 downto 48)) - 32);
 						v.exponent_fdiv := to_integer(shift_right((signed("0" & v.a(63 downto 52)) - 2045), 1));
-						v.y := 1X"0" & reciprocal_root_lut(v.index) & 47X"0";
+						v.y := "0" & reciprocal_root_lut(v.index) & "000" & X"00000000000";
 						v.op := '1';
 					end if;
 
@@ -198,7 +198,7 @@ begin
 				when F1 =>
 					case r.istate is
 						when 0 =>
-							fp_mac_i.a <= 56X"40000000000000";
+							fp_mac_i.a <= X"40000000000000";
 							fp_mac_i.b <= v.qb;
 							fp_mac_i.c <= v.y;
 							fp_mac_i.op <= '1';
@@ -210,7 +210,7 @@ begin
 							fp_mac_i.op <= '0';
 							v.y0 := fp_mac_o.d(109 downto 54);
 						when 2 =>
-							fp_mac_i.a <= 56X"0";
+							fp_mac_i.a <= X"00000000000000";
 							fp_mac_i.b <= v.e0;
 							fp_mac_i.c <= v.e0;
 							fp_mac_i.op <= '0';
@@ -222,7 +222,7 @@ begin
 							fp_mac_i.op <= '0';
 							v.y1 := fp_mac_o.d(109 downto 54);
 						when 4 =>
-							fp_mac_i.a <= 56X"0";
+							fp_mac_i.a <= X"00000000000000";
 							fp_mac_i.b <= v.e1;
 							fp_mac_i.c <= v.e1;
 							fp_mac_i.op <= '0';
@@ -234,7 +234,7 @@ begin
 							fp_mac_i.op <= '0';
 							v.y2 := fp_mac_o.d(109 downto 54);
 						when 6 =>
-							fp_mac_i.a <= 56X"0";
+							fp_mac_i.a <= X"00000000000000";
 							fp_mac_i.b <= v.qa;
 							fp_mac_i.c <= v.y2;
 							fp_mac_i.op <= '0';
@@ -280,19 +280,19 @@ begin
 				when F2 =>
 					case r.istate is
 						when 0 =>
-							fp_mac_i.a <= 56X"0";
+							fp_mac_i.a <= X"00000000000000";
 							fp_mac_i.b <= v.qa;
 							fp_mac_i.c <= v.y;
 							fp_mac_i.op <= '0';
 							v.y0 := fp_mac_o.d(109 downto 54);
 						when 1 =>
-							fp_mac_i.a <= 56X"0";
-							fp_mac_i.b <= 56X"20000000000000";
+							fp_mac_i.a <= X"00000000000000";
+							fp_mac_i.b <= X"20000000000000";
 							fp_mac_i.c <= v.y;
 							fp_mac_i.op <= '0';
 							v.h0 := fp_mac_o.d(109 downto 54);
 						when 2 =>
-							fp_mac_i.a <= 56X"20000000000000";
+							fp_mac_i.a <= X"20000000000000";
 							fp_mac_i.b <= v.h0;
 							fp_mac_i.c <= v.y0;
 							fp_mac_i.op <= '1';
@@ -310,7 +310,7 @@ begin
 							fp_mac_i.op <= '0';
 							v.h1 := fp_mac_o.d(109 downto 54);
 						when 5 =>
-							fp_mac_i.a <= 56X"20000000000000";
+							fp_mac_i.a <= X"20000000000000";
 							fp_mac_i.b <= v.h1;
 							fp_mac_i.c <= v.y1;
 							fp_mac_i.op <= '1';
@@ -383,24 +383,24 @@ begin
 					fp_mac_i.c <= (others => '0');
 					fp_mac_i.op <= '0';
 
-					v.mantissa_fdiv := std_logic_vector(v.q0(54 downto 0)) & 59X"0";
+					v.mantissa_fdiv := std_logic_vector(v.q0(54 downto 0)) & "000" & X"00000000000000";
 
-					v.remainder_rnd := 2X"2";
+					v.remainder_rnd := "10";
 					if v.r1 > 0 then
-						v.remainder_rnd := 2X"1";
+						v.remainder_rnd := "01";
 					elsif v.r1 = 0 then
-						v.remainder_rnd := 2X"0";
+						v.remainder_rnd := "00";
 					end if;
 
 					v.counter_fdiv := 0;
 					if v.mantissa_fdiv(113) = '0' then
-						v.mantissa_fdiv := v.mantissa_fdiv(112 downto 0) & 1X"0";
+						v.mantissa_fdiv := v.mantissa_fdiv(112 downto 0) & "0";
 						v.counter_fdiv := 1;
 					end if;
 					if v.op = '1' then
 						v.counter_fdiv := 1;
 						if v.mantissa_fdiv(113) = '0' then
-							v.mantissa_fdiv := v.mantissa_fdiv(112 downto 0) & 1X"0";
+							v.mantissa_fdiv := v.mantissa_fdiv(112 downto 0) & "0";
 							v.counter_fdiv := 0;
 						end if;
 					end if;
@@ -424,10 +424,10 @@ begin
 
 					v.mantissa_fdiv := std_logic_vector(shift_right(unsigned(v.mantissa_fdiv),v.counter_rnd));
 
-					v.mantissa_rnd := 30X"0" & v.mantissa_fdiv(113 downto 90);
+					v.mantissa_rnd := "00" & X"0000000" & v.mantissa_fdiv(113 downto 90);
 					v.grs := v.mantissa_fdiv(89 downto 88) & or_reduce(v.mantissa_fdiv(87 downto 0));
 					if v.fmt = "01" then
-						v.mantissa_rnd := 1X"0" & v.mantissa_fdiv(113 downto 61);
+						v.mantissa_rnd := "0" & v.mantissa_fdiv(113 downto 61);
 						v.grs := v.mantissa_fdiv(60 downto 59) & or_reduce(v.mantissa_fdiv(58 downto 0));
 					end if;
 
@@ -572,8 +572,8 @@ begin
 
 					v.q := (others => '0');
 
-					v.m := 4X"1" & v.b(51 downto 0) & 1X"0";
-					v.r := 5X"1" & v.a(51 downto 0);
+					v.m := X"1" & v.b(51 downto 0) & "0";
+					v.r := "0" & X"1" & v.a(51 downto 0);
 					v.op := '0';
 					if fp_fdiv_i.op.fsqrt = '1' then
 						v.m := (others => '0');
@@ -598,7 +598,7 @@ begin
 
 				when F2 =>
 
-					v.mantissa_fdiv := v.q & v.r(55 downto 0) & 54X"0";
+					v.mantissa_fdiv := v.q & v.r(55 downto 0) & "00" & X"0000000000000";
 
 					v.counter_fdiv := 0;
 					if v.mantissa_fdiv(164) = '0' then
@@ -627,10 +627,10 @@ begin
 
 					v.mantissa_fdiv := std_logic_vector(shift_right(unsigned(v.mantissa_fdiv),v.counter_rnd));
 
-					v.mantissa_rnd := 30X"0" & v.mantissa_fdiv(164 downto 141);
+					v.mantissa_rnd := "00" & X"0000000" & v.mantissa_fdiv(164 downto 141);
 					v.grs := v.mantissa_fdiv(140 downto 139) & or_reduce(v.mantissa_fdiv(138 downto 0));
 					if v.fmt = "01" then
-						v.mantissa_rnd := 1X"0" & v.mantissa_fdiv(164 downto 112);
+						v.mantissa_rnd := "0" & v.mantissa_fdiv(164 downto 112);
 						v.grs := v.mantissa_fdiv(111 downto 110) & or_reduce(v.mantissa_fdiv(109 downto 0));
 					end if;
 
@@ -641,7 +641,7 @@ begin
 			fp_fdiv_o.fp_rnd.sig <= v.sign_rnd;
 			fp_fdiv_o.fp_rnd.expo <= v.exponent_rnd;
 			fp_fdiv_o.fp_rnd.mant <= v.mantissa_rnd;
-			fp_fdiv_o.fp_rnd.rema <= 2X"0";
+			fp_fdiv_o.fp_rnd.rema <= "00";
 			fp_fdiv_o.fp_rnd.fmt <= v.fmt;
 			fp_fdiv_o.fp_rnd.rm <= v.rm;
 			fp_fdiv_o.fp_rnd.grs <= v.grs;
