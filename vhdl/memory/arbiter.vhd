@@ -31,8 +31,8 @@ architecture behavior of arbiter is
 constant instr_access : std_logic := '0';
 constant data_access  : std_logic := '1';
 
-signal access_type  : std_logic;
-signal release_type : std_logic;
+signal access_type  : std_logic := instr_access;
+signal release_type : std_logic := instr_access;
 
 begin
 

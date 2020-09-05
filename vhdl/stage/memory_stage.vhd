@@ -29,8 +29,8 @@ end memory_stage;
 
 architecture behavior of memory_stage is
 
-	signal r   : memory_reg_type;
-	signal rin : memory_reg_type;
+	signal r   : memory_reg_type := init_memory_reg;
+	signal rin : memory_reg_type := init_memory_reg;
 
 begin
 

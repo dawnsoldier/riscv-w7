@@ -35,8 +35,8 @@ end fetch_stage;
 
 architecture behavior of fetch_stage is
 
-	signal r   : fetch_reg_type;
-	signal rin : fetch_reg_type;
+	signal r   : fetch_reg_type := init_fetch_reg;
+	signal rin : fetch_reg_type := init_fetch_reg;
 
 begin
 
@@ -52,7 +52,7 @@ begin
 		v.instr := nop;
 
 		v.valid := not d.w.clear;
-		v.stall := pfetch_o.stall or d.d.stall or d.e.stall or d.m.stall or d.w.stall or d.w.clear;
+		v.stall := pfetch_o.stall or d.d.stall or d.e.stall or d.m.stall or d.w.stall;
 		v.clear := csr_eo.exc or csr_eo.mret or d.w.clear;
 
 		if v.clear = '0' then

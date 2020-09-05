@@ -36,8 +36,8 @@ end decode_stage;
 
 architecture behavior of decode_stage is
 
-	signal r   : decode_reg_type;
-	signal rin : decode_reg_type;
+	signal r   : decode_reg_type := init_decode_reg;
+	signal rin : decode_reg_type := init_decode_reg;
 
 begin
 

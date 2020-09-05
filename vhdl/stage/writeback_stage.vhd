@@ -29,8 +29,8 @@ end writeback_stage;
 
 architecture behavior of writeback_stage is
 
-	signal r   : writeback_reg_type;
-	signal rin : writeback_reg_type;
+	signal r   : writeback_reg_type := init_writeback_reg;
+	signal rin : writeback_reg_type := init_writeback_reg;
 
 begin
 

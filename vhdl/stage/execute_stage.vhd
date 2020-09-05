@@ -45,8 +45,8 @@ end execute_stage;
 
 architecture behavior of execute_stage is
 
-	signal r   : execute_reg_type;
-	signal rin : execute_reg_type;
+	signal r   : execute_reg_type := init_execute_reg;
+	signal rin : execute_reg_type := init_execute_reg;
 
 begin
 
@@ -278,6 +278,15 @@ begin
 		dmem_i.mem_wstrb <= v.strobe;
 
 		csr_ei.epc <= v.pc;
+		if v.valid = '0' then
+			if d.e.valid = '1' then
+				csr_ei.epc <= d.e.pc;
+			elsif d.m.valid = '1' then
+				csr_ei.epc <= d.m.pc;
+			elsif d.w.valid = '1' then
+				csr_ei.epc <= d.w.pc;
+			end if;
+		end if;
 		csr_ei.exc <= v.exc;
 		csr_ei.etval <= v.etval;
 		csr_ei.ecause <= v.ecause;
@@ -286,15 +295,6 @@ begin
 		csr_ei.mret <= v.mret;
 
 		if (time_irpt or ext_irpt) = '1' then
-			if v.valid = '0' then
-				if d.e.valid = '1' then
-					csr_ei.epc <= d.e.pc;
-				elsif d.m.valid = '1' then
-					csr_ei.epc <= d.m.pc;
-				elsif d.w.valid = '1' then
-					csr_ei.epc <= d.w.pc;
-				end if;
-			end if;
 		end if;
 
 		csr_ei.time_irpt <= time_irpt;
