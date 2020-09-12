@@ -35,31 +35,8 @@ architecture behavior of bram_mem is
 	type word_type is array (0 to 7) of std_logic_vector(7 downto 0);
 	type memory_type is array (0 to 2**bram_depth-1) of word_type;
 
-	impure function init_memory(
-		file_name : in string
-	)
-	return memory_type is
-		file memory_file      : text open read_mode is file_name;
-		variable memory_line  : line;
-		variable memory_block : memory_type;
-		variable memory_word  : std_logic_vector(63 downto 0);
-	begin
-		for i in 0 to 2**bram_depth-1 loop
-			readline(memory_file, memory_line);
-			hread(memory_line, memory_word);
-			memory_block(i)(7) := memory_word(63 downto 56);
-			memory_block(i)(6) := memory_word(55 downto 48);
-			memory_block(i)(5) := memory_word(47 downto 40);
-			memory_block(i)(4) := memory_word(39 downto 32);
-			memory_block(i)(3) := memory_word(31 downto 24);
-			memory_block(i)(2) := memory_word(23 downto 16);
-			memory_block(i)(1) := memory_word(15 downto 8);
-			memory_block(i)(0) := memory_word(7 downto 0);
-		end loop;
-		return memory_block;
-	end function;
-
-	signal memory_block : memory_type := init_memory("bram_mem.dat");
+	signal memory_block : memory_type := (
+	);
 
 	attribute ramstyle : string;
 	attribute ramstyle of memory_block : signal is "M10K";
@@ -106,9 +83,9 @@ begin
 				end if;
 
 				ready <= '1';
-			
+
 			elsif bram_ren = '1' then
-			
+
 				rdata <= memory_block(to_integer(unsigned(bram_addr)));
 
 				ready <= '1';

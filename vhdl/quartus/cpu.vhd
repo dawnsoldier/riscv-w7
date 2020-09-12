@@ -10,6 +10,9 @@ use work.constants.all;
 use work.wire.all;
 
 entity cpu is
+	generic(
+		bram_depth : integer := bram_depth
+	);
 	port(
 		reset : in  std_logic;
 		clock : in  std_logic;
