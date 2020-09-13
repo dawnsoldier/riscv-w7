@@ -2,9 +2,11 @@
 
 DIR=$1
 
-if [ ! -d "$DIR/sim/work" ]; then
-  mkdir $DIR/sim/work
+if [ -d "$DIR/sim/work" ]; then
+  rm -rf $DIR/sim/work
 fi
+
+mkdir $DIR/sim/work
 
 GHDL=$2
 
