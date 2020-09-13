@@ -129,7 +129,7 @@ begin
 
 		v.stall := '0';
 
-		v.clear := csr_eo.exc or csr_eo.mret or d.e.jump or d.w.clear;
+		v.clear := csr_eo.exc or csr_eo.mret or d.e.jump or a.w.clear;
 
 		v.enable := not(d.e.stall or d.m.stall or d.w.stall);
 

@@ -76,7 +76,7 @@ begin
 
 		v.stall := '0';
 
-		v.clear := csr_eo.exc or csr_eo.mret or a.w.clear or d.w.clear;
+		v.clear := csr_eo.exc or csr_eo.mret or a.w.clear or a.w.clear;
 
 		if d.e.jump = '1' and d.f.taken = '0' then
 			v.clear := '1';
