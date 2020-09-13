@@ -51,7 +51,7 @@ begin
 		v.inc := "100";
 		v.instr := nop;
 
-		v.valid := not d.w.clear;
+		v.valid := not a.w.clear;
 		v.stall := pfetch_o.stall or d.d.stall or d.e.stall or d.m.stall or d.w.stall;
 		v.clear := csr_eo.exc or csr_eo.mret or a.w.clear;
 
