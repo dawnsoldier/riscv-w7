@@ -124,6 +124,7 @@ begin
 			v.csr := '0';
 			v.exc := '0';
 			v.mret := '0';
+			v.valid := '0';
 		end if;
 
 		if v.clear = '1' then
@@ -161,6 +162,7 @@ begin
 		y.mret <= v.mret;
 		y.valid <= v.valid;
 		y.stall <= v.stall;
+		y.clear <= v.clear;
 
 		q.pc <= r.pc;
 		q.int_wren <= r.int_wren;
@@ -191,6 +193,7 @@ begin
 		q.mret <= r.mret;
 		q.valid <= r.valid;
 		q.stall <= r.stall;
+		q.clear <= r.clear;
 
 	end process;
 

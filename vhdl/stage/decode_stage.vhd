@@ -76,7 +76,7 @@ begin
 
 		v.stall := '0';
 
-		v.clear := csr_eo.exc or csr_eo.mret or d.w.clear;
+		v.clear := csr_eo.exc or csr_eo.mret or a.w.clear or d.w.clear;
 
 		if d.e.jump = '1' and d.f.taken = '0' then
 			v.clear := '1';
@@ -324,6 +324,7 @@ begin
 			v.exc := '0';
 			v.mret := '0';
 			v.fence := '0';
+			v.valid := '0';
 		end if;
 
 		if v.clear = '1' then
@@ -377,6 +378,7 @@ begin
 		y.fence <= v.fence;
 		y.valid <= v.valid;
 		y.stall <= v.stall;
+		y.clear <= v.clear;
 
 		q.pc <= r.pc;
 		q.npc <= r.npc;
@@ -423,6 +425,7 @@ begin
 		q.fence <= r.fence;
 		q.valid <= r.valid;
 		q.stall <= r.stall;
+		q.clear <= r.clear;
 
 	end process;
 

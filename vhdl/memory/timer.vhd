@@ -32,6 +32,8 @@ architecture behavior of timer is
 	signal rdata : std_logic_vector(63 downto 0) := (others => '0');
 	signal ready : std_logic := '0';
 
+	signal irpt : std_logic := '0';
+
 begin
 
 	process(clock)
@@ -100,6 +102,7 @@ begin
 
 	timer_rdata <= rdata;
 	timer_ready <= ready;
+	timer_irpt <= irpt;
 
 	process(clock)
 
@@ -108,12 +111,12 @@ begin
 		if (rising_edge(clock)) then
 
 			if (reset = '0') then
-				timer_irpt <= '0';
+				irpt <= '0';
 			else
 				if (unsigned(mtime) >= unsigned(mtimecmp)) then
-					timer_irpt <= '1';
+					irpt <= '1';
 				else
-					timer_irpt <= '0';
+					irpt <= '0';
 				end if;
 			end if;
 

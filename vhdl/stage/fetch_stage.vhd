@@ -149,6 +149,7 @@ begin
 		y.exc <= v.exc;
 		y.etval <= v.etval;
 		y.ecause <= v.ecause;
+		y.clear <= v.clear;
 
 		q.pc <= r.pc;
 		q.instr <= v.instr;
@@ -156,6 +157,7 @@ begin
 		q.exc <= r.exc;
 		q.etval <= r.etval;
 		q.ecause <= r.ecause;
+		q.clear <= r.clear;
 
 	end process;
 

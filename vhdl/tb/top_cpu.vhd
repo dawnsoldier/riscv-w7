@@ -25,16 +25,16 @@ architecture behavior of top_cpu is
 		);
 	end component;
 
-	signal reset : std_logic := '0';
+	signal reset : std_logic := '1';
 	signal clock : std_logic := '0';
 	signal rtc   : std_logic := '0';
-	signal rx    : std_logic := '0';
-	signal tx    : std_logic := '0';
+	signal rx    : std_logic := '1';
+	signal tx    : std_logic := '1';
 	signal count : unsigned(31 downto 0) := (others => '0');
 
 begin
 
-	reset <= '1' after 100 ns;
+	-- reset <= '1' after 100 ns;
 	clock <= not clock after 20 ns;
 
 	process (clock)

@@ -19,6 +19,7 @@ package wire is
 		etval  : std_logic_vector(63 downto 0);
 		ecause : std_logic_vector(3 downto 0);
 		exc    : std_logic;
+		clear  : std_logic;
 	end record;
 
 	type fetch_reg_type is record
@@ -95,6 +96,7 @@ package wire is
 		fence       : std_logic;
 		valid       : std_logic;
 		stall       : std_logic;
+		clear       : std_logic;
 	end record;
 
 	type decode_reg_type is record
@@ -258,6 +260,7 @@ package wire is
 		mret        : std_logic;
 		valid       : std_logic;
 		stall       : std_logic;
+		clear       : std_logic;
 	end record;
 
 	type execute_reg_type is record
@@ -402,6 +405,7 @@ package wire is
 		mret       : std_logic;
 		valid      : std_logic;
 		stall      : std_logic;
+		clear      : std_logic;
 	end record;
 
 	type memory_reg_type is record

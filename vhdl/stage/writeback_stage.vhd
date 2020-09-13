@@ -89,7 +89,7 @@ begin
 			v.store := '0';
 			v.exc := '0';
 			v.mret := '0';
-			v.clear := '0';
+			v.valid := '0';
 		end if;
 
 		if v.clear = '1' then
@@ -146,6 +146,7 @@ begin
 			else
 
 				r <= rin;
+				r.clear <= '0';
 
 			end if;
 
