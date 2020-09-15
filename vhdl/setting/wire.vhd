@@ -618,6 +618,7 @@ package wire is
 		npc       : std_logic_vector(63 downto 0);
 		jump      : std_logic;
 		fence     : std_logic;
+		valid     : std_logic;
 		mem_rdata : std_logic_vector(63 downto 0);
 		mem_ready : std_logic;
 	end record;

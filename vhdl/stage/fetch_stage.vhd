@@ -116,6 +116,7 @@ begin
 		pfetch_i.npc <= v.pc;
 		pfetch_i.jump <= v.spec;
 		pfetch_i.fence <= d.d.fence;
+		pfetch_i.valid <= v.valid;
 		pfetch_i.mem_rdata <= imem_o.mem_rdata;
 		pfetch_i.mem_ready <= imem_o.mem_ready;
 

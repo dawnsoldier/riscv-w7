@@ -247,7 +247,10 @@ begin
 						end if;
 					end if;
 					lzc_i.a <= v.aa;
-					v.counter := to_integer(unsigned(not(lzc_o.c)));
+					if (int_mul_i.enable and (int_mul_i.op.alu_mul or int_mul_i.op.alu_mulh or
+							int_mul_i.op.alu_mulhu or int_mul_i.op.alu_mulhsu)) = '1' then
+						v.counter := to_integer(unsigned(not(lzc_o.c)));
+					end if;
 					v.counter := 63 - v.counter;
 					v.rr := (others => '0');
 				when MUL1 =>

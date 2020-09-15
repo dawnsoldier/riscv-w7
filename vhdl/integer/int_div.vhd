@@ -86,8 +86,11 @@ begin
 					v.overflow := to_std_logic(v.data1 = overflow_sign and v.data2 = overflow);
 				end if;
 				lzc_i.a <= v.data1;
-				v.counter := to_integer(unsigned(not(lzc_o.c)));
-				v.data1 := std_logic_vector(shift_left(unsigned(v.data1),v.counter));
+				if (int_div_i.enable and (int_div_i.op.alu_div or int_div_i.op.alu_divu or
+						int_div_i.op.alu_rem or int_div_i.op.alu_remu)) = '1' then
+					v.counter := to_integer(unsigned(not(lzc_o.c)));
+					v.data1 := std_logic_vector(shift_left(unsigned(v.data1),v.counter));
+				end if;
 				v.counter := 63 - v.counter;
 				v.aq := (128 downto 64 => '0') & v.data1;
 				v.m := '0' & v.data2;

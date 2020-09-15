@@ -83,8 +83,10 @@ begin
 			v.fpc := v.pc(63 downto 3) & "000";
 		end if;
 
-		v.wid := to_integer(unsigned(v.fpc(pfetch_depth downto 1)));
-		v.rid := to_integer(unsigned(v.pc(pfetch_depth downto 1)));
+		if pfetch_i.valid = '1' then
+			v.wid := to_integer(unsigned(v.fpc(pfetch_depth downto 1)));
+			v.rid := to_integer(unsigned(v.pc(pfetch_depth downto 1)));
+		end if;
 
 		v.equal := nor_reduce(v.fpc(63 downto 3) xor v.pc(63 downto 3));
 		v.full := nor_reduce(v.fpc(pfetch_depth downto 3) xor v.pc(pfetch_depth downto 3));
