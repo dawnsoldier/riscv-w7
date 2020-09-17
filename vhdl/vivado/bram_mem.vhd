@@ -10,7 +10,6 @@ use work.configure.all;
 
 library std;
 use std.textio.all;
-use std.env.all;
 
 entity bram_mem is
 	generic(
