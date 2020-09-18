@@ -129,7 +129,7 @@ begin
 
 		v.stall := '0';
 
-		v.clear := csr_eo.exc or csr_eo.mret or d.e.jump or a.w.clear;
+		v.clear := csr_eo.exc or csr_eo.mret or d.e.jump or d.w.clear;
 
 		v.enable := not(d.e.stall or d.m.stall or d.w.stall);
 
@@ -278,15 +278,10 @@ begin
 		dmem_i.mem_wdata <= store_data(v.sdata, v.store_op);
 		dmem_i.mem_wstrb <= v.strobe;
 
-		csr_ei.epc <= v.pc;
-		if v.valid = '0' then
-			if d.e.valid = '1' then
-				csr_ei.epc <= d.e.pc;
-			elsif d.m.valid = '1' then
-				csr_ei.epc <= d.m.pc;
-			elsif d.w.valid = '1' then
-				csr_ei.epc <= d.w.pc;
-			end if;
+		if r.jump = '1' then
+			csr_ei.epc <= r.pc;
+		else
+      csr_ei.epc <= v.pc;
 		end if;
 		csr_ei.exc <= v.exc;
 		csr_ei.etval <= v.etval;

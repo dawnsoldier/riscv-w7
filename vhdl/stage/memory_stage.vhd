@@ -78,7 +78,7 @@ begin
 
 		v.stall := '0';
 
-		v.clear := a.w.clear;
+		v.clear := d.w.clear;
 
 		if (v.load or v.fpu_load) = '1' then
 			v.wdata := load_data(dmem_o.mem_rdata, v.byteenable, v.load_op);

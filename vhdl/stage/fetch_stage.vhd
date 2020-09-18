@@ -48,19 +48,16 @@ begin
 
 		v := r;
 
-		v.inc := "100";
-		v.instr := nop;
+		v.valid := not d.w.clear;
+		v.stall := pfetch_o.stall or d.d.stall or d.e.stall or d.m.stall or d.w.stall or d.w.clear;
+		v.clear := csr_eo.exc or csr_eo.mret or d.w.clear;
 
-		v.valid := not a.w.clear;
-		v.stall := pfetch_o.stall or d.d.stall or d.e.stall or d.m.stall or d.w.stall;
-		v.clear := csr_eo.exc or csr_eo.mret or a.w.clear;
-
-		if v.clear = '0' then
-			v.instr := pfetch_o.instr;
-		end if;
+		v.instr := pfetch_o.instr;
 
 		if and_reduce(v.instr(1 downto 0)) = '0' then
 			v.inc := "010";
+		else
+			v.inc := "100";
 		end if;
 
 		btb_i.get_pc <= d.d.pc;
@@ -76,9 +73,6 @@ begin
 		btb_i.upd_jump <= d.e.jump;
 		btb_i.stall <= v.stall;
 		btb_i.clear <= v.clear;
-
-		v.taken := '0';
-		v.spec := '0';
 
 		if csr_eo.exc = '1' then
 			v.taken := '0';
@@ -109,7 +103,12 @@ begin
 			v.spec := '1';
 			v.pc :=  btb_o.pred_baddr;
 		elsif v.stall = '0' then
+			v.taken := '0';
+			v.spec := '0';
 			v.pc := std_logic_vector(unsigned(v.pc) + v.inc);
+		else
+			v.taken := '0';
+			v.spec := '0';
 		end if;
 
 		pfetch_i.pc <= r.pc;
