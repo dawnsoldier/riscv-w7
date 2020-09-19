@@ -66,16 +66,16 @@ begin
 							highaddr := pmp_i.pmpaddr(i);
 							if unsigned(pmp_i.mem_addr(55 downto 2)) < unsigned(highaddr(53 downto 0)) and
 									unsigned(pmp_i.mem_addr(55 downto 2)) >= unsigned(lowaddr(53 downto 0)) then
-								if pmp_i.pmpcfg(i).L = "1" or pmp_i.priv_mode = u_mode then
-									if pmp_i.pmpcfg(i).X = "0" and pmp_i.mem_instr = '1' then
+								if pmp_i.pmpcfg(i).L = '1' or pmp_i.priv_mode = u_mode then
+									if pmp_i.pmpcfg(i).X = '0' and pmp_i.mem_instr = '1' then
 										exc := '1';
 										etval := pmp_i.mem_addr;
 										ecause := except_instr_access_fault;
-									elsif pmp_i.pmpcfg(i).R = "0" and or_reduce(pmp_i.mem_wstrb) = '0' then
+									elsif pmp_i.pmpcfg(i).R = '0' and or_reduce(pmp_i.mem_wstrb) = '0' then
 										exc := '1';
 										etval := pmp_i.mem_addr;
 										ecause := except_load_access_fault;
-									elsif  pmp_i.pmpcfg(i).W = "0" and or_reduce(pmp_i.mem_wstrb) = '1' then
+									elsif  pmp_i.pmpcfg(i).W = '0' and or_reduce(pmp_i.mem_wstrb) = '1' then
 										exc := '1';
 										etval := pmp_i.mem_addr;
 										ecause := except_store_access_fault;
@@ -85,16 +85,16 @@ begin
 							end if;
 						elsif pmp_i.pmpcfg(i).A = "10" then
 							if nor_reduce(pmp_i.mem_addr(55 downto 2) xor pmp_i.pmpaddr(i)(53 downto 0)) = '1' then
-								if pmp_i.pmpcfg(i).L = "1" or pmp_i.priv_mode = u_mode then
-									if pmp_i.pmpcfg(i).X = "0" and pmp_i.mem_instr = '1' then
+								if pmp_i.pmpcfg(i).L = '1' or pmp_i.priv_mode = u_mode then
+									if pmp_i.pmpcfg(i).X = '0' and pmp_i.mem_instr = '1' then
 										exc := '1';
 										etval := pmp_i.mem_addr;
 										ecause := except_instr_access_fault;
-									elsif pmp_i.pmpcfg(i).R = "0" and or_reduce(pmp_i.mem_wstrb) = '0' then
+									elsif pmp_i.pmpcfg(i).R = '0' and or_reduce(pmp_i.mem_wstrb) = '0' then
 										exc := '1';
 										etval := pmp_i.mem_addr;
 										ecause := except_load_access_fault;
-									elsif  pmp_i.pmpcfg(i).W = "0" and or_reduce(pmp_i.mem_wstrb) = '1' then
+									elsif  pmp_i.pmpcfg(i).W = '0' and or_reduce(pmp_i.mem_wstrb) = '1' then
 										exc := '1';
 										etval := pmp_i.mem_addr;
 										ecause := except_store_access_fault;
@@ -115,16 +115,16 @@ begin
 							mask := std_logic_vector(shift_left(unsigned(mask),mask_inc));
 							lowaddr := pmp_i.pmpaddr(i) and mask;
 							if nor_reduce((pmp_i.mem_addr(55 downto 2) and mask(53 downto 0)) xor lowaddr(53 downto 0)) = '1' then
-								if pmp_i.pmpcfg(i).L = "1" or pmp_i.priv_mode = u_mode then
-									if pmp_i.pmpcfg(i).X = "0" and pmp_i.mem_instr = '1' then
+								if pmp_i.pmpcfg(i).L = '1' or pmp_i.priv_mode = u_mode then
+									if pmp_i.pmpcfg(i).X = '0' and pmp_i.mem_instr = '1' then
 										exc := '1';
 										etval := pmp_i.mem_addr;
 										ecause := except_instr_access_fault;
-									elsif pmp_i.pmpcfg(i).R = "0" and or_reduce(pmp_i.mem_wstrb) = '0' then
+									elsif pmp_i.pmpcfg(i).R = '0' and or_reduce(pmp_i.mem_wstrb) = '0' then
 										exc := '1';
 										etval := pmp_i.mem_addr;
 										ecause := except_load_access_fault;
-									elsif  pmp_i.pmpcfg(i).W = "0" and or_reduce(pmp_i.mem_wstrb) = '1' then
+									elsif  pmp_i.pmpcfg(i).W = '0' and or_reduce(pmp_i.mem_wstrb) = '1' then
 										exc := '1';
 										etval := pmp_i.mem_addr;
 										ecause := except_store_access_fault;

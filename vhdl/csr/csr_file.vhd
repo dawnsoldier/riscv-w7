@@ -40,7 +40,7 @@ architecture behavior of csr_file is
 
 begin
 
-	process(csr_ei,mcsr,ucsr,priv_mode,exc,mret)
+	process(mcsr,ucsr,priv_mode,exc,mret)
 
 	begin
 
@@ -54,7 +54,7 @@ begin
 		csr_eo.mret <= mret;
 
 		if mcsr.mtvec.mode = "01" then
-			csr_eo.tvec <= std_logic_vector(unsigned(mcsr.mtvec.base) + unsigned(csr_ei.ecause)) & "00";
+			csr_eo.tvec <= std_logic_vector(unsigned(mcsr.mtvec.base) + unsigned(mcsr.mcause.code(3 downto 0))) & "00";
 		else
 			csr_eo.tvec <= mcsr.mtvec.base & "00";
 		end if;
@@ -264,45 +264,45 @@ begin
 				end if;
 
 				if csr_ei.time_irpt = '1' then
-					mcsr.mip.mtip <= "1";
+					mcsr.mip.mtip <= '1';
 				else
-					mcsr.mip.mtip <= "0";
+					mcsr.mip.mtip <= '0';
 				end if;
 
 				if csr_ei.ext_irpt = '1' then
-					mcsr.mip.meip <= "1";
+					mcsr.mip.meip <= '1';
 				else
-					mcsr.mip.meip <= "0";
+					mcsr.mip.meip <= '0';
 				end if;
 
-				if mcsr.mstatus.mie = "1" and mcsr.mie.mtie = "1" and mcsr.mip.mtip = "1" then
+				if mcsr.mstatus.mie = '1' and mcsr.mie.mtie = '1' and mcsr.mip.mtip = '1' then
 					mcsr.mstatus.mpie <= mcsr.mstatus.mie;
 					mcsr.mstatus.mpp <= priv_mode;
-					mcsr.mstatus.mie <= "0";
+					mcsr.mstatus.mie <= '0';
 					priv_mode <= m_mode;
 					mcsr.mepc <= csr_ei.epc;
 					mcsr.mtval <= X"0000000000000000";
-					mcsr.mcause.irpt <= "1";
+					mcsr.mcause.irpt <= '1';
 					mcsr.mcause.code <= X"00000000000000" & "000" & interrupt_mach_timer;
 					exc <= '1';
-				elsif mcsr.mstatus.mie = "1" and mcsr.mie.meie = "1" and mcsr.mip.meip = "1" then
+				elsif mcsr.mstatus.mie = '1' and mcsr.mie.meie = '1' and mcsr.mip.meip = '1' then
 					mcsr.mstatus.mpie <= mcsr.mstatus.mie;
 					mcsr.mstatus.mpp <= priv_mode;
-					mcsr.mstatus.mie <= "0";
+					mcsr.mstatus.mie <= '0';
 					priv_mode <= m_mode;
 					mcsr.mepc <= csr_ei.epc;
 					mcsr.mtval <= X"0000000000000000";
-					mcsr.mcause.irpt <= "1";
+					mcsr.mcause.irpt <= '1';
 					mcsr.mcause.code <= X"00000000000000" & "000" & interrupt_mach_extern;
 					exc <= '1';
 				elsif csr_ei.exc = '1' then
 					mcsr.mstatus.mpie <= mcsr.mstatus.mie;
 					mcsr.mstatus.mpp <= priv_mode;
-					mcsr.mstatus.mie <= "0";
+					mcsr.mstatus.mie <= '0';
 					priv_mode <= m_mode;
 					mcsr.mepc <= csr_ei.epc;
 					mcsr.mtval <= csr_ei.etval;
-					mcsr.mcause.irpt <= "0";
+					mcsr.mcause.irpt <= '0';
 					mcsr.mcause.code <= X"00000000000000" & "000" & csr_ei.ecause;
 					exc <= '1';
 				else
@@ -312,7 +312,7 @@ begin
 				if csr_ei.mret = '1' then
 					priv_mode <= mcsr.mstatus.mpp;
 					mcsr.mstatus.mie <= mcsr.mstatus.mpie;
-					mcsr.mstatus.mpie <= "0";
+					mcsr.mstatus.mpie <= '0';
 					mcsr.mstatus.mpp <= u_mode;
 					mret <= '1';
 				else
@@ -322,25 +322,25 @@ begin
 				if csr_wi.wren = '1' then
 					case csr_wi.waddr is
 						when csr_mstatus =>
-							mcsr.mstatus.sd   <= csr_wi.wdata(63 downto 63);
-							mcsr.mstatus.mprv <= csr_wi.wdata(17 downto 17);
+							mcsr.mstatus.sd   <= csr_wi.wdata(63);
+							mcsr.mstatus.mprv <= csr_wi.wdata(17);
 							mcsr.mstatus.fs   <= csr_wi.wdata(14 downto 13);
 							if xor_reduce(csr_wi.wdata(12 downto 11)) = '0' then
 								mcsr.mstatus.mpp  <= csr_wi.wdata(12 downto 11);
 							end if;
-							mcsr.mstatus.mpie <= csr_wi.wdata(7 downto 7);
-							mcsr.mstatus.upie <= csr_wi.wdata(4 downto 4);
-							mcsr.mstatus.mie  <= csr_wi.wdata(3 downto 3);
-							mcsr.mstatus.uie  <= csr_wi.wdata(0 downto 0);
+							mcsr.mstatus.mpie <= csr_wi.wdata(7);
+							mcsr.mstatus.upie <= csr_wi.wdata(4);
+							mcsr.mstatus.mie  <= csr_wi.wdata(3);
+							mcsr.mstatus.uie  <= csr_wi.wdata(0);
 						when csr_mie =>
-							mcsr.mie.meie <= csr_wi.wdata(11 downto 11);
-							mcsr.mie.ueie <= csr_wi.wdata(8 downto 8);
-							mcsr.mie.mtie <= csr_wi.wdata(7 downto 7);
-							mcsr.mie.utie <= csr_wi.wdata(4 downto 4);
-							mcsr.mie.msie <= csr_wi.wdata(3 downto 3);
-							mcsr.mie.usie <= csr_wi.wdata(0 downto 0);
+							mcsr.mie.meie <= csr_wi.wdata(11);
+							mcsr.mie.ueie <= csr_wi.wdata(8);
+							mcsr.mie.mtie <= csr_wi.wdata(7);
+							mcsr.mie.utie <= csr_wi.wdata(4);
+							mcsr.mie.msie <= csr_wi.wdata(3);
+							mcsr.mie.usie <= csr_wi.wdata(0);
 						when csr_mcause =>
-							mcsr.mcause.irpt <= csr_wi.wdata(63 downto 63);
+							mcsr.mcause.irpt <= csr_wi.wdata(63);
 							mcsr.mcause.code <= csr_wi.wdata(62 downto 0);
 						when csr_mtvec =>
 							mcsr.mtvec.base <= csr_wi.wdata(63 downto 2);
@@ -356,181 +356,181 @@ begin
 						when csr_medeleg =>
 							mcsr.medeleg <= csr_wi.wdata;
 						when csr_pmpcfg0 =>
-							if mcsr.pmpcfg(7).L = "0" then
-								mcsr.pmpcfg(7).L <= csr_wi.wdata(63 downto 63);
+							if mcsr.pmpcfg(7).L = '0' then
+								mcsr.pmpcfg(7).L <= csr_wi.wdata(63);
 								mcsr.pmpcfg(7).A <= csr_wi.wdata(60 downto 59);
-								mcsr.pmpcfg(7).X <= csr_wi.wdata(58 downto 58);
-								mcsr.pmpcfg(7).W <= csr_wi.wdata(57 downto 57);
-								mcsr.pmpcfg(7).R <= csr_wi.wdata(56 downto 56);
+								mcsr.pmpcfg(7).X <= csr_wi.wdata(58);
+								mcsr.pmpcfg(7).W <= csr_wi.wdata(57);
+								mcsr.pmpcfg(7).R <= csr_wi.wdata(56);
 							end if;
-							if mcsr.pmpcfg(6).L = "0" then
-								mcsr.pmpcfg(6).L <= csr_wi.wdata(55 downto 55);
+							if mcsr.pmpcfg(6).L = '0' then
+								mcsr.pmpcfg(6).L <= csr_wi.wdata(55);
 								mcsr.pmpcfg(6).A <= csr_wi.wdata(52 downto 51);
-								mcsr.pmpcfg(6).X <= csr_wi.wdata(50 downto 50);
-								mcsr.pmpcfg(6).W <= csr_wi.wdata(49 downto 49);
-								mcsr.pmpcfg(6).R <= csr_wi.wdata(48 downto 48);
+								mcsr.pmpcfg(6).X <= csr_wi.wdata(50);
+								mcsr.pmpcfg(6).W <= csr_wi.wdata(49);
+								mcsr.pmpcfg(6).R <= csr_wi.wdata(48);
 							end if;
-							if mcsr.pmpcfg(5).L = "0" then
-								mcsr.pmpcfg(5).L <= csr_wi.wdata(47 downto 47);
+							if mcsr.pmpcfg(5).L = '0' then
+								mcsr.pmpcfg(5).L <= csr_wi.wdata(47);
 								mcsr.pmpcfg(5).A <= csr_wi.wdata(44 downto 43);
-								mcsr.pmpcfg(5).X <= csr_wi.wdata(42 downto 42);
-								mcsr.pmpcfg(5).W <= csr_wi.wdata(41 downto 41);
-								mcsr.pmpcfg(5).R <= csr_wi.wdata(40 downto 40);
+								mcsr.pmpcfg(5).X <= csr_wi.wdata(42);
+								mcsr.pmpcfg(5).W <= csr_wi.wdata(41);
+								mcsr.pmpcfg(5).R <= csr_wi.wdata(40);
 							end if;
-							if mcsr.pmpcfg(4).L = "0" then
-								mcsr.pmpcfg(4).L <= csr_wi.wdata(39 downto 39);
+							if mcsr.pmpcfg(4).L = '0' then
+								mcsr.pmpcfg(4).L <= csr_wi.wdata(39);
 								mcsr.pmpcfg(4).A <= csr_wi.wdata(36 downto 35);
-								mcsr.pmpcfg(4).X <= csr_wi.wdata(34 downto 34);
-								mcsr.pmpcfg(4).W <= csr_wi.wdata(33 downto 33);
-								mcsr.pmpcfg(4).R <= csr_wi.wdata(32 downto 32);
+								mcsr.pmpcfg(4).X <= csr_wi.wdata(34);
+								mcsr.pmpcfg(4).W <= csr_wi.wdata(33);
+								mcsr.pmpcfg(4).R <= csr_wi.wdata(32);
 							end if;
-							if mcsr.pmpcfg(3).L = "0" then
-								mcsr.pmpcfg(3).L <= csr_wi.wdata(31 downto 31);
+							if mcsr.pmpcfg(3).L = '0' then
+								mcsr.pmpcfg(3).L <= csr_wi.wdata(31);
 								mcsr.pmpcfg(3).A <= csr_wi.wdata(28 downto 27);
-								mcsr.pmpcfg(3).X <= csr_wi.wdata(26 downto 26);
-								mcsr.pmpcfg(3).W <= csr_wi.wdata(25 downto 25);
-								mcsr.pmpcfg(3).R <= csr_wi.wdata(24 downto 24);
+								mcsr.pmpcfg(3).X <= csr_wi.wdata(26);
+								mcsr.pmpcfg(3).W <= csr_wi.wdata(25);
+								mcsr.pmpcfg(3).R <= csr_wi.wdata(24);
 							end if;
-							if mcsr.pmpcfg(2).L = "0" then
-								mcsr.pmpcfg(2).L <= csr_wi.wdata(23 downto 23);
+							if mcsr.pmpcfg(2).L = '0' then
+								mcsr.pmpcfg(2).L <= csr_wi.wdata(23);
 								mcsr.pmpcfg(2).A <= csr_wi.wdata(20 downto 19);
-								mcsr.pmpcfg(2).X <= csr_wi.wdata(18 downto 18);
-								mcsr.pmpcfg(2).W <= csr_wi.wdata(17 downto 17);
-								mcsr.pmpcfg(2).R <= csr_wi.wdata(16 downto 16);
+								mcsr.pmpcfg(2).X <= csr_wi.wdata(18);
+								mcsr.pmpcfg(2).W <= csr_wi.wdata(17);
+								mcsr.pmpcfg(2).R <= csr_wi.wdata(16);
 							end if;
-							if mcsr.pmpcfg(1).L = "0" then
-								mcsr.pmpcfg(1).L <= csr_wi.wdata(15 downto 15);
+							if mcsr.pmpcfg(1).L = '0' then
+								mcsr.pmpcfg(1).L <= csr_wi.wdata(15);
 								mcsr.pmpcfg(1).A <= csr_wi.wdata(12 downto 11);
-								mcsr.pmpcfg(1).X <= csr_wi.wdata(10 downto 10);
-								mcsr.pmpcfg(1).W <= csr_wi.wdata(9 downto 9);
-								mcsr.pmpcfg(1).R <= csr_wi.wdata(8 downto 8);
+								mcsr.pmpcfg(1).X <= csr_wi.wdata(10);
+								mcsr.pmpcfg(1).W <= csr_wi.wdata(9);
+								mcsr.pmpcfg(1).R <= csr_wi.wdata(8);
 							end if;
-							if mcsr.pmpcfg(0).L = "0" then
-								mcsr.pmpcfg(0).L <= csr_wi.wdata(7 downto 7);
+							if mcsr.pmpcfg(0).L = '0' then
+								mcsr.pmpcfg(0).L <= csr_wi.wdata(7);
 								mcsr.pmpcfg(0).A <= csr_wi.wdata(4 downto 3);
-								mcsr.pmpcfg(0).X <= csr_wi.wdata(2 downto 2);
-								mcsr.pmpcfg(0).W <= csr_wi.wdata(1 downto 1);
-								mcsr.pmpcfg(0).R <= csr_wi.wdata(0 downto 0);
+								mcsr.pmpcfg(0).X <= csr_wi.wdata(2);
+								mcsr.pmpcfg(0).W <= csr_wi.wdata(1);
+								mcsr.pmpcfg(0).R <= csr_wi.wdata(0);
 							end if;
 						when csr_pmpcfg2 =>
-							if mcsr.pmpcfg(15).L = "0" then
-								mcsr.pmpcfg(15).L <= csr_wi.wdata(63 downto 63);
+							if mcsr.pmpcfg(15).L = '0' then
+								mcsr.pmpcfg(15).L <= csr_wi.wdata(63);
 								mcsr.pmpcfg(15).A <= csr_wi.wdata(60 downto 59);
-								mcsr.pmpcfg(15).X <= csr_wi.wdata(58 downto 58);
-								mcsr.pmpcfg(15).W <= csr_wi.wdata(57 downto 57);
-								mcsr.pmpcfg(15).R <= csr_wi.wdata(56 downto 56);
+								mcsr.pmpcfg(15).X <= csr_wi.wdata(58);
+								mcsr.pmpcfg(15).W <= csr_wi.wdata(57);
+								mcsr.pmpcfg(15).R <= csr_wi.wdata(56);
 							end if;
-							if mcsr.pmpcfg(14).L = "0" then
-								mcsr.pmpcfg(14).L <= csr_wi.wdata(55 downto 55);
+							if mcsr.pmpcfg(14).L = '0' then
+								mcsr.pmpcfg(14).L <= csr_wi.wdata(55);
 								mcsr.pmpcfg(14).A <= csr_wi.wdata(52 downto 51);
-								mcsr.pmpcfg(14).X <= csr_wi.wdata(50 downto 50);
-								mcsr.pmpcfg(14).W <= csr_wi.wdata(49 downto 49);
-								mcsr.pmpcfg(14).R <= csr_wi.wdata(48 downto 48);
+								mcsr.pmpcfg(14).X <= csr_wi.wdata(50);
+								mcsr.pmpcfg(14).W <= csr_wi.wdata(49);
+								mcsr.pmpcfg(14).R <= csr_wi.wdata(48);
 							end if;
-							if mcsr.pmpcfg(13).L = "0" then
-								mcsr.pmpcfg(13).L <= csr_wi.wdata(47 downto 47);
+							if mcsr.pmpcfg(13).L = '0' then
+								mcsr.pmpcfg(13).L <= csr_wi.wdata(47);
 								mcsr.pmpcfg(13).A <= csr_wi.wdata(44 downto 43);
-								mcsr.pmpcfg(13).X <= csr_wi.wdata(42 downto 42);
-								mcsr.pmpcfg(13).W <= csr_wi.wdata(41 downto 41);
-								mcsr.pmpcfg(13).R <= csr_wi.wdata(40 downto 40);
+								mcsr.pmpcfg(13).X <= csr_wi.wdata(42);
+								mcsr.pmpcfg(13).W <= csr_wi.wdata(41);
+								mcsr.pmpcfg(13).R <= csr_wi.wdata(40);
 							end if;
-							if mcsr.pmpcfg(12).L = "0" then
-								mcsr.pmpcfg(12).L <= csr_wi.wdata(39 downto 39);
+							if mcsr.pmpcfg(12).L = '0' then
+								mcsr.pmpcfg(12).L <= csr_wi.wdata(39);
 								mcsr.pmpcfg(12).A <= csr_wi.wdata(36 downto 35);
-								mcsr.pmpcfg(12).X <= csr_wi.wdata(34 downto 34);
-								mcsr.pmpcfg(12).W <= csr_wi.wdata(33 downto 33);
-								mcsr.pmpcfg(12).R <= csr_wi.wdata(32 downto 32);
+								mcsr.pmpcfg(12).X <= csr_wi.wdata(34);
+								mcsr.pmpcfg(12).W <= csr_wi.wdata(33);
+								mcsr.pmpcfg(12).R <= csr_wi.wdata(32);
 							end if;
-							if mcsr.pmpcfg(11).L = "0" then
-								mcsr.pmpcfg(11).L <= csr_wi.wdata(31 downto 31);
+							if mcsr.pmpcfg(11).L = '0' then
+								mcsr.pmpcfg(11).L <= csr_wi.wdata(31);
 								mcsr.pmpcfg(11).A <= csr_wi.wdata(28 downto 27);
-								mcsr.pmpcfg(11).X <= csr_wi.wdata(26 downto 26);
-								mcsr.pmpcfg(11).W <= csr_wi.wdata(25 downto 25);
-								mcsr.pmpcfg(11).R <= csr_wi.wdata(24 downto 24);
+								mcsr.pmpcfg(11).X <= csr_wi.wdata(26);
+								mcsr.pmpcfg(11).W <= csr_wi.wdata(25);
+								mcsr.pmpcfg(11).R <= csr_wi.wdata(24);
 							end if;
-							if mcsr.pmpcfg(10).L = "0" then
-								mcsr.pmpcfg(10).L <= csr_wi.wdata(23 downto 23);
+							if mcsr.pmpcfg(10).L = '0' then
+								mcsr.pmpcfg(10).L <= csr_wi.wdata(23);
 								mcsr.pmpcfg(10).A <= csr_wi.wdata(20 downto 19);
-								mcsr.pmpcfg(10).X <= csr_wi.wdata(18 downto 18);
-								mcsr.pmpcfg(10).W <= csr_wi.wdata(17 downto 17);
-								mcsr.pmpcfg(10).R <= csr_wi.wdata(16 downto 16);
+								mcsr.pmpcfg(10).X <= csr_wi.wdata(18);
+								mcsr.pmpcfg(10).W <= csr_wi.wdata(17);
+								mcsr.pmpcfg(10).R <= csr_wi.wdata(16);
 							end if;
-							if mcsr.pmpcfg(9).L = "0" then
-								mcsr.pmpcfg(9).L <= csr_wi.wdata(15 downto 15);
+							if mcsr.pmpcfg(9).L = '0' then
+								mcsr.pmpcfg(9).L <= csr_wi.wdata(15);
 								mcsr.pmpcfg(9).A <= csr_wi.wdata(12 downto 11);
-								mcsr.pmpcfg(9).X <= csr_wi.wdata(10 downto 10);
-								mcsr.pmpcfg(9).W <= csr_wi.wdata(9 downto 9);
-								mcsr.pmpcfg(9).R <= csr_wi.wdata(8 downto 8);
+								mcsr.pmpcfg(9).X <= csr_wi.wdata(10);
+								mcsr.pmpcfg(9).W <= csr_wi.wdata(9);
+								mcsr.pmpcfg(9).R <= csr_wi.wdata(8);
 							end if;
-							if mcsr.pmpcfg(8).L = "0" then
-								mcsr.pmpcfg(8).L <= csr_wi.wdata(7 downto 7);
+							if mcsr.pmpcfg(8).L = '0' then
+								mcsr.pmpcfg(8).L <= csr_wi.wdata(7);
 								mcsr.pmpcfg(8).A <= csr_wi.wdata(4 downto 3);
-								mcsr.pmpcfg(8).X <= csr_wi.wdata(2 downto 2);
-								mcsr.pmpcfg(8).W <= csr_wi.wdata(1 downto 1);
-								mcsr.pmpcfg(8).R <= csr_wi.wdata(0 downto 0);
+								mcsr.pmpcfg(8).X <= csr_wi.wdata(2);
+								mcsr.pmpcfg(8).W <= csr_wi.wdata(1);
+								mcsr.pmpcfg(8).R <= csr_wi.wdata(0);
 							end if;
 						when csr_pmpaddr0 =>
-							if mcsr.pmpcfg(0).L = "0" and mcsr.pmpcfg(1).A /= "01" then
+							if mcsr.pmpcfg(0).L = '0' and mcsr.pmpcfg(1).A /= "01" then
 								mcsr.pmpaddr(0)(53 downto 0) <= csr_wi.wdata(53 downto 0);
 							end if;
 						when csr_pmpaddr1 =>
-							if mcsr.pmpcfg(1).L = "0" and mcsr.pmpcfg(2).A /= "01" then
+							if mcsr.pmpcfg(1).L = '0' and mcsr.pmpcfg(2).A /= "01" then
 								mcsr.pmpaddr(1)(53 downto 0) <= csr_wi.wdata(53 downto 0);
 							end if;
 						when csr_pmpaddr2 =>
-							if mcsr.pmpcfg(2).L = "0" and mcsr.pmpcfg(3).A /= "01" then
+							if mcsr.pmpcfg(2).L = '0' and mcsr.pmpcfg(3).A /= "01" then
 								mcsr.pmpaddr(2)(53 downto 0) <= csr_wi.wdata(53 downto 0);
 							end if;
 						when csr_pmpaddr3 =>
-							if mcsr.pmpcfg(3).L = "0" and mcsr.pmpcfg(4).A /= "01" then
+							if mcsr.pmpcfg(3).L = '0' and mcsr.pmpcfg(4).A /= "01" then
 								mcsr.pmpaddr(3)(53 downto 0) <= csr_wi.wdata(53 downto 0);
 							end if;
 						when csr_pmpaddr4 =>
-							if mcsr.pmpcfg(4).L = "0" and mcsr.pmpcfg(5).A /= "01" then
+							if mcsr.pmpcfg(4).L = '0' and mcsr.pmpcfg(5).A /= "01" then
 								mcsr.pmpaddr(4)(53 downto 0) <= csr_wi.wdata(53 downto 0);
 							end if;
 						when csr_pmpaddr5 =>
-							if mcsr.pmpcfg(5).L = "0" and mcsr.pmpcfg(6).A /= "01" then
+							if mcsr.pmpcfg(5).L = '0' and mcsr.pmpcfg(6).A /= "01" then
 								mcsr.pmpaddr(5)(53 downto 0) <= csr_wi.wdata(53 downto 0);
 							end if;
 						when csr_pmpaddr6 =>
-							if mcsr.pmpcfg(6).L = "0" and mcsr.pmpcfg(7).A /= "01" then
+							if mcsr.pmpcfg(6).L = '0' and mcsr.pmpcfg(7).A /= "01" then
 								mcsr.pmpaddr(6)(53 downto 0) <= csr_wi.wdata(53 downto 0);
 							end if;
 						when csr_pmpaddr7 =>
-							if mcsr.pmpcfg(7).L = "0" and mcsr.pmpcfg(8).A /= "01" then
+							if mcsr.pmpcfg(7).L = '0' and mcsr.pmpcfg(8).A /= "01" then
 								mcsr.pmpaddr(7)(53 downto 0) <= csr_wi.wdata(53 downto 0);
 							end if;
 						when csr_pmpaddr8 =>
-							if mcsr.pmpcfg(8).L = "0" and mcsr.pmpcfg(9).A /= "01" then
+							if mcsr.pmpcfg(8).L = '0' and mcsr.pmpcfg(9).A /= "01" then
 								mcsr.pmpaddr(8)(53 downto 0) <= csr_wi.wdata(53 downto 0);
 							end if;
 						when csr_pmpaddr9 =>
-							if mcsr.pmpcfg(9).L = "0" and mcsr.pmpcfg(10).A /= "01" then
+							if mcsr.pmpcfg(9).L = '0' and mcsr.pmpcfg(10).A /= "01" then
 								mcsr.pmpaddr(9)(53 downto 0) <= csr_wi.wdata(53 downto 0);
 							end if;
 						when csr_pmpaddr10 =>
-							if mcsr.pmpcfg(10).L = "0" and mcsr.pmpcfg(11).A /= "01" then
+							if mcsr.pmpcfg(10).L = '0' and mcsr.pmpcfg(11).A /= "01" then
 								mcsr.pmpaddr(10)(53 downto 0) <= csr_wi.wdata(53 downto 0);
 							end if;
 						when csr_pmpaddr11 =>
-							if mcsr.pmpcfg(11).L = "0" and mcsr.pmpcfg(12).A /= "01" then
+							if mcsr.pmpcfg(11).L = '0' and mcsr.pmpcfg(12).A /= "01" then
 								mcsr.pmpaddr(11)(53 downto 0) <= csr_wi.wdata(53 downto 0);
 							end if;
 						when csr_pmpaddr12 =>
-							if mcsr.pmpcfg(12).L = "0" and mcsr.pmpcfg(13).A /= "01" then
+							if mcsr.pmpcfg(12).L = '0' and mcsr.pmpcfg(13).A /= "01" then
 								mcsr.pmpaddr(12)(53 downto 0) <= csr_wi.wdata(53 downto 0);
 							end if;
 						when csr_pmpaddr13 =>
-							if mcsr.pmpcfg(13).L = "0" and mcsr.pmpcfg(14).A /= "01" then
+							if mcsr.pmpcfg(13).L = '0' and mcsr.pmpcfg(14).A /= "01" then
 								mcsr.pmpaddr(13)(53 downto 0) <= csr_wi.wdata(53 downto 0);
 							end if;
 						when csr_pmpaddr14 =>
-							if mcsr.pmpcfg(14).L = "0" and mcsr.pmpcfg(15).A /= "01" then
+							if mcsr.pmpcfg(14).L = '0' and mcsr.pmpcfg(15).A /= "01" then
 								mcsr.pmpaddr(14)(53 downto 0) <= csr_wi.wdata(53 downto 0);
 							end if;
 						when csr_pmpaddr15 =>
-							if mcsr.pmpcfg(15).L = "0" then
+							if mcsr.pmpcfg(15).L = '0' then
 								mcsr.pmpaddr(15)(53 downto 0) <= csr_wi.wdata(53 downto 0);
 							end if;
 						when others => null;
