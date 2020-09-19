@@ -27,10 +27,10 @@ set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to ADC_SDO
 #============================================================
 # ARDUINO
 #============================================================
-set_location_assignment PIN_AG13 -to ARDUINO_IO[0]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to ARDUINO_IO[0]
-set_location_assignment PIN_AF13 -to ARDUINO_IO[1]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to ARDUINO_IO[1]
+set_location_assignment PIN_AG13 -to RX
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to RX
+set_location_assignment PIN_AF13 -to TX
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to TX
 set_location_assignment PIN_AG10 -to ARDUINO_IO[2]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to ARDUINO_IO[2]
 set_location_assignment PIN_AG9 -to ARDUINO_IO[3]
@@ -181,8 +181,8 @@ set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HPS_SPIM_CLK
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HPS_SPIM_MISO
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HPS_SPIM_MOSI
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HPS_SPIM_SS
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to RX
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to TX
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HPS_UART_RX
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HPS_UART_TX
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HPS_USB_CLKOUT
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HPS_USB_DATA[0]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HPS_USB_DATA[1]

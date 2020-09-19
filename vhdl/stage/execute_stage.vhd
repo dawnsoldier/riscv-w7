@@ -278,8 +278,12 @@ begin
 		dmem_i.mem_wdata <= store_data(v.sdata, v.store_op);
 		dmem_i.mem_wstrb <= v.strobe;
 
-		if r.jump = '1' then
-			csr_ei.epc <= r.pc;
+		if d.w.jump = '1' then
+			csr_ei.epc <= d.w.pc;
+		elsif d.m.jump = '1' then
+			csr_ei.epc <= d.m.pc;
+		elsif d.e.jump = '1' then
+			csr_ei.epc <= d.e.pc;
 		else
       csr_ei.epc <= v.pc;
 		end if;
@@ -289,9 +293,6 @@ begin
 		csr_ei.ecall <= v.ecall;
 		csr_ei.ebreak <= v.ebreak;
 		csr_ei.mret <= v.mret;
-
-		if (time_irpt or ext_irpt) = '1' then
-		end if;
 
 		csr_ei.time_irpt <= time_irpt;
 		csr_ei.ext_irpt <= ext_irpt;
@@ -337,6 +338,7 @@ begin
 		y.ebreak <= v.ebreak;
 		y.mret <= v.mret;
 		y.valid <= v.valid;
+		y.jump <= v.jump;
 		y.stall <= v.stall;
 		y.clear <= v.clear;
 
@@ -379,6 +381,7 @@ begin
 		q.ebreak <= r.ebreak;
 		q.mret <= r.mret;
 		q.valid <= r.valid;
+		q.jump <= r.jump;
 		q.stall <= r.stall;
 		q.clear <= r.clear;
 

@@ -404,6 +404,7 @@ package wire is
 		ebreak     : std_logic;
 		mret       : std_logic;
 		valid      : std_logic;
+		jump       : std_logic;
 		stall      : std_logic;
 		clear      : std_logic;
 	end record;
@@ -438,6 +439,7 @@ package wire is
 		ebreak     : std_logic;
 		mret       : std_logic;
 		valid      : std_logic;
+		jump       : std_logic;
 		clear      : std_logic;
 		fstall     : std_logic;
 		istall     : std_logic;
@@ -474,6 +476,7 @@ package wire is
 		ebreak     => '0',
 		mret       => '0',
 		valid      => '0',
+		jump       => '0',
 		clear      => '0',
 		fstall     => '0',
 		istall     => '0',
@@ -487,6 +490,7 @@ package wire is
 		ebreak : std_logic;
 		mret   : std_logic;
 		valid  : std_logic;
+		jump   : std_logic;
 		stall  : std_logic;
 		clear  : std_logic;
 	end record;
@@ -521,6 +525,7 @@ package wire is
 		mret       : std_logic;
 		valid      : std_logic;
 		clear      : std_logic;
+		jump       : std_logic;
 		stall      : std_logic;
 	end record;
 
@@ -553,6 +558,7 @@ package wire is
 		ebreak     => '0',
 		mret       => '0',
 		valid      => '0',
+		jump       => '0',
 		clear      => '1',
 		stall      => '0'
 	);
