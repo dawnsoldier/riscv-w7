@@ -70,7 +70,6 @@ begin
 		v.ebreak := d.e.ebreak;
 		v.mret := d.e.mret;
 		v.valid := d.e.valid;
-		v.jump := d.e.jump;
 		v.byteenable := d.e.byteenable;
 
 		if (d.m.stall or d.w.stall) = '1' then
@@ -125,11 +124,10 @@ begin
 			v.csr := '0';
 			v.exc := '0';
 			v.mret := '0';
-			v.valid := '0';
 		end if;
 
 		if v.clear = '1' then
-			v.jump := '0';
+			v.valid := '0';
 			v.stall := '0';
 		end if;
 
@@ -163,7 +161,6 @@ begin
 		y.ebreak <= v.ebreak;
 		y.mret <= v.mret;
 		y.valid <= v.valid;
-		y.jump <= v.jump;
 		y.stall <= v.stall;
 		y.clear <= v.clear;
 
@@ -195,7 +192,6 @@ begin
 		q.ebreak <= r.ebreak;
 		q.mret <= r.mret;
 		q.valid <= r.valid;
-		q.jump <= r.jump;
 		q.stall <= r.stall;
 		q.clear <= r.clear;
 
