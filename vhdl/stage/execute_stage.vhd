@@ -131,7 +131,7 @@ begin
 
 		v.clear := csr_eo.exc or csr_eo.mret or d.e.jump or d.w.clear;
 
-		v.enable := not(d.e.stall or d.m.stall or d.w.stall);
+		v.enable := not(d.e.stall or d.m.stall or d.w.stall or d.w.clear);
 
 		fpu_exe_i.idata <= v.rdata1;
 

@@ -172,7 +172,7 @@ begin
 
 		v.stall := '0';
 
-		v.enable := not(r_exe.stall or r_mem.stall);
+		v.enable := not(r_exe.stall or r_mem.stall or fpu_exe_i.clear);
 		v.clear := fpu_exe_i.clear;
 
 		fp_exe_i.idata <= v.idata;
