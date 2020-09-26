@@ -124,10 +124,10 @@ begin
 			v.csr := '0';
 			v.exc := '0';
 			v.mret := '0';
+			v.valid := '0';
 		end if;
 
 		if v.clear = '1' then
-			v.valid := '0';
 			v.stall := '0';
 		end if;
 
