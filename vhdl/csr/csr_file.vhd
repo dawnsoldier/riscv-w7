@@ -297,7 +297,15 @@ begin
 					mcsr.mstatus.mpp <= priv_mode;
 					mcsr.mstatus.mie <= '0';
 					priv_mode <= m_mode;
-					mcsr.mepc <= csr_ei.epc;
+					if csr_ei.d_valid = '1' then
+						mcsr.mepc <= csr_ei.d_epc;
+					elsif csr_ei.e_valid = '1' then
+						mcsr.mepc <= csr_ei.e_epc;
+					elsif csr_ei.m_valid = '1' then
+						mcsr.mepc <= csr_ei.m_epc;
+					elsif csr_ei.w_valid = '1' then
+						mcsr.mepc <= csr_ei.w_epc;
+					end if;
 					mcsr.mtval <= X"0000000000000000";
 					mcsr.mcause.irpt <= '1';
 					mcsr.mcause.code <= X"00000000000000" & "000" & interrupt_mach_timer;
@@ -307,7 +315,15 @@ begin
 					mcsr.mstatus.mpp <= priv_mode;
 					mcsr.mstatus.mie <= '0';
 					priv_mode <= m_mode;
-					mcsr.mepc <= csr_ei.epc;
+					if csr_ei.d_valid = '1' then
+						mcsr.mepc <= csr_ei.d_epc;
+					elsif csr_ei.e_valid = '1' then
+						mcsr.mepc <= csr_ei.e_epc;
+					elsif csr_ei.m_valid = '1' then
+						mcsr.mepc <= csr_ei.m_epc;
+					elsif csr_ei.w_valid = '1' then
+						mcsr.mepc <= csr_ei.w_epc;
+					end if;
 					mcsr.mtval <= X"0000000000000000";
 					mcsr.mcause.irpt <= '1';
 					mcsr.mcause.code <= X"00000000000000" & "000" & interrupt_mach_extern;
@@ -317,7 +333,7 @@ begin
 					mcsr.mstatus.mpp <= priv_mode;
 					mcsr.mstatus.mie <= '0';
 					priv_mode <= m_mode;
-					mcsr.mepc <= csr_ei.epc;
+					mcsr.mepc <= csr_ei.d_epc;
 					mcsr.mtval <= csr_ei.etval;
 					mcsr.mcause.irpt <= '0';
 					mcsr.mcause.code <= X"00000000000000" & "000" & csr_ei.ecause;

@@ -278,16 +278,14 @@ begin
 		dmem_i.mem_wdata <= store_data(v.sdata, v.store_op);
 		dmem_i.mem_wstrb <= v.strobe;
 
-		csr_ei.epc <= v.pc;
-		if v.valid = '0' then
-			if d.e.valid = '1' then
-				csr_ei.epc <= d.e.pc;
-			elsif d.m.valid = '1' then
-				csr_ei.epc <= d.m.pc;
-			elsif d.w.valid = '1' then
-				csr_ei.epc <= d.w.pc;
-			end if;
-		end if;
+		csr_ei.d_epc <= v.pc;
+		csr_ei.e_epc <= d.e.pc;
+		csr_ei.m_epc <= d.m.pc;
+		csr_ei.w_epc <= d.w.pc;
+		csr_ei.d_valid <= v.valid;
+		csr_ei.e_valid <= d.e.valid;
+		csr_ei.m_valid <= d.m.valid;
+		csr_ei.w_valid <= d.w.valid;
 		csr_ei.exc <= v.exc;
 		csr_ei.etval <= v.etval;
 		csr_ei.ecause <= v.ecause;

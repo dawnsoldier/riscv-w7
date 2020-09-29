@@ -49,7 +49,14 @@ package csr_wire is
 	end record;
 
 	type csr_exception_in_type is record
-		epc       : std_logic_vector(63 downto 0);
+		d_epc     : std_logic_vector(63 downto 0);
+		e_epc     : std_logic_vector(63 downto 0);
+		m_epc     : std_logic_vector(63 downto 0);
+		w_epc     : std_logic_vector(63 downto 0);
+		d_valid   : std_logic;
+		e_valid   : std_logic;
+		m_valid   : std_logic;
+		w_valid   : std_logic;
 		etval     : std_logic_vector(63 downto 0);
 		ecause    : std_logic_vector(3 downto 0);
 		exc       : std_logic;
