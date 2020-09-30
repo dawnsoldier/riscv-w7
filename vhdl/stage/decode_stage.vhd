@@ -82,6 +82,8 @@ begin
 			v.clear := '1';
 		elsif d.e.jump = '0' and d.f.taken = '1' then
 			v.clear := '1';
+		elsif d.e.jump = '1' and d.f.taken = '1' and or_reduce(d.e.address xor d.f.pc) = '1' then
+			v.clear := '1';
 		end if;
 
 		v.opcode := v.instr(6 downto 0);

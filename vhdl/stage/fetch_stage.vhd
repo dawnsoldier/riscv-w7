@@ -90,6 +90,10 @@ begin
 			v.taken := '0';
 			v.spec := '1';
 			v.pc := d.d.npc;
+		elsif d.e.jump = '1' and d.f.taken = '1' and or_reduce(d.e.address xor d.f.pc) = '1' then
+			v.taken := '0';
+			v.spec := '1';
+			v.pc := d.e.address;
 		elsif btb_o.pred_return = '1' then
 			v.taken := '1';
 			v.spec := '1';
