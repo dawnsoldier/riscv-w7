@@ -23,6 +23,35 @@ void increase_timer_interrupt(long long counter)
   *port_mtimecmp = val_mtimecmp;
 }
 
+void print_mcsr(uint64_t mcsr)
+{
+  char str[16];
+  char c;
+  uint8_t mod;
+  for (int i=15; i>=0; i--)
+  {
+    mod = mcsr % 16;
+    mcsr = mcsr / 16;
+    if (mod >= 10)
+    {
+      c = 'A' + mod - 10;
+    }
+    else
+    {
+      c = '0' + mod;
+    }
+    str[i] = c;
+  }
+  putch('0');
+  putch('x');
+  for (int i=0; i<16; i++)
+  {
+    putch(str[i]);
+  }
+  putch('\r');
+  putch('\n');
+}
+
 void handle_timer_interrupt()
 {
   increase_timer_interrupt(TIMER_COUNT);
@@ -31,6 +60,21 @@ void handle_timer_interrupt()
   static unsigned int sec = 0;
   unsigned char min1,min0;
   unsigned char sec1,sec0;
+
+  uint64_t epc = read_csr(mepc);
+  uint64_t tval = read_csr(mtval);
+  uint64_t cause = read_csr(mcause);
+  uintptr_t address;
+
+  __asm__("la %0,_loop" : "=r"(address));
+
+  if (epc != address)
+  {
+    print_mcsr(epc);
+    print_mcsr(tval);
+    print_mcsr(cause);
+    while(1);
+  }
 
   min1 = '0' + min / 10;
   min0 = '0' + min % 10;
@@ -67,7 +111,9 @@ void init_timer_interrupt()
 {
   increase_timer_interrupt(TIMER_COUNT);
 
-  uintptr_t address = (uintptr_t) handle_timer_interrupt;
+  uintptr_t address;
+
+  __asm__("la %0,_mtvec" : "=r"(address));
 
   write_csr(mtvec,address);
 
@@ -84,11 +130,4 @@ void init_timer_interrupt()
   val |= MIP_MTIP;
 
   write_csr(mie,val);
-}
-
-int main()
-{
-  init_timer_interrupt();
-
-  while(1);
 }

@@ -1,5 +1,7 @@
   .section .text
   .globl _start
+  .globl _mtvec
+  .globl _loop
 _start:
   li  x1, 0
   li  x2, 0
@@ -33,8 +35,20 @@ _start:
   li  x30,0
   li  x31,0
 
-  lui sp,(0x3000)>>12
+  li sp,0x800
 
-	jal ra,main
+	j main
 
   .align 2
+
+_mtvec:
+
+  j handle_timer_interrupt
+
+main:
+
+  jal ra,init_timer_interrupt
+
+_loop:
+
+  j _loop
