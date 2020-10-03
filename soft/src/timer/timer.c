@@ -61,21 +61,6 @@ void handle_timer_interrupt()
   unsigned char min1,min0;
   unsigned char sec1,sec0;
 
-  uint64_t epc = read_csr(mepc);
-  uint64_t tval = read_csr(mtval);
-  uint64_t cause = read_csr(mcause);
-  uintptr_t address;
-
-  __asm__("la %0,_loop" : "=r"(address));
-
-  if (epc != address)
-  {
-    print_mcsr(epc);
-    print_mcsr(tval);
-    print_mcsr(cause);
-    while(1);
-  }
-
   min1 = '0' + min / 10;
   min0 = '0' + min % 10;
   sec1 = '0' + sec / 10;
@@ -104,6 +89,7 @@ void handle_timer_interrupt()
   {
     min = 0;
   }
+  __asm__("addi x2,x2,48");
   __asm__("mret");
 }
 
@@ -130,4 +116,11 @@ void init_timer_interrupt()
   val |= MIP_MTIP;
 
   write_csr(mie,val);
+}
+
+int main()
+{
+  init_timer_interrupt();
+
+  while(1);
 }
