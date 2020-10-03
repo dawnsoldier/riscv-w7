@@ -116,12 +116,16 @@ begin
 
 			v := r_btb;
 
-			v.wpc := btb_i.upd_pc;
-			v.waddr := btb_i.upd_addr;
-			v.wid := to_integer(unsigned(v.wpc(btb_depth downto 1)));
+			if btb_i.upd_jump = '0' and btb_i.stall = '0' and btb_i.clear = '0' then
+				v.rpc := btb_i.get_pc;
+				v.rid := to_integer(unsigned(v.rpc(btb_depth downto 1)));
+			end if;
 
-			v.rpc := btb_i.get_pc;
-			v.rid := to_integer(unsigned(v.rpc(btb_depth downto 1)));
+			if (btb_i.upd_branch = '1' and btb_i.upd_jump = '1') or (btb_i.upd_uncond = '1') then
+				v.wpc := btb_i.upd_pc;
+				v.waddr := btb_i.upd_addr;
+				v.wid := to_integer(unsigned(v.wpc(btb_depth downto 1)));
+			end if;
 
 			if btb_i.upd_jump = '0' and btb_i.stall = '0' and btb_i.clear = '0' and
 					nor_reduce(target(v.rid).tag xor v.rpc(63 downto btb_depth+1)) = '1' then
@@ -148,13 +152,9 @@ begin
 
 			v := r_bht;
 
-			v.get_ind := to_integer(unsigned(v.history xor btb_i.get_pc(bht_depth downto 1)));
-			v.get_sat := pattern(v.get_ind);
-
-			v.upd_ind := to_integer(unsigned(v.history xor btb_i.upd_pc(bht_depth downto 1)));
-			v.upd_sat := pattern(v.upd_ind);
-
 			if btb_i.upd_branch = '1' then
+				v.upd_ind := to_integer(unsigned(v.history xor btb_i.upd_pc(bht_depth downto 1)));
+				v.upd_sat := pattern(v.upd_ind);
 				v.history := v.history(bht_depth-2 downto 0) & '0';
 				if btb_i.upd_jump = '1' then
 					v.history(0) := '1';
@@ -170,6 +170,8 @@ begin
 
 			if btb_i.get_branch = '1' and btb_i.upd_jump = '0' and btb_i.stall = '0' and
 					btb_i.clear = '0' then
+				v.get_ind := to_integer(unsigned(v.history xor btb_i.get_pc(bht_depth downto 1)));
+				v.get_sat := pattern(v.get_ind);
 				btb_o.pred_jump <= v.get_sat(1);
 			else
 				btb_o.pred_jump <= '0';
