@@ -14,7 +14,7 @@ while line_in:
 
 line_in = file_mem.readline()
 cnt = 1
-bram_mem_depth = 2**7
+bram_mem_depth = 2**13
 while line_in:
     byte0 = "x\""+ line_in[0:2] + "\""
     byte1 = "x\""+ line_in[2:4] + "\""

@@ -6,7 +6,7 @@ use ieee.numeric_std.all;
 
 package configure is
 
-	constant bram_depth      : integer := 11;
+	constant bram_depth      : integer := 13;
 
 	constant btb_enable      : boolean := true;
 	constant btb_depth       : integer := 6;
@@ -15,12 +15,12 @@ package configure is
 
 	constant pfetch_depth    : integer := 4;
 
-	constant fpu_enable      : boolean := false;
-	constant fpu_performance : boolean := false;
-	constant mul_performance : boolean := false;
+	constant fpu_enable      : boolean := true;
+	constant fpu_performance : boolean := true;
+	constant mul_performance : boolean := true;
 
-	constant pmp_enable      : boolean := false;
-	constant pmp_regions     : integer := 0;
+	constant pmp_enable      : boolean := true;
+	constant pmp_regions     : integer := 8;
 
 	constant start_base_addr : std_logic_vector(63 downto 0) := X"0000000000000000";
 

@@ -6,7 +6,7 @@ use ieee.numeric_std.all;
 
 package configure is
 
-	constant bram_depth      : integer := 7;
+	constant bram_depth      : integer := 13;
 
 	constant btb_enable      : boolean := true;
 	constant btb_depth       : integer := 6;
