@@ -213,7 +213,7 @@ then
     WAVE="--wave=dhrystone.ghw"
   fi
   cp $DIR/build/dhrystone/dat/dhrystone.dat bram_mem.dat
-  $SIMULA top_cpu --ieee-asserts=disable-at-0 --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
+  $SIMULA top_cpu --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
 elif [ "$3" = 'coremark' ]
 then
   if [ "$5" = 'wave' ]
@@ -221,7 +221,7 @@ then
     WAVE="--wave=coremark.ghw"
   fi
   cp $DIR/build/coremark/dat/coremark.dat bram_mem.dat
-  $SIMULA top_cpu --ieee-asserts=disable-at-0 --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
+  $SIMULA top_cpu --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
 elif [ "$3" = 'csmith' ]
 then
   if [ "$5" = 'wave' ]
@@ -229,7 +229,7 @@ then
     WAVE="--wave=csmith.ghw"
   fi
   cp $DIR/build/csmith/dat/csmith.dat bram_mem.dat
-  $SIMULA top_cpu --ieee-asserts=disable-at-0 --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
+  $SIMULA top_cpu --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
 elif [ "$3" = 'torture' ]
 then
   if [ "$5" = 'wave' ]
@@ -237,7 +237,7 @@ then
     WAVE="--wave=torture.ghw"
   fi
   cp $DIR/build/torture/dat/torture.dat bram_mem.dat
-  $SIMULA top_cpu --ieee-asserts=disable-at-0 --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
+  $SIMULA top_cpu --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
 elif [ "$3" = 'all' ]
 then
   for filename in $DIR/build/isa/dat/*.dat; do
@@ -249,7 +249,7 @@ then
       WAVE="--wave=${filename}.ghw"
     fi
     echo "${filename}"
-    $SIMULA top_cpu --ieee-asserts=disable-at-0 --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
+    $SIMULA top_cpu --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
   done
 elif [ "$3" = 'mi' ]
 then
@@ -262,7 +262,7 @@ then
       WAVE="--wave=${filename}.ghw"
     fi
     echo "${filename}"
-    $SIMULA top_cpu --ieee-asserts=disable-at-0 --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
+    $SIMULA top_cpu --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
   done
 elif [ "$3" = 'ui' ]
 then
@@ -275,7 +275,7 @@ then
       WAVE="--wave=${filename}.ghw"
     fi
     echo "${filename}"
-    $SIMULA top_cpu --ieee-asserts=disable-at-0 --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
+    $SIMULA top_cpu --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
   done
 elif [ "$3" = 'uc' ]
 then
@@ -288,7 +288,7 @@ then
       WAVE="--wave=${filename}.ghw"
     fi
     echo "${filename}"
-    $SIMULA top_cpu --ieee-asserts=disable-at-0 --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
+    $SIMULA top_cpu --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
   done
 elif [ "$3" = 'um' ]
 then
@@ -301,7 +301,7 @@ then
       WAVE="--wave=${filename}.ghw"
     fi
     echo "${filename}"
-    $SIMULA top_cpu --ieee-asserts=disable-at-0 --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
+    $SIMULA top_cpu --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
   done
 elif [ "$3" = 'uf' ]
 then
@@ -314,7 +314,7 @@ then
       WAVE="--wave=${filename}.ghw"
     fi
     echo "${filename}"
-    $SIMULA top_cpu --ieee-asserts=disable-at-0 --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
+    $SIMULA top_cpu --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
   done
 elif [ "$3" = 'ud' ]
 then
@@ -327,7 +327,7 @@ then
       WAVE="--wave=${filename}.ghw"
     fi
     echo "${filename}"
-    $SIMULA top_cpu --ieee-asserts=disable-at-0 --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
+    $SIMULA top_cpu --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
   done
 else
   filename="$3"
@@ -338,7 +338,7 @@ else
     WAVE="--wave=${filename}.ghw"
   fi
   echo "${filename}"
-  $SIMULA top_cpu --ieee-asserts=disable-at-0 --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
+  $SIMULA top_cpu --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
 fi
 end=`date +%s`
 echo Execution time was `expr $end - $start` seconds.

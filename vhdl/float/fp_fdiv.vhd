@@ -175,10 +175,12 @@ begin
 					v.qa := "01" & signed(v.a(51 downto 0)) & "00";
 					v.qb := "01" & signed(v.b(51 downto 0)) & "00";
 
-					v.sign_fdiv := v.a(64) xor v.b(64);
-					v.exponent_fdiv := to_integer(signed("0" & v.a(63 downto 52)) - signed("0" & v.b(63 downto 52)));
-					v.y := "0" & nor_reduce(v.b(51 downto 45)) & reciprocal_lut(to_integer(unsigned(v.b(51 downto 45)))) & "00" & X"00000000000";
-					v.op := '0';
+					if fp_fdiv_i.op.fsqrt = '1' or fp_fdiv_i.op.fdiv = '1' then
+						v.sign_fdiv := v.a(64) xor v.b(64);
+						v.exponent_fdiv := to_integer(signed("0" & v.a(63 downto 52)) - signed("0" & v.b(63 downto 52)));
+						v.y := "0" & nor_reduce(v.b(51 downto 45)) & reciprocal_lut(to_integer(unsigned(v.b(51 downto 45)))) & "00" & X"00000000000";
+						v.op := '0';
+					end if;
 
 					if fp_fdiv_i.op.fsqrt = '1' then
 						v.qa := "01" & signed(v.a(51 downto 0)) & "00";
@@ -479,6 +481,11 @@ begin
 
 	FIXED : if fpu_performance = false generate
 
+		fp_mac_i.a <= (others => '0');
+		fp_mac_i.b <= (others => '0');
+		fp_mac_i.c <= (others => '0');
+		fp_mac_i.op <= '0';
+
 		process(r_fix, fp_fdiv_i)
 			variable v : fp_fdiv_fixed_reg_type;
 
@@ -565,8 +572,9 @@ begin
 
 					v.sign_fdiv := v.a(64) xor v.b(64);
 
-					v.exponent_fdiv := to_integer(signed("0" & v.a(63 downto 52)) - signed("0" & v.b(63 downto 52)));
-					if fp_fdiv_i.op.fsqrt = '1' then
+					if fp_fdiv_i.op.fdiv = '1' then
+						v.exponent_fdiv := to_integer(signed("0" & v.a(63 downto 52)) - signed("0" & v.b(63 downto 52)));
+					elsif fp_fdiv_i.op.fsqrt = '1' then
 						v.exponent_fdiv := to_integer(shift_right((signed("0" & v.a(63 downto 52)) - 2045), 1));
 					end if;
 

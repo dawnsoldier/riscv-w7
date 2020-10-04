@@ -566,6 +566,7 @@ package fp_wire is
 		rm     : std_logic_vector(2 downto 0);
 		class1 : std_logic_vector(9 downto 0);
 		class2 : std_logic_vector(9 downto 0);
+		enable : std_logic;
 	end record;
 
 	type fp_cmp_out_type is record
@@ -582,6 +583,7 @@ package fp_wire is
 		rm     : std_logic_vector(2 downto 0);
 		class1 : std_logic_vector(9 downto 0);
 		class2 : std_logic_vector(9 downto 0);
+		enable : std_logic;
 	end record;
 
 	type fp_max_out_type is record
@@ -601,8 +603,9 @@ package fp_wire is
 	end record;
 
 	type fp_ext_in_type is record
-		data : std_logic_vector(63 downto 0);
-		fmt  : std_logic_vector(1 downto 0);
+		data   : std_logic_vector(63 downto 0);
+		fmt    : std_logic_vector(1 downto 0);
+		enable : std_logic;
 	end record;
 
 	type fp_ext_out_type is record
@@ -611,10 +614,11 @@ package fp_wire is
 	end record;
 
 	type fp_cvt_f2f_in_type is record
-		data  : std_logic_vector(64 downto 0);
-		fmt   : std_logic_vector(1 downto 0);
-		rm    : std_logic_vector(2 downto 0);
-		class : std_logic_vector(9 downto 0);
+		data   : std_logic_vector(64 downto 0);
+		fmt    : std_logic_vector(1 downto 0);
+		rm     : std_logic_vector(2 downto 0);
+		class  : std_logic_vector(9 downto 0);
+		enable : std_logic;
 	end record;
 
 	type fp_cvt_f2f_out_type is record
@@ -622,10 +626,11 @@ package fp_wire is
 	end record;
 
 	type fp_cvt_i2f_in_type is record
-		data : std_logic_vector(63 downto 0);
-		op   : fp_operation_type;
-		fmt  : std_logic_vector(1 downto 0);
-		rm   : std_logic_vector(2 downto 0);
+		data   : std_logic_vector(63 downto 0);
+		op     : fp_operation_type;
+		fmt    : std_logic_vector(1 downto 0);
+		rm     : std_logic_vector(2 downto 0);
+		enable : std_logic;
 	end record;
 
 	type fp_cvt_i2f_out_type is record
@@ -633,10 +638,11 @@ package fp_wire is
 	end record;
 
 	type fp_cvt_f2i_in_type is record
-		data  : std_logic_vector(64 downto 0);
-		op    : fp_operation_type;
-		rm    : std_logic_vector(2 downto 0);
-		class : std_logic_vector(9 downto 0);
+		data   : std_logic_vector(64 downto 0);
+		op     : fp_operation_type;
+		rm     : std_logic_vector(2 downto 0);
+		class  : std_logic_vector(9 downto 0);
+		enable : std_logic;
 	end record;
 
 	type fp_cvt_f2i_out_type is record

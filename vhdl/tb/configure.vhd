@@ -16,7 +16,7 @@ package configure is
 	constant pfetch_depth    : integer := 4;
 
 	constant fpu_enable      : boolean := true;
-	constant fpu_performance : boolean := true;
+	constant fpu_performance : boolean := false;
 	constant mul_performance : boolean := true;
 
 	constant pmp_enable      : boolean := true;

@@ -28,10 +28,11 @@ architecture behavior of fp_cvt is
 begin
 
 	process(fp_cvt_f2f_i)
-		variable data  : std_logic_vector(64 downto 0);
-		variable fmt   : std_logic_vector(1 downto 0);
-		variable rm    : std_logic_vector(2 downto 0);
-		variable class : std_logic_vector(9 downto 0);
+		variable data   : std_logic_vector(64 downto 0);
+		variable fmt    : std_logic_vector(1 downto 0);
+		variable rm     : std_logic_vector(2 downto 0);
+		variable class  : std_logic_vector(9 downto 0);
+		variable enable : std_logic;
 
 		variable snan : std_logic;
 		variable qnan : std_logic;
@@ -51,10 +52,11 @@ begin
 		variable grs : std_logic_vector(2 downto 0);
 
 	begin
-		data  := fp_cvt_f2f_i.data;
-		fmt   := fp_cvt_f2f_i.fmt;
-		rm    := fp_cvt_f2f_i.rm;
-		class := fp_cvt_f2f_i.class;
+		data   := fp_cvt_f2f_i.data;
+		fmt    := fp_cvt_f2f_i.fmt;
+		rm     := fp_cvt_f2f_i.rm;
+		class  := fp_cvt_f2f_i.class;
+		enable := fp_cvt_f2f_i.enable;
 
 		snan := class(8);
 		qnan := class(9);
@@ -62,7 +64,11 @@ begin
 		inf  := class(0) or class(7);
 		zero := class(3) or class(4);
 
-		exponent_cvt := to_integer(unsigned(data(63 downto 52)));
+		if enable = '1' then
+			exponent_cvt := to_integer(unsigned(data(63 downto 52)));
+		else
+			exponent_cvt := 0;
+		end if;
 		mantissa_cvt := "01" & data(51 downto 0) & x"000000" & "00";
 
 		exponent_bias := 1920;
@@ -107,10 +113,11 @@ begin
 	end process;
 
 	process(fp_cvt_f2i_i)
-		variable data  : std_logic_vector(64 downto 0);
-		variable op    : std_logic_vector(1 downto 0);
-		variable rm    : std_logic_vector(2 downto 0);
-		variable class : std_logic_vector(9 downto 0);
+		variable data   : std_logic_vector(64 downto 0);
+		variable op     : std_logic_vector(1 downto 0);
+		variable rm     : std_logic_vector(2 downto 0);
+		variable class  : std_logic_vector(9 downto 0);
+		variable enable : std_logic;
 
 		variable result : std_logic_vector(63 downto 0);
 		variable flags  : std_logic_vector(4 downto 0);
@@ -146,10 +153,11 @@ begin
 		variable oor_32s : std_logic;
 
 	begin
-		data  := fp_cvt_f2i_i.data;
-		op    := fp_cvt_f2i_i.op.fcvt_op;
-		rm    := fp_cvt_f2i_i.rm;
-		class := fp_cvt_f2i_i.class;
+		data   := fp_cvt_f2i_i.data;
+		op     := fp_cvt_f2i_i.op.fcvt_op;
+		rm     := fp_cvt_f2i_i.rm;
+		class  := fp_cvt_f2i_i.class;
+		enable := fp_cvt_f2i_i.enable;
 
 		flags  := (others => '0');
 		result := (others => '0');
@@ -170,7 +178,11 @@ begin
 		end if;
 
 		sign_cvt     := data(64);
-		exponent_cvt := to_integer(unsigned(data(63 downto 52))) - 2044;
+		if enable = '1' then
+			exponent_cvt := to_integer(unsigned(data(63 downto 52))) - 2044;
+		else
+			exponent_cvt := 0;
+		end if;
 		mantissa_cvt := X"00000000000000001" & data(51 downto 0);
 
 		oor := '0';
@@ -299,10 +311,11 @@ begin
 	end process;
 
 	process(fp_cvt_i2f_i, lzc_o)
-		variable data : std_logic_vector(63 downto 0);
-		variable op   : std_logic_vector(1 downto 0);
-		variable fmt  : std_logic_vector(1 downto 0);
-		variable rm   : std_logic_vector(2 downto 0);
+		variable data   : std_logic_vector(63 downto 0);
+		variable op     : std_logic_vector(1 downto 0);
+		variable fmt    : std_logic_vector(1 downto 0);
+		variable rm     : std_logic_vector(2 downto 0);
+		variable enable : std_logic;
 
 		variable snan : std_logic;
 		variable qnan : std_logic;
@@ -323,10 +336,11 @@ begin
 		variable grs : std_logic_vector(2 downto 0);
 
 	begin
-		data := fp_cvt_i2f_i.data;
-		op   := fp_cvt_i2f_i.op.fcvt_op;
-		fmt  := fp_cvt_i2f_i.fmt;
-		rm   := fp_cvt_i2f_i.rm;
+		data   := fp_cvt_i2f_i.data;
+		op     := fp_cvt_i2f_i.op.fcvt_op;
+		fmt    := fp_cvt_i2f_i.fmt;
+		rm     := fp_cvt_i2f_i.rm;
+		enable := fp_cvt_i2f_i.enable;
 
 		snan := '0';
 		qnan := '0';
@@ -363,7 +377,11 @@ begin
 		zero := nor_reduce(mantissa_uint);
 
 		lzc_i.a              <= mantissa_uint;
-		counter_uint := to_integer(unsigned(not lzc_o.c));
+		if enable = '1' then
+			counter_uint := to_integer(unsigned(not lzc_o.c));
+		else
+			counter_uint := 0;
+		end if;
 
 		mantissa_uint := std_logic_vector(shift_left(unsigned(mantissa_uint),counter_uint));
 

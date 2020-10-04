@@ -414,7 +414,11 @@ begin
 		mantissa_lzc := mantissa_mac(162 downto 0) & "1" & X"FFFFFFFFFFFFFFFFFFFFFFF";
 
 		lzc_i.a      <= mantissa_lzc;
-		counter_mac  := to_integer(unsigned(not (lzc_o.c)));
+		if ready = '1' then
+			counter_mac := to_integer(unsigned(not (lzc_o.c)));
+		else
+			counter_mac := 0;
+		end if;
 		mantissa_mac := std_logic_vector(shift_left(unsigned(mantissa_mac),counter_mac));
 
 		sign_rnd     := sign_mac xor neg;

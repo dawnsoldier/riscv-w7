@@ -96,10 +96,13 @@ begin
 
 		fp_ext1_i.data <= v.data1;
 		fp_ext1_i.fmt <= v.fmt_ext;
+		fp_ext1_i.enable <= v.enable;
 		fp_ext2_i.data <= v.data2;
 		fp_ext2_i.fmt <= v.fmt_ext;
+		fp_ext2_i.enable <= v.enable;
 		fp_ext3_i.data <= v.data3;
 		fp_ext3_i.fmt <= v.fmt_ext;
+		fp_ext3_i.enable <= v.enable;
 
 		v.ext1 := fp_ext1_o.result;
 		v.ext2 := fp_ext2_o.result;
@@ -114,6 +117,7 @@ begin
 		fp_cmp_i.rm <= v.rm;
 		fp_cmp_i.class1 <= v.class1;
 		fp_cmp_i.class2 <= v.class2;
+		fp_cmp_i.enable <= v.enable;
 
 		fp_max_i.data1 <= v.data1;
 		fp_max_i.data2 <= v.data2;
@@ -123,6 +127,7 @@ begin
 		fp_max_i.rm <= v.rm;
 		fp_max_i.class1 <= v.class1;
 		fp_max_i.class2 <= v.class2;
+		fp_max_i.enable <= v.enable;
 
 		fp_sgnj_i.data1 <= v.data1;
 		fp_sgnj_i.data2 <= v.data2;
@@ -133,16 +138,19 @@ begin
 		fp_cvt_i2f_i.op <= v.op;
 		fp_cvt_i2f_i.fmt <= v.fmt;
 		fp_cvt_i2f_i.rm <= v.rm;
+		fp_cvt_i2f_i.enable <= v.enable;
 
 		fp_cvt_f2f_i.data <= v.ext1;
 		fp_cvt_f2f_i.fmt <= v.fmt;
 		fp_cvt_f2f_i.rm <= v.rm;
 		fp_cvt_f2f_i.class <= v.class1;
+		fp_cvt_f2f_i.enable <= v.enable;
 
 		fp_cvt_f2i_i.data <= v.ext1;
 		fp_cvt_f2i_i.op <= v.op;
 		fp_cvt_f2i_i.rm <= v.rm;
 		fp_cvt_f2i_i.class <= v.class1;
+		fp_cvt_f2i_i.enable <= v.enable;
 
 		fp_fma_i.data1 <= v.ext1;
 		fp_fma_i.data2 <= v.ext2;

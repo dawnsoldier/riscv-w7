@@ -24,8 +24,9 @@ architecture behavior of fp_ext is
 begin
 
 	process(fp_ext_i, lzc_o)
-		variable data : std_logic_vector(63 downto 0);
-		variable fmt  : std_logic_vector(1 downto 0);
+		variable data   : std_logic_vector(63 downto 0);
+		variable fmt    : std_logic_vector(1 downto 0);
+		variable enable : std_logic;
 
 		variable mantissa : std_logic_vector(63 downto 0);
 		variable counter  : integer range 0 to 63;
@@ -38,8 +39,9 @@ begin
 		variable exponent_ones : std_logic;
 
 	begin
-		data := fp_ext_i.data;
-		fmt  := fp_ext_i.fmt;
+		data   := fp_ext_i.data;
+		fmt    := fp_ext_i.fmt;
+		enable := fp_ext_i.enable;
 
 		mantissa := (others => '1');
 		counter  := 0;
@@ -64,7 +66,9 @@ begin
 		end if;
 
 		lzc_i.a         <= mantissa;
-		counter := to_integer(unsigned(not lzc_o.c));
+		if enable = '1' then
+			counter := to_integer(unsigned(not lzc_o.c));
+		end if;
 
 		if fmt = "00" then
 			result(64) := data(31);

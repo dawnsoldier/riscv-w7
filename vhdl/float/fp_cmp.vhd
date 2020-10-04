@@ -26,6 +26,7 @@ begin
 		variable rm     : std_logic_vector(2 downto 0);
 		variable class1 : std_logic_vector(9 downto 0);
 		variable class2 : std_logic_vector(9 downto 0);
+		variable enable : std_logic;
 
 		variable cmp_lt : std_logic;
 		variable cmp_le : std_logic;
@@ -39,6 +40,7 @@ begin
 		rm     := fp_cmp_i.rm;
 		class1 := fp_cmp_i.class1;
 		class2 := fp_cmp_i.class2;
+		enable := fp_cmp_i.enable;
 
 		cmp_lt := '0';
 		cmp_le := '0';
@@ -46,9 +48,11 @@ begin
 		result := (others => '0');
 		flags  := (others => '0');
 
-		if rm = "000" or rm = "001" or rm = "010" then
-			cmp_lt := to_std_logic(unsigned(data1(63 downto 0)) < unsigned(data2(63 downto 0)));
-			cmp_le := to_std_logic(unsigned(data1(63 downto 0)) <= unsigned(data2(63 downto 0)));
+		if enable = '1' then
+			if rm = "000" or rm = "001" or rm = "010" then
+				cmp_lt := to_std_logic(unsigned(data1(63 downto 0)) < unsigned(data2(63 downto 0)));
+				cmp_le := to_std_logic(unsigned(data1(63 downto 0)) <= unsigned(data2(63 downto 0)));
+			end if;
 		end if;
 
 		--FEQ

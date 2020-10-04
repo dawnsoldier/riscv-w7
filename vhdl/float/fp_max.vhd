@@ -29,6 +29,7 @@ begin
 		variable rm     : std_logic_vector(2 downto 0);
 		variable class1 : std_logic_vector(9 downto 0);
 		variable class2 : std_logic_vector(9 downto 0);
+		variable enable : std_logic;
 
 		variable nan  : std_logic_vector(63 downto 0);
 		variable comp : std_logic;
@@ -45,6 +46,7 @@ begin
 		rm     := fp_max_i.rm;
 		class1 := fp_max_i.class1;
 		class2 := fp_max_i.class2;
+		enable := fp_max_i.enable;
 
 		nan  := x"7FF8000000000000";
 		comp := '0';
@@ -56,8 +58,10 @@ begin
 			nan := x"000000007FC00000";
 		end if;
 
-		if rm = "000" or rm = "001" then
-			comp := to_std_logic(unsigned(ext1(63 downto 0)) > unsigned(ext2(63 downto 0)));
+		if enable = '1' then
+			if rm = "000" or rm = "001" then
+				comp := to_std_logic(unsigned(ext1(63 downto 0)) > unsigned(ext2(63 downto 0)));
+			end if;
 		end if;
 
 		if rm = "000" then
