@@ -34,6 +34,9 @@ architecture behavior of top_cpu is
 	signal rtc   : std_logic := '0';
 	signal count : unsigned(31 downto 0) := (others => '0');
 
+	signal clk_pll   : std_logic := '0';
+	signal count_pll : unsigned(31 downto 0) := (others => '0');
+
 begin
 
 	process (clk)
@@ -43,14 +46,24 @@ begin
 		if (rising_edge(clk)) then
 
 			if rst = '0' then
-				count <= (others => '0');
 				rtc   <= '0';
+				count <= (others => '0');
+
+				clk_pll   <= '0'; 
+				count_pll <= (others => '0');
 			else
 				if count = clk_divider_rtc then
 					rtc <= not rtc;
 					count <= (others => '0');
 				else
 					count <= count + 1;
+				end if;
+
+				if count_pll = clk_divider_pll then
+					clk_pll <= not clk_pll;
+					count_pll <= (others => '0');
+				else
+					count_pll <= count_pll + 1;
 				end if;
 			end if;
 
@@ -61,7 +74,7 @@ begin
 	cpu_comp : cpu
 		port map(
 			reset => rst,
-			clock => clk,
+			clock => clk_pll,
 			rtc   => rtc,
 			rx    => rx,
 			tx    => tx

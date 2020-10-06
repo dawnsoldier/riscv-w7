@@ -30,11 +30,13 @@ package configure is
 	constant timer_base_addr : std_logic_vector(63 downto 0) := X"0000000000200000";
 	constant timer_top_addr  : std_logic_vector(63 downto 0) := X"0000000000200010";
 
-	constant clk_freq        : integer := 25000000;
+	constant clk_freq        : integer := 50000000;
+	constant clk_pll         : integer := 25000000;
 	constant rtc_freq        : integer := 32768;
 	constant baudrate        : integer := 115200;
 
-	constant clks_per_bit    : integer := 2*clk_freq/baudrate;
-	constant clk_divider_rtc : integer := 2*clk_freq/rtc_freq;
+	constant clk_divider_pll : integer := clk_freq/clk_pll-1;
+	constant clk_divider_rtc : integer := clk_freq/rtc_freq-1;
+	constant clks_per_bit    : integer := clk_pll/baudrate-1;
 
 end configure;
