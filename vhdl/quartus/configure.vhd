@@ -35,8 +35,8 @@ package configure is
 	constant rtc_freq        : integer := 32768;
 	constant baudrate        : integer := 115200;
 
-	constant clk_divider_pll : integer := clk_freq/clk_pll-1;
-	constant clk_divider_rtc : integer := clk_freq/rtc_freq-1;
+	constant clk_divider_pll : integer := (clk_freq/clk_pll)/2-1;
+	constant clk_divider_rtc : integer := (clk_freq/rtc_freq)/2-1;
 	constant clks_per_bit    : integer := clk_pll/baudrate-1;
 
 end configure;

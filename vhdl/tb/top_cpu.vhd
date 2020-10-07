@@ -25,7 +25,7 @@ architecture behavior of top_cpu is
 		);
 	end component;
 
-	signal reset : std_logic := '1';
+	signal reset : std_logic := '0';
 	signal clock : std_logic := '0';
 	signal rtc   : std_logic := '0';
 	signal rx    : std_logic := '1';
@@ -34,7 +34,7 @@ architecture behavior of top_cpu is
 
 begin
 
-	-- reset <= '1' after 100 ns;
+	reset <= '1' after 100 ns;
 	clock <= not clock after 20 ns;
 
 	process (clock)
