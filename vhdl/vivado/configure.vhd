@@ -8,7 +8,7 @@ package configure is
 
 	constant bram_depth      : integer := 12;
 
-	constant btb_enable      : boolean := true;
+	constant bp_enable       : boolean := true;
 	constant btb_depth       : integer := 6;
 	constant bht_depth       : integer := 6;
 	constant ras_depth       : integer := 2;

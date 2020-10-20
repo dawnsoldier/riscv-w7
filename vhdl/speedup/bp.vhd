@@ -9,22 +9,22 @@ use work.configure.all;
 use work.constants.all;
 use work.wire.all;
 
-entity btb is
+entity bp is
 	generic(
-		btb_enable : boolean := btb_enable;
-		btb_depth  : integer := btb_depth;
-		bht_depth  : integer := bht_depth;
-		ras_depth  : integer := ras_depth
+		bp_enable : boolean := bp_enable;
+		btb_depth : integer := btb_depth;
+		bht_depth : integer := bht_depth;
+		ras_depth : integer := ras_depth
 	);
 	port(
 		reset : in  std_logic;
 		clock : in  std_logic;
-		btb_i : in  btb_in_type;
-		btb_o : out btb_out_type
+		bp_i  : in  bp_in_type;
+		bp_o  : out bp_out_type
 	);
-end btb;
+end bp;
 
-architecture behavior of btb is
+architecture behavior of bp is
 
 	type index_type is record
 		address : std_logic_vector(63 downto 0);
@@ -106,9 +106,9 @@ architecture behavior of btb is
 
 begin
 
-	BTB_ON : if btb_enable = true generate
+	BP_ON : if bp_enable = true generate
 
-		branch_target_buffer : process(r_btb,btb_i,target)
+		branch_target_buffer : process(r_btb,bp_i,target)
 
 		variable v : reg_btb_type;
 
@@ -116,35 +116,35 @@ begin
 
 			v := r_btb;
 
-			if btb_i.clear = '0' then
-				v.rpc := btb_i.get_pc;
+			if bp_i.clear = '0' then
+				v.rpc := bp_i.get_pc;
 				v.rid := to_integer(unsigned(v.rpc(btb_depth downto 1)));
 			end if;
 
-			if btb_i.clear = '0' then
-				v.wpc := btb_i.upd_pc;
-				v.waddr := btb_i.upd_addr;
+			if bp_i.clear = '0' then
+				v.wpc := bp_i.upd_pc;
+				v.waddr := bp_i.upd_addr;
 				v.wid := to_integer(unsigned(v.wpc(btb_depth downto 1)));
 			end if;
 
-			if btb_i.upd_jump = '0' and btb_i.stall = '0' and btb_i.clear = '0' and
+			if bp_i.upd_jump = '0' and bp_i.stall = '0' and bp_i.clear = '0' and
 					nor_reduce(target(v.rid).tag xor v.rpc(63 downto btb_depth+1)) = '1' then
-				btb_o.pred_baddr <= target(v.rid).address;
-				btb_o.pred_branch <= btb_i.get_branch;
-				btb_o.pred_uncond <= btb_i.get_uncond;
+				bp_o.pred_baddr <= target(v.rid).address;
+				bp_o.pred_branch <= bp_i.get_branch;
+				bp_o.pred_uncond <= bp_i.get_uncond;
 			else
-				btb_o.pred_baddr <= (others => '0');
-				btb_o.pred_branch <= '0';
-				btb_o.pred_uncond <= '0';
+				bp_o.pred_baddr <= (others => '0');
+				bp_o.pred_branch <= '0';
+				bp_o.pred_uncond <= '0';
 			end if;
 
-			v.update := (btb_i.upd_branch and btb_i.upd_jump) or btb_i.upd_uncond;
+			v.update := (bp_i.upd_branch and bp_i.upd_jump) or bp_i.upd_uncond;
 
 			rin_btb <= v;
 
 		end process;
 
-		branch_history_table : process(r_bht,btb_i,pattern)
+		branch_history_table : process(r_bht,bp_i,pattern)
 
 		variable v : reg_bht_type;
 
@@ -152,44 +152,44 @@ begin
 
 			v := r_bht;
 
-			if btb_i.clear = '0' then
-				v.upd_ind := to_integer(unsigned(v.history xor btb_i.upd_pc(bht_depth downto 1)));
+			if bp_i.clear = '0' then
+				v.upd_ind := to_integer(unsigned(v.history xor bp_i.upd_pc(bht_depth downto 1)));
 				v.upd_sat := pattern(v.upd_ind);
 			end if;
 
-			if btb_i.clear = '0' then
-				v.get_ind := to_integer(unsigned(v.history xor btb_i.get_pc(bht_depth downto 1)));
+			if bp_i.clear = '0' then
+				v.get_ind := to_integer(unsigned(v.history xor bp_i.get_pc(bht_depth downto 1)));
 				v.get_sat := pattern(v.get_ind);
 			end if;
 
-			if btb_i.upd_branch = '1' then
+			if bp_i.upd_branch = '1' then
 				v.history := v.history(bht_depth-2 downto 0) & '0';
-				if btb_i.upd_jump = '1' then
+				if bp_i.upd_jump = '1' then
 					v.history(0) := '1';
 					if v.upd_sat < 3 then
 						v.upd_sat := v.upd_sat + 1;
 					end if;
-				elsif btb_i.upd_jump = '0' then
+				elsif bp_i.upd_jump = '0' then
 					if v.upd_sat > 0 then
 						v.upd_sat := v.upd_sat - 1;
 					end if;
 				end if;
 			end if;
 
-			if btb_i.get_branch = '1' and btb_i.upd_jump = '0' and btb_i.stall = '0' and
-					btb_i.clear = '0' then
-				btb_o.pred_jump <= v.get_sat(1);
+			if bp_i.get_branch = '1' and bp_i.upd_jump = '0' and bp_i.stall = '0' and
+					bp_i.clear = '0' then
+				bp_o.pred_jump <= v.get_sat(1);
 			else
-				btb_o.pred_jump <= '0';
+				bp_o.pred_jump <= '0';
 			end if;
 
-			v.update := btb_i.upd_branch;
+			v.update := bp_i.upd_branch;
 
 			rin_bht <= v;
 
 		end process;
 
-		return_address_stack : process(r_ras,btb_i,stack)
+		return_address_stack : process(r_ras,bp_i,stack)
 
 		variable v : reg_ras_type;
 
@@ -197,9 +197,9 @@ begin
 
 			v := r_ras;
 
-			v.waddr := btb_i.upd_npc;
+			v.waddr := bp_i.upd_npc;
 
-			if btb_i.upd_return = '1' then
+			if bp_i.upd_return = '1' then
 				if v.count < 2**ras_depth then
 					v.count := v.count + 1;
 				end if;
@@ -211,10 +211,10 @@ begin
 				end if;
 			end if;
 
-			if btb_i.get_return = '1' and btb_i.upd_jump = '0' and btb_i.stall = '0' and
-					btb_i.clear = '0' and v.count > 0 then
-				btb_o.pred_raddr <= stack(v.rid);
-				btb_o.pred_return <= '1';
+			if bp_i.get_return = '1' and bp_i.upd_jump = '0' and bp_i.stall = '0' and
+					bp_i.clear = '0' and v.count > 0 then
+				bp_o.pred_raddr <= stack(v.rid);
+				bp_o.pred_return <= '1';
 				v.count := v.count - 1;
 				v.wid := v.rid;
 				if v.rid > 0 then
@@ -223,11 +223,11 @@ begin
 					v.rid := 2**ras_depth-1;
 				end if;
 			else
-				btb_o.pred_raddr <= (others => '0');
-				btb_o.pred_return <= '0';
+				bp_o.pred_raddr <= (others => '0');
+				bp_o.pred_return <= '0';
 			end if;
 
-			v.update := btb_i.upd_return;
+			v.update := bp_i.upd_return;
 
 			rin_ras <= v;
 
@@ -270,17 +270,17 @@ begin
 
 		end process;
 
-	end generate BTB_ON;
+	end generate BP_ON;
 
-	BTB_OFF : if btb_enable = false generate
+	BP_OFF : if bp_enable = false generate
 
-		btb_o.pred_baddr <= (others => '0');
-		btb_o.pred_branch <= '0';
-		btb_o.pred_jump <= '0';
-		btb_o.pred_raddr <= (others => '0');
-		btb_o.pred_return <= '0';
-		btb_o.pred_uncond <= '0';
+		bp_o.pred_baddr <= (others => '0');
+		bp_o.pred_branch <= '0';
+		bp_o.pred_jump <= '0';
+		bp_o.pred_raddr <= (others => '0');
+		bp_o.pred_return <= '0';
+		bp_o.pred_uncond <= '0';
 
-	end generate BTB_OFF;
+	end generate BP_OFF;
 
 end architecture;

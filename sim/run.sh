@@ -114,8 +114,8 @@ $ANALYS $DIR/vhdl/memory/uart.vhd
 
 $SYNTAX $DIR/vhdl/speedup/prefetch.vhd
 $ANALYS $DIR/vhdl/speedup/prefetch.vhd
-$SYNTAX $DIR/vhdl/speedup/btb.vhd
-$ANALYS $DIR/vhdl/speedup/btb.vhd
+$SYNTAX $DIR/vhdl/speedup/bp.vhd
+$ANALYS $DIR/vhdl/speedup/bp.vhd
 
 $SYNTAX $DIR/vhdl/tb/bram_mem.vhd
 $ANALYS $DIR/vhdl/tb/bram_mem.vhd

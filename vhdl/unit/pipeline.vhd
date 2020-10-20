@@ -39,8 +39,8 @@ architecture behavior of pipeline is
 			reset    : in  std_logic;
 			clock    : in  std_logic;
 			csr_eo   : in  csr_exception_out_type;
-			btb_o    : in  btb_out_type;
-			btb_i    : out btb_in_type;
+			bp_o     : in  bp_out_type;
+			bp_i     : out bp_in_type;
 			pfetch_o : in  prefetch_out_type;
 			pfetch_i : out prefetch_in_type;
 			imem_o   : in  mem_out_type;
@@ -158,12 +158,12 @@ architecture behavior of pipeline is
 		);
 	end component;
 
-	component btb
+	component bp
 		port(
 			reset : in  std_logic;
 			clock : in  std_logic;
-			btb_i : in  btb_in_type;
-			btb_o : out btb_out_type
+			bp_i  : in  bp_in_type;
+			bp_o  : out bp_out_type
 		);
 	end component;
 
@@ -214,8 +214,8 @@ architecture behavior of pipeline is
 	signal int_unit_i : int_unit_in_type;
 	signal int_unit_o : int_unit_out_type;
 
-	signal btb_i : btb_in_type;
-	signal btb_o : btb_out_type;
+	signal bp_i : bp_in_type;
+	signal bp_o : bp_out_type;
 
 	signal pfetch_i : prefetch_in_type;
 	signal pfetch_o : prefetch_out_type;
@@ -235,8 +235,8 @@ begin
 			reset    => reset,
 			clock    => clock,
 			csr_eo   => csr_unit_o.csr_eo,
-			btb_o    => btb_o,
-			btb_i    => btb_i,
+			bp_o     => bp_o,
+			bp_i     => bp_i,
 			pfetch_o => pfetch_o,
 			pfetch_i => pfetch_i,
 			imem_o   => imem_o,
@@ -386,12 +386,12 @@ begin
 			int_unit_o => int_unit_o
 		);
 
-	btb_comp : btb
+	bp_comp : bp
 		port map(
 			reset => reset,
 			clock => clock,
-			btb_i => btb_i,
-			btb_o => btb_o
+			bp_i  => bp_i,
+			bp_o  => bp_o
 		);
 
 	prefetch_comp : prefetch

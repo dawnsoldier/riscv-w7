@@ -18,8 +18,8 @@ entity fetch_stage is
 		reset    : in  std_logic;
 		clock    : in  std_logic;
 		csr_eo   : in  csr_exception_out_type;
-		btb_o    : in  btb_out_type;
-		btb_i    : out btb_in_type;
+		bp_o     : in  bp_out_type;
+		bp_i     : out bp_in_type;
 		pfetch_o : in  prefetch_out_type;
 		pfetch_i : out prefetch_in_type;
 		imem_o   : in  mem_out_type;
@@ -40,7 +40,7 @@ architecture behavior of fetch_stage is
 
 begin
 
-	combinational : process(a, d, r, csr_eo, btb_o, pfetch_o, imem_o, ipmp_o)
+	combinational : process(a, d, r, csr_eo, bp_o, pfetch_o, imem_o, ipmp_o)
 
 		variable v : fetch_reg_type;
 
@@ -60,19 +60,19 @@ begin
 			v.inc := "100";
 		end if;
 
-		btb_i.get_pc <= d.d.pc;
-		btb_i.get_branch <= d.d.int_op.branch;
-		btb_i.get_return <= d.d.return_pop;
-		btb_i.get_uncond <= d.d.jump_uncond;
-		btb_i.upd_pc <= d.e.pc;
-		btb_i.upd_npc <= d.e.npc;
-		btb_i.upd_addr <= d.e.address;
-		btb_i.upd_branch <= d.e.int_op.branch;
-		btb_i.upd_return <= d.e.return_push;
-		btb_i.upd_uncond <= d.e.jump_uncond;
-		btb_i.upd_jump <= d.e.jump;
-		btb_i.stall <= v.stall;
-		btb_i.clear <= v.clear;
+		bp_i.get_pc <= d.d.pc;
+		bp_i.get_branch <= d.d.int_op.branch;
+		bp_i.get_return <= d.d.return_pop;
+		bp_i.get_uncond <= d.d.jump_uncond;
+		bp_i.upd_pc <= d.e.pc;
+		bp_i.upd_npc <= d.e.npc;
+		bp_i.upd_addr <= d.e.address;
+		bp_i.upd_branch <= d.e.int_op.branch;
+		bp_i.upd_return <= d.e.return_push;
+		bp_i.upd_uncond <= d.e.jump_uncond;
+		bp_i.upd_jump <= d.e.jump;
+		bp_i.stall <= v.stall;
+		bp_i.clear <= v.clear;
 
 		if csr_eo.exc = '1' then
 			v.taken := '0';
@@ -94,18 +94,18 @@ begin
 			v.taken := '0';
 			v.spec := '1';
 			v.pc := d.e.address;
-		elsif btb_o.pred_return = '1' then
+		elsif bp_o.pred_return = '1' then
 			v.taken := '1';
 			v.spec := '1';
-			v.pc :=  btb_o.pred_raddr;
-		elsif btb_o.pred_uncond = '1' then
+			v.pc :=  bp_o.pred_raddr;
+		elsif bp_o.pred_uncond = '1' then
 			v.taken := '1';
 			v.spec := '1';
-			v.pc :=  btb_o.pred_baddr;
-		elsif btb_o.pred_branch = '1' and btb_o.pred_jump = '1' then
+			v.pc :=  bp_o.pred_baddr;
+		elsif bp_o.pred_branch = '1' and bp_o.pred_jump = '1' then
 			v.taken := '1';
 			v.spec := '1';
-			v.pc :=  btb_o.pred_baddr;
+			v.pc :=  bp_o.pred_baddr;
 		elsif v.stall = '0' then
 			v.taken := '0';
 			v.spec := '0';

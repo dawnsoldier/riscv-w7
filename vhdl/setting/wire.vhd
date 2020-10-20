@@ -629,7 +629,7 @@ package wire is
 		stall : std_logic;
 	end record;
 
-	type btb_in_type is record
+	type bp_in_type is record
 		get_pc     : std_logic_vector(63 downto 0);
 		get_branch : std_logic;
 		get_return : std_logic;
@@ -645,7 +645,7 @@ package wire is
 		clear      : std_logic;
 	end record;
 
-	type btb_out_type is record
+	type bp_out_type is record
 		pred_baddr  : std_logic_vector(63 downto 0);
 		pred_branch : std_logic;
 		pred_jump   : std_logic;
