@@ -163,7 +163,40 @@ architecture behavior of pipeline is
 			reset : in  std_logic;
 			clock : in  std_logic;
 			bp_i  : in  bp_in_type;
-			bp_o  : out bp_out_type
+			bp_o  : out bp_out_type;
+			bht_i : out bht_in_type;
+			bht_o : in  bht_out_type;
+			btb_i : out btb_in_type;
+			btb_o : in  btb_out_type;
+			ras_i : out ras_in_type;
+			ras_o : in  ras_out_type
+		);
+	end component;
+
+	component bht
+		port(
+			reset : in  std_logic;
+			clock : in  std_logic;
+			bht_i : in  bht_in_type;
+			bht_o : out bht_out_type
+		);
+	end component;
+
+	component btb
+		port(
+			reset : in  std_logic;
+			clock : in  std_logic;
+			btb_i : in  btb_in_type;
+			btb_o : out btb_out_type
+		);
+	end component;
+
+	component ras
+		port(
+			reset : in  std_logic;
+			clock : in  std_logic;
+			ras_i : in  ras_in_type;
+			ras_o : out ras_out_type
 		);
 	end component;
 
@@ -216,6 +249,15 @@ architecture behavior of pipeline is
 
 	signal bp_i : bp_in_type;
 	signal bp_o : bp_out_type;
+
+	signal bht_i : bht_in_type;
+	signal bht_o : bht_out_type;
+
+	signal btb_i : btb_in_type;
+	signal btb_o : btb_out_type;
+
+	signal ras_i : ras_in_type;
+	signal ras_o : ras_out_type;
 
 	signal pfetch_i : prefetch_in_type;
 	signal pfetch_o : prefetch_out_type;
@@ -391,7 +433,37 @@ begin
 			reset => reset,
 			clock => clock,
 			bp_i  => bp_i,
-			bp_o  => bp_o
+			bp_o  => bp_o,
+			bht_i => bht_i,
+			bht_o => bht_o,
+			btb_i => btb_i,
+			btb_o => btb_o,
+			ras_i => ras_i,
+			ras_o => ras_o
+		);
+
+	bht_comp : bht
+		port map(
+			reset => reset,
+			clock => clock,
+			bht_i => bht_i,
+			bht_o => bht_o
+		);
+
+	btb_comp : btb
+		port map(
+			reset => reset,
+			clock => clock,
+			btb_i => btb_i,
+			btb_o => btb_o
+		);
+
+	ras_comp : ras
+		port map(
+			reset => reset,
+			clock => clock,
+			ras_i => ras_i,
+			ras_o => ras_o
 		);
 
 	prefetch_comp : prefetch

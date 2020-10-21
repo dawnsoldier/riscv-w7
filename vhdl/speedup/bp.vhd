@@ -20,25 +20,17 @@ entity bp is
 		reset : in  std_logic;
 		clock : in  std_logic;
 		bp_i  : in  bp_in_type;
-		bp_o  : out bp_out_type
+		bp_o  : out bp_out_type;
+		bht_i : out bht_in_type;
+		bht_o : in  bht_out_type;
+		btb_i : out btb_in_type;
+		btb_o : in  btb_out_type;
+		ras_i : out ras_in_type;
+		ras_o : in  ras_out_type
 	);
 end bp;
 
 architecture behavior of bp is
-
-	type index_type is record
-		address : std_logic_vector(63 downto 0);
-		tag     : std_logic_vector(62 - btb_depth downto 0);
-	end record;
-
-	constant init_index : index_type := (
-		address => (others => '0'),
-		tag     => (others => '0')
-	);
-
-	type target_type is array (0 to 2**btb_depth-1) of index_type;
-
-	signal target : target_type := (others => init_index);
 
 	type reg_btb_type is record
 		wpc    : std_logic_vector(63 downto 0);
@@ -58,10 +50,6 @@ architecture behavior of bp is
 		update => '0'
 	);
 
-	type pattern_type is array (0 to 2**bht_depth-1) of unsigned(1 downto 0);
-
-	signal pattern : pattern_type := (others => (others => '0'));
-
 	type reg_bht_type is record
 		history : std_logic_vector(bht_depth-1 downto 0);
 		get_ind : integer range 0 to 2**bht_depth-1;
@@ -79,10 +67,6 @@ architecture behavior of bp is
 		upd_sat => (others => '0'),
 		update  => '0'
 	);
-
-	type stack_type is array (0 to 2**ras_depth-1) of std_logic_vector(63 downto 0);
-
-	signal stack : stack_type := (others => (others => '0'));
 
 	type reg_ras_type is record
 		count  : integer range 0 to 2**ras_depth;
@@ -108,7 +92,7 @@ begin
 
 	BP_ON : if bp_enable = true generate
 
-		branch_target_buffer : process(r_btb,bp_i,target)
+		branch_target_buffer : process(r_btb,bp_i,btb_o)
 
 		variable v : reg_btb_type;
 
@@ -127,9 +111,11 @@ begin
 				v.wid := to_integer(unsigned(v.wpc(btb_depth downto 1)));
 			end if;
 
+			btb_i.raddr <= v.rid;
+
 			if bp_i.upd_jump = '0' and bp_i.stall = '0' and bp_i.clear = '0' and
-					nor_reduce(target(v.rid).tag xor v.rpc(63 downto btb_depth+1)) = '1' then
-				bp_o.pred_baddr <= target(v.rid).address;
+					nor_reduce(btb_o.rdata(126-btb_depth downto 64) xor v.rpc(63 downto btb_depth+1)) = '1' then
+				bp_o.pred_baddr <= btb_o.rdata(63 downto 0);
 				bp_o.pred_branch <= bp_i.get_branch;
 				bp_o.pred_uncond <= bp_i.get_uncond;
 			else
@@ -140,11 +126,15 @@ begin
 
 			v.update := (bp_i.upd_branch and bp_i.upd_jump) or bp_i.upd_uncond;
 
+			btb_i.wen <= v.update;
+			btb_i.waddr <= v.wid;
+			btb_i.wdata <= v.wpc(63 downto btb_depth+1) & v.waddr;
+
 			rin_btb <= v;
 
 		end process;
 
-		branch_history_table : process(r_bht,bp_i,pattern)
+		branch_history_table : process(r_bht,bp_i,bht_o)
 
 		variable v : reg_bht_type;
 
@@ -154,13 +144,17 @@ begin
 
 			if bp_i.clear = '0' then
 				v.upd_ind := to_integer(unsigned(v.history xor bp_i.upd_pc(bht_depth downto 1)));
-				v.upd_sat := pattern(v.upd_ind);
 			end if;
+
+			bht_i.raddr1 <= v.upd_ind;
+			v.upd_sat := bht_o.rdata1;
 
 			if bp_i.clear = '0' then
 				v.get_ind := to_integer(unsigned(v.history xor bp_i.get_pc(bht_depth downto 1)));
-				v.get_sat := pattern(v.get_ind);
 			end if;
+
+			bht_i.raddr2 <= v.get_ind;
+			v.get_sat := bht_o.rdata2;
 
 			if bp_i.upd_branch = '1' then
 				v.history := v.history(bht_depth-2 downto 0) & '0';
@@ -185,11 +179,15 @@ begin
 
 			v.update := bp_i.upd_branch;
 
+			bht_i.wen <= v.update;
+			bht_i.waddr <= v.upd_ind;
+			bht_i.wdata <= v.upd_sat;
+
 			rin_bht <= v;
 
 		end process;
 
-		return_address_stack : process(r_ras,bp_i,stack)
+		return_address_stack : process(r_ras,bp_i,ras_o)
 
 		variable v : reg_ras_type;
 
@@ -211,9 +209,11 @@ begin
 				end if;
 			end if;
 
+			ras_i.raddr <= v.rid;
+
 			if bp_i.get_return = '1' and bp_i.upd_jump = '0' and bp_i.stall = '0' and
 					bp_i.clear = '0' and v.count > 0 then
-				bp_o.pred_raddr <= stack(v.rid);
+				bp_o.pred_raddr <= ras_o.rdata;
 				bp_o.pred_return <= '1';
 				v.count := v.count - 1;
 				v.wid := v.rid;
@@ -228,6 +228,10 @@ begin
 			end if;
 
 			v.update := bp_i.upd_return;
+
+			ras_i.wen <= v.update;
+			ras_i.waddr <= r_ras.wid;
+			ras_i.wdata <= v.waddr;
 
 			rin_ras <= v;
 
@@ -246,19 +250,6 @@ begin
 					r_ras <= init_reg_ras;
 
 				else
-
-					if rin_btb.update = '1' then
-						target(rin_btb.wid).tag <= rin_btb.wpc(63 downto btb_depth+1);
-						target(rin_btb.wid).address <= rin_btb.waddr;
-					end if;
-
-					if rin_bht.update = '1' then
-						pattern(rin_bht.upd_ind) <= rin_bht.upd_sat;
-					end if;
-
-					if rin_ras.update = '1' then
-						stack(r_ras.wid) <= rin_ras.waddr;
-					end if;
 
 					r_btb <= rin_btb;
 					r_bht <= rin_bht;

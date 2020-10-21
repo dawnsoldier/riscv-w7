@@ -654,6 +654,41 @@ package wire is
 		pred_uncond : std_logic;
 	end record;
 
+	type bht_in_type is record
+		raddr1 : integer range 0 to 2**bht_depth-1;
+		raddr2 : integer range 0 to 2**bht_depth-1;
+		wen    : std_logic;
+		waddr  : integer range 0 to 2**bht_depth-1;
+		wdata  : unsigned(1 downto 0);
+	end record;
+
+	type bht_out_type is record
+		rdata1 : unsigned(1 downto 0);
+		rdata2 : unsigned(1 downto 0);
+	end record;
+
+	type btb_in_type is record
+		raddr : integer range 0 to 2**btb_depth-1;
+		wen   : std_logic;
+		waddr : integer range 0 to 2**btb_depth-1;
+		wdata : std_logic_vector(126-btb_depth downto 0);
+	end record;
+
+	type btb_out_type is record
+		rdata : std_logic_vector(126-btb_depth downto 0);
+	end record;
+
+	type ras_in_type is record
+		raddr : integer range 0 to 2**ras_depth-1;
+		wen   : std_logic;
+		waddr : integer range 0 to 2**ras_depth-1;
+		wdata : std_logic_vector(63 downto 0);
+	end record;
+
+	type ras_out_type is record
+		rdata : std_logic_vector(63 downto 0);
+	end record;
+
 	type mem_in_type is record
 		mem_valid : std_logic;
 		mem_instr : std_logic;
