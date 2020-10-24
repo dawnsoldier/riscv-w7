@@ -629,6 +629,17 @@ package wire is
 		stall : std_logic;
 	end record;
 
+	type prebuffer_in_type is record
+		raddr : integer range 0 to 2**pfetch_depth-1;
+		wren  : std_logic;
+		waddr : integer range 0 to 2**pfetch_depth-1;
+		wdata : std_logic_vector(63 downto 0);
+	end record;
+
+	type prebuffer_out_type is record
+		rdata : std_logic_vector(31 downto 0);
+	end record;
+
 	type bp_in_type is record
 		get_pc     : std_logic_vector(63 downto 0);
 		get_branch : std_logic;

@@ -14,18 +14,16 @@ entity prefetch is
 		pfetch_depth : integer := pfetch_depth
 	);
 	port(
-		reset    : in  std_logic;
-		clock    : in  std_logic;
-		pfetch_i : in  prefetch_in_type;
-		pfetch_o : out prefetch_out_type
+		reset     : in  std_logic;
+		clock     : in  std_logic;
+		pfetch_i  : in  prefetch_in_type;
+		pfetch_o  : out prefetch_out_type;
+		pbuffer_i : out prebuffer_in_type;
+		pbuffer_o : in  prebuffer_out_type
 	);
 end prefetch;
 
 architecture behavior of prefetch is
-
-	type buffer_type is array (0 to 2**pfetch_depth-1) of std_logic_vector(15 downto 0);
-
-	signal prefetch_buffer : buffer_type := (others => (others => '0'));
 
 	type reg_type is record
 		pc     : std_logic_vector(63 downto 0);
@@ -63,7 +61,7 @@ architecture behavior of prefetch is
 
 begin
 
-	process(r,pfetch_i,prefetch_buffer)
+	process(r,pfetch_i,pbuffer_o)
 
 	variable v : reg_type;
 
@@ -116,26 +114,28 @@ begin
 			v.fpc := v.npc(63 downto 3) & "000";
 		end if;
 
+		pbuffer_i.raddr <= v.rid;
+
 		if v.rden = '1' then
 			if v.rid = 2**pfetch_depth-1 then
 				if (v.wid = 0) then
 					if v.wrdis = '1' then
 						v.stall := '1';
 					else
-						v.instr := pfetch_i.mem_rdata(15 downto 0) & prefetch_buffer(v.rid);
+						v.instr := pfetch_i.mem_rdata(15 downto 0) & pbuffer_o.rdata(15 downto 0);
 					end if;
 				else
-					v.instr := prefetch_buffer(0) & prefetch_buffer(v.rid);
+					v.instr := pbuffer_o.rdata;
 				end if;
 			else
 				if v.wid = (v.rid+1) then
 					if v.wrdis = '1' then
 						v.stall := '1';
 					else
-						v.instr := pfetch_i.mem_rdata(15 downto 0) & prefetch_buffer(v.rid);
+						v.instr := pfetch_i.mem_rdata(15 downto 0) & pbuffer_o.rdata(15 downto 0);
 					end if;
 				else
-					v.instr := prefetch_buffer(v.rid+1) & prefetch_buffer(v.rid);
+					v.instr := pbuffer_o.rdata;
 				end if;
 			end if;
 		elsif pfetch_i.mem_ready = '1' then
@@ -160,6 +160,10 @@ begin
 		pfetch_o.instr <= v.instr;
 		pfetch_o.stall <= v.stall;
 
+		pbuffer_i.wren <= v.wrbuf;
+		pbuffer_i.waddr <= v.wid;
+		pbuffer_i.wdata <= pfetch_i.mem_rdata;
+
 		rin <= v;
 
 	end process;
@@ -175,13 +179,6 @@ begin
 				r <= init_reg;
 
 			else
-
-				if rin.wrbuf = '1' then
-					prefetch_buffer(rin.wid) <= pfetch_i.mem_rdata(15 downto 0);
-					prefetch_buffer(rin.wid+1) <= pfetch_i.mem_rdata(31 downto 16);
-					prefetch_buffer(rin.wid+2) <= pfetch_i.mem_rdata(47 downto 32);
-					prefetch_buffer(rin.wid+3) <= pfetch_i.mem_rdata(63 downto 48);
-				end if;
 
 				r <= rin;
 
