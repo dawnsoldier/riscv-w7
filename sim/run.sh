@@ -112,6 +112,21 @@ $ANALYS $DIR/vhdl/memory/timer.vhd
 $SYNTAX $DIR/vhdl/memory/uart.vhd
 $ANALYS $DIR/vhdl/memory/uart.vhd
 
+$SYNTAX $DIR/vhdl/cache/data.vhd
+$ANALYS $DIR/vhdl/cache/data.vhd
+$SYNTAX $DIR/vhdl/cache/tag.vhd
+$ANALYS $DIR/vhdl/cache/tag.vhd
+$SYNTAX $DIR/vhdl/cache/valid.vhd
+$ANALYS $DIR/vhdl/cache/valid.vhd
+$SYNTAX $DIR/vhdl/cache/hit.vhd
+$ANALYS $DIR/vhdl/cache/hit.vhd
+$SYNTAX $DIR/vhdl/cache/lru.vhd
+$ANALYS $DIR/vhdl/cache/lru.vhd
+$SYNTAX $DIR/vhdl/cache/ctrl.vhd
+$ANALYS $DIR/vhdl/cache/ctrl.vhd
+$SYNTAX $DIR/vhdl/cache/cache.vhd
+$ANALYS $DIR/vhdl/cache/cache.vhd
+
 $SYNTAX $DIR/vhdl/speedup/prefetch.vhd
 $ANALYS $DIR/vhdl/speedup/prefetch.vhd
 $SYNTAX $DIR/vhdl/speedup/prebuffer.vhd
