@@ -71,7 +71,6 @@ architecture behavior of ctrl is
 		lid   : integer range 0 to 4;
 		wid   : integer range 0 to 7;
 		en    : std_logic;
-		stall : std_logic;
 	end record;
 
 	constant init_data_type : data_type := (
@@ -81,8 +80,7 @@ architecture behavior of ctrl is
 		ready => '0',
 		lid   => 0,
 		wid   => 0,
-		en    => '0',
-		stall => '0'
+		en    => '0'
 	);
 
 	signal r,rin : ctrl_type := init_ctrl_type;
@@ -325,7 +323,6 @@ begin
 									v.cline(191 downto 128) when v.lid = 2 else
 									v.cline(255 downto 192) when v.lid = 3;
 				v.ready := v.en;
-				v.stall := '0';
 
 			when UPDATE =>
 
@@ -334,19 +331,16 @@ begin
 									v.cline(191 downto 128) when v.lid = 2 else
 									v.cline(255 downto 192) when v.lid = 3;
 				v.ready := '1';
-				v.stall := '0';
 
 			when others =>
 
 				v.rdata := (others => '0');
 				v.ready := '0';
-				v.stall := '1';
 
 		end case;
 
 		cache_o.mem_rdata <= v.rdata;
 		cache_o.mem_ready <= v.ready;
-		cache_o.mem_stall <= v.stall;
 
 	end process;
 

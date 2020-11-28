@@ -818,7 +818,6 @@ package wire is
 	end record;
 
 	type cache_out_type is record
-		mem_stall : std_logic;
 		mem_ready : std_logic;
 		mem_rdata : std_logic_vector(63 downto 0);
 	end record;
