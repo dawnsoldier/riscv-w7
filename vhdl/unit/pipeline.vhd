@@ -43,8 +43,8 @@ architecture behavior of pipeline is
 			bp_i     : out bp_in_type;
 			pfetch_o : in  prefetch_out_type;
 			pfetch_i : out prefetch_in_type;
-			imem_o   : in  mem_out_type;
-			imem_i   : out mem_in_type;
+			icache_o : in  cache_out_type;
+			icache_i : out cache_in_type;
 			ipmp_o   : in  pmp_out_type;
 			ipmp_i   : out pmp_in_type;
 			a        : in  fetch_in_type;
@@ -220,6 +220,17 @@ architecture behavior of pipeline is
 		);
 	end component;
 
+	component cache
+		port(
+			reset   : in  std_logic;
+			clock   : in  std_logic;
+			cache_i : in  cache_in_type;
+			cache_o : out cache_out_type;
+			mem_o   : in  mem_out_type;
+			mem_i   : out mem_in_type
+		);
+	end component;
+
 	component fpu
 		port(
 			reset     : in  std_logic;
@@ -276,6 +287,9 @@ architecture behavior of pipeline is
 	signal pbuffer_i : prebuffer_in_type;
 	signal pbuffer_o : prebuffer_out_type;
 
+	signal icache_i : cache_in_type;
+	signal icache_o : cache_out_type;
+
 	signal fpu_dec_i : fpu_dec_in_type;
 	signal fpu_dec_o : fpu_dec_out_type;
 
@@ -295,8 +309,8 @@ begin
 			bp_i     => bp_i,
 			pfetch_o => pfetch_o,
 			pfetch_i => pfetch_i,
-			imem_o   => imem_o,
-			imem_i   => imem_i,
+			icache_o => icache_o,
+			icache_i => icache_i,
 			ipmp_o   => ipmp_o,
 			ipmp_i   => ipmp_i,
 			a.f      => fetch_y,
@@ -496,6 +510,16 @@ begin
 			clock     => clock,
 			pbuffer_i => pbuffer_i,
 			pbuffer_o => pbuffer_o
+		);
+
+	icache_comp : cache
+		port map(
+			reset   => reset,
+			clock   => clock,
+			cache_i => icache_i,
+			cache_o => icache_o,
+			mem_o   => imem_o,
+			mem_i   => imem_i
 		);
 
 	FP_Unit : if fpu_enable = true generate

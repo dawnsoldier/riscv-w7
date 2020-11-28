@@ -14,12 +14,14 @@ entity ctrl is
 		set_depth  : integer := set_depth
 	);
 	port(
-		reset  : in  std_logic;
-		clock  : in  std_logic;
-		ctrl_i : in  ctrl_in_type;
-		ctrl_o : out ctrl_out_type;
-		mem_i  : out mem_in_type;
-		mem_o  : in  mem_out_type
+		reset   : in  std_logic;
+		clock   : in  std_logic;
+		ctrl_i  : in  ctrl_in_type;
+		ctrl_o  : out ctrl_out_type;
+		cache_i : in  cache_in_type;
+		cache_o : out cache_out_type;
+		mem_o   : in  mem_out_type;
+		mem_i   : out mem_in_type
 	);
 end ctrl;
 
@@ -32,10 +34,8 @@ architecture behavior of ctrl is
 		count : integer range 0 to 3;
 		addr  : std_logic_vector(63 downto 0);
 		valid : std_logic;
-		tag   : std_logic_vector(60-set_depth downto 0);
+		tag   : std_logic_vector(58-set_depth downto 0);
 		cline : std_logic_vector(255 downto 0);
-		rdata : std_logic_vector(63 downto 0);
-		ready : std_logic;
 		sid   : integer range 0 to 2**set_depth-1;
 		lid   : integer range 0 to 4;
 		wid   : integer range 0 to 7;
@@ -53,8 +53,6 @@ architecture behavior of ctrl is
 		valid => '0',
 		tag   => (others => '0'),
 		cline => (others => '0'),
-		rdata => (others => '0'),
-		ready => '0',
 		sid   => 0,
 		lid   => 0,
 		wid   => 0,
@@ -65,11 +63,34 @@ architecture behavior of ctrl is
 		wen   => (others => '0')
 	);
 
+	type data_type is record
+		state : state_type;
+		cline : std_logic_vector(255 downto 0);
+		rdata : std_logic_vector(63 downto 0);
+		ready : std_logic;
+		lid   : integer range 0 to 4;
+		wid   : integer range 0 to 7;
+		en    : std_logic;
+		stall : std_logic;
+	end record;
+
+	constant init_data_type : data_type := (
+		state => HIT,
+		cline => (others => '0'),
+		rdata => (others => '0'),
+		ready => '0',
+		lid   => 0,
+		wid   => 0,
+		en    => '0',
+		stall => '0'
+	);
+
 	signal r,rin : ctrl_type := init_ctrl_type;
+	signal r_next,rin_next : data_type := init_data_type;
 
 begin
 
-	process(ctrl_i,mem_o,r)
+	process(ctrl_i,cache_i,mem_o,r)
 
 	variable v : ctrl_type;
 
@@ -84,21 +105,34 @@ begin
 
 			when HIT =>
 
-				if ctrl_i.cache_i.mem_valid = '1' then
-					v.en := ctrl_i.cache_i.mem_valid;
-					v.addr := ctrl_i.cache_i.mem_addr(63 downto 3) & "000";
-					v.tag := ctrl_i.cache_i.mem_addr(63 downto set_depth+5);
-					v.sid := to_integer(unsigned(ctrl_i.cache_i.mem_addr(set_depth+4 downto 5)));
-					v.lid := to_integer(unsigned(ctrl_i.cache_i.mem_addr(4 downto 3)));
+				if cache_i.mem_valid = '1' then
+					v.en := cache_i.mem_valid;
+					v.addr := cache_i.mem_addr(63 downto 5) & "00000";
+					v.tag := cache_i.mem_addr(63 downto set_depth+5);
+					v.sid := to_integer(unsigned(cache_i.mem_addr(set_depth+4 downto 5)));
+					v.lid := to_integer(unsigned(cache_i.mem_addr(4 downto 3)));
 				else
 					v.en := '0';
 				end if;
 
+			when UPDATE =>
+
+				v.en := '0';
+
 			when others =>
 
-				null;
+				v.en := '0';
 
 		end case;
+
+		ctrl_o.data0_i.raddr <= v.sid;
+		ctrl_o.data1_i.raddr <= v.sid;
+		ctrl_o.data2_i.raddr <= v.sid;
+		ctrl_o.data3_i.raddr <= v.sid;
+		ctrl_o.data4_i.raddr <= v.sid;
+		ctrl_o.data5_i.raddr <= v.sid;
+		ctrl_o.data6_i.raddr <= v.sid;
+		ctrl_o.data7_i.raddr <= v.sid;
 
 		ctrl_o.tag0_i.raddr <= v.sid;
 		ctrl_o.tag1_i.raddr <= v.sid;
@@ -141,6 +175,15 @@ begin
 					v.valid := '0';
 				end if;
 
+				v.cline := ctrl_i.data0_o.rdata when v.wid = 0 else
+									ctrl_i.data1_o.rdata when v.wid = 1 else
+									ctrl_i.data2_o.rdata when v.wid = 2 else
+									ctrl_i.data3_o.rdata when v.wid = 3 else
+									ctrl_i.data4_o.rdata when v.wid = 4 else
+									ctrl_i.data5_o.rdata when v.wid = 5 else
+									ctrl_i.data6_o.rdata when v.wid = 6 else
+									ctrl_i.data7_o.rdata when v.wid = 7;
+
 			when MISS =>
 
 				if r.miss = '1' then
@@ -164,17 +207,17 @@ begin
 					end case;
 
 					v.addr(63 downto 3) := std_logic_vector(unsigned(v.addr(63 downto 3))+1);
-					v.count := v.count + 1;
+					if v.count /= 3 then
+						v.count := v.count + 1;
+					end if;
 
 				end if;
 
-			when UPDATE =>
+				if cache_i.mem_spec = '1' then
+					v.state := HIT;
+				end if;
 
-				v.rdata := r.cline(63 downto 0) when r.lid = 0 else
-									r.cline(127 downto 64) when r.lid = 1 else
-									r.cline(191 downto 128) when r.lid = 2 else
-									r.cline(255 downto 192) when r.lid = 3;
-				v.ready := '1';
+			when UPDATE =>
 
 				v.wen(v.wid) := '1';
 				v.wvec(v.wid) := '1';
@@ -185,15 +228,6 @@ begin
 				null;
 
 		end case;
-
-		ctrl_o.data0_i.raddr <= v.sid;
-		ctrl_o.data1_i.raddr <= v.sid;
-		ctrl_o.data2_i.raddr <= v.sid;
-		ctrl_o.data3_i.raddr <= v.sid;
-		ctrl_o.data4_i.raddr <= v.sid;
-		ctrl_o.data5_i.raddr <= v.sid;
-		ctrl_o.data6_i.raddr <= v.sid;
-		ctrl_o.data7_i.raddr <= v.sid;
 
 		ctrl_o.data0_i.waddr <= v.sid;
 		ctrl_o.data1_i.waddr <= v.sid;
@@ -266,35 +300,53 @@ begin
 
 		rin <= v;
 
-		case r.state is
+		rin_next.state <= v.state;
+		rin_next.cline <= v.cline;
+		rin_next.lid <= v.lid;
+		rin_next.wid <= v.wid;
+		rin_next.en <= v.en;
+
+	end process;
+
+	process(ctrl_i,r_next)
+
+	variable v : data_type;
+
+	begin
+
+		v := r_next;
+
+		case v.state is
 
 			when HIT =>
 
-				v.cline := ctrl_i.data0_o.rdata when r.wid = 0 else
-									ctrl_i.data1_o.rdata when r.wid = 1 else
-									ctrl_i.data2_o.rdata when r.wid = 2 else
-									ctrl_i.data3_o.rdata when r.wid = 3 else
-									ctrl_i.data4_o.rdata when r.wid = 4 else
-									ctrl_i.data5_o.rdata when r.wid = 5 else
-									ctrl_i.data6_o.rdata when r.wid = 6 else
-									ctrl_i.data7_o.rdata when r.wid = 7;
+				v.rdata := v.cline(63 downto 0) when v.lid = 0 else
+									v.cline(127 downto 64) when v.lid = 1 else
+									v.cline(191 downto 128) when v.lid = 2 else
+									v.cline(255 downto 192) when v.lid = 3;
+				v.ready := v.en;
+				v.stall := '0';
 
-				v.rdata := v.cline(63 downto 0) when r.lid = 0 else
-									v.cline(127 downto 64) when r.lid = 1 else
-									v.cline(191 downto 128) when r.lid = 2 else
-									v.cline(255 downto 192) when r.lid = 3;
+			when UPDATE =>
 
+				v.rdata := v.cline(63 downto 0) when v.lid = 0 else
+									v.cline(127 downto 64) when v.lid = 1 else
+									v.cline(191 downto 128) when v.lid = 2 else
+									v.cline(255 downto 192) when v.lid = 3;
 				v.ready := '1';
+				v.stall := '0';
 
 			when others =>
 
 				v.rdata := (others => '0');
 				v.ready := '0';
+				v.stall := '1';
 
 		end case;
 
-		ctrl_o.cache_o.mem_rdata <= v.rdata;
-		ctrl_o.cache_o.mem_ready <= v.ready;
+		cache_o.mem_rdata <= v.rdata;
+		cache_o.mem_ready <= v.ready;
+		cache_o.mem_stall <= v.stall;
 
 	end process;
 
@@ -305,6 +357,7 @@ begin
 		if rising_edge(clock) then
 
 			r <= rin;
+			r_next <= rin_next;
 
 		end if;
 

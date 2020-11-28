@@ -763,21 +763,7 @@ package wire is
 		wid   : integer range 0 to 7;
 	end record;
 
-	type cache_in_type is record
-		mem_valid : std_logic;
-		mem_instr : std_logic;
-		mem_addr  : std_logic_vector(63 downto 0);
-		mem_wdata : std_logic_vector(63 downto 0);
-		mem_wstrb : std_logic_vector(7 downto 0);
-	end record;
-
-	type cache_out_type is record
-		mem_ready : std_logic;
-		mem_rdata : std_logic_vector(63 downto 0);
-	end record;
-
 	type ctrl_in_type is record
-		cache_i : cache_in_type;
 		data0_o : data_out_type;
 		data1_o : data_out_type;
 		data2_o : data_out_type;
@@ -800,7 +786,6 @@ package wire is
 	end record;
 
 	type ctrl_out_type is record
-		cache_o : cache_out_type;
 		data0_i : data_in_type;
 		data1_i : data_in_type;
 		data2_i : data_in_type;
@@ -820,6 +805,22 @@ package wire is
 		valid_i : valid_in_type;
 		lru_i   : lru_in_type;
 		hit_i   : hit_in_type;
+	end record;
+
+	type cache_in_type is record
+		mem_valid   : std_logic;
+		mem_instr   : std_logic;
+		mem_spec    : std_logic;
+		mem_invalid : std_logic;
+		mem_addr    : std_logic_vector(63 downto 0);
+		mem_wdata   : std_logic_vector(63 downto 0);
+		mem_wstrb   : std_logic_vector(7 downto 0);
+	end record;
+
+	type cache_out_type is record
+		mem_stall : std_logic;
+		mem_ready : std_logic;
+		mem_rdata : std_logic_vector(63 downto 0);
 	end record;
 
 	type mem_in_type is record
