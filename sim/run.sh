@@ -129,6 +129,8 @@ $ANALYS $DIR/vhdl/cache/cache.vhd
 
 $SYNTAX $DIR/vhdl/speedup/prefetch.vhd
 $ANALYS $DIR/vhdl/speedup/prefetch.vhd
+$SYNTAX $DIR/vhdl/speedup/prectrl.vhd
+$ANALYS $DIR/vhdl/speedup/prectrl.vhd
 $SYNTAX $DIR/vhdl/speedup/prebuffer.vhd
 $ANALYS $DIR/vhdl/speedup/prebuffer.vhd
 $SYNTAX $DIR/vhdl/speedup/bht.vhd

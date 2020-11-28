@@ -205,20 +205,9 @@ architecture behavior of pipeline is
 			reset     : in  std_logic;
 			clock     : in  std_logic;
 			pfetch_i  : in  prefetch_in_type;
-			pfetch_o  : out prefetch_out_type;
-			pbuffer_i : out prebuffer_in_type;
-			pbuffer_o : in  prebuffer_out_type
+			pfetch_o  : out prefetch_out_type
   	);
   end component;
-
-	component prebuffer
-		port(
-			reset     : in  std_logic;
-			clock     : in  std_logic;
-			pbuffer_i : in  prebuffer_in_type;
-			pbuffer_o : out prebuffer_out_type
-		);
-	end component;
 
 	component cache
 		port(
@@ -499,17 +488,7 @@ begin
 			reset     => reset,
 			clock     => clock,
 			pfetch_i  => pfetch_i,
-			pfetch_o  => pfetch_o,
-			pbuffer_i => pbuffer_i,
-			pbuffer_o => pbuffer_o
-		);
-
-	prebuffer_comp : prebuffer
-		port map(
-			reset     => reset,
-			clock     => clock,
-			pbuffer_i => pbuffer_i,
-			pbuffer_o => pbuffer_o
+			pfetch_o  => pfetch_o
 		);
 
 	icache_comp : cache

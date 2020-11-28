@@ -17,175 +17,53 @@ entity prefetch is
 		reset     : in  std_logic;
 		clock     : in  std_logic;
 		pfetch_i  : in  prefetch_in_type;
-		pfetch_o  : out prefetch_out_type;
-		pbuffer_i : out prebuffer_in_type;
-		pbuffer_o : in  prebuffer_out_type
+		pfetch_o  : out prefetch_out_type
 	);
 end prefetch;
 
 architecture behavior of prefetch is
 
-	type reg_type is record
-		pc     : std_logic_vector(63 downto 0);
-		npc    : std_logic_vector(63 downto 0);
-		fpc    : std_logic_vector(63 downto 0);
-		instr  : std_logic_vector(31 downto 0);
-		wren   : std_logic;
-		rden   : std_logic;
-		wrdis  : std_logic;
-		wrbuf  : std_logic;
-		equal  : std_logic;
-		full   : std_logic;
-		wid    : natural range 0 to 2**pfetch_depth-1;
-		rid    : natural range 0 to 2**pfetch_depth-1;
-		stall  : std_logic;
-	end record;
+	component prebuffer
+		port(
+			reset     : in  std_logic;
+			clock     : in  std_logic;
+			pbuffer_i : in  prebuffer_in_type;
+			pbuffer_o : out prebuffer_out_type
+		);
+	end component;
 
-	constant init_reg : reg_type := (
-		pc     => start_base_addr,
-		npc    => start_base_addr,
-		fpc    => start_base_addr,
-		instr  => nop,
-		wren   => '0',
-		rden   => '0',
-		wrdis  => '0',
-		wrbuf  => '0',
-		equal  => '0',
-		full   => '0',
-		wid    => 0,
-		rid    => 0,
-		stall  => '0'
-	);
+	component prectrl
+		port(
+			reset     : in  std_logic;
+			clock     : in  std_logic;
+			pctrl_i   : in  prefetch_in_type;
+			pctrl_o   : out prefetch_out_type;
+			pbuffer_i : out prebuffer_in_type;
+			pbuffer_o : in  prebuffer_out_type
+		);
+	end component;
 
-	signal r, rin : reg_type := init_reg;
+	signal pbuffer_i : prebuffer_in_type;
+	signal pbuffer_o : prebuffer_out_type;
 
 begin
 
-	process(r,pfetch_i,pbuffer_o)
+	prebuffer_comp : prebuffer
+		port map(
+			reset     => reset,
+			clock     => clock,
+			pbuffer_i => pbuffer_i,
+			pbuffer_o => pbuffer_o
+		);
 
-	variable v : reg_type;
-
-	begin
-
-		v := r;
-
-		v.instr := nop;
-		v.stall := '0';
-		v.wrdis := '0';
-		v.wrbuf := '0';
-
-		v.pc := pfetch_i.pc;
-		v.npc := pfetch_i.npc;
-
-		if pfetch_i.fence = '1' then
-			v.fpc := v.pc(63 downto 3) & "000";
-		end if;
-
-		if pfetch_i.valid = '1' then
-			v.wid := to_integer(unsigned(v.fpc(pfetch_depth downto 1)));
-			v.rid := to_integer(unsigned(v.pc(pfetch_depth downto 1)));
-		end if;
-
-		v.equal := nor_reduce(v.fpc(63 downto 3) xor v.pc(63 downto 3));
-		v.full := nor_reduce(v.fpc(pfetch_depth downto 3) xor v.pc(pfetch_depth downto 3));
-
-		if v.equal = '1' then
-			v.wren := '1';
-			v.rden := '0';
-		elsif v.full = '1' then
-			v.wren := '0';
-		elsif v.full = '0' then
-			v.wren := '1';
-			v.rden := '1';
-		end if;
-
-		if pfetch_i.mem_ready = '1' then
-			if v.wren = '1' then
-				v.wrbuf := '1';
-				v.fpc := std_logic_vector(unsigned(v.fpc) + 8);
-			end if;
-		elsif pfetch_i.mem_ready = '0' then
-			if v.wren = '1' then
-				v.wrdis := '1';
-			end if;
-		end if;
-
-		if pfetch_i.jump = '1' then
-			v.fpc := v.npc(63 downto 3) & "000";
-		end if;
-
-		pbuffer_i.raddr <= v.rid;
-
-		if v.rden = '1' then
-			if v.rid = 2**pfetch_depth-1 then
-				if (v.wid = 0) then
-					if v.wrdis = '1' then
-						v.stall := '1';
-					else
-						v.instr := pfetch_i.mem_rdata(15 downto 0) & pbuffer_o.rdata(15 downto 0);
-					end if;
-				else
-					v.instr := pbuffer_o.rdata;
-				end if;
-			else
-				if v.wid = (v.rid+1) then
-					if v.wrdis = '1' then
-						v.stall := '1';
-					else
-						v.instr := pfetch_i.mem_rdata(15 downto 0) & pbuffer_o.rdata(15 downto 0);
-					end if;
-				else
-					v.instr := pbuffer_o.rdata;
-				end if;
-			end if;
-		elsif pfetch_i.mem_ready = '1' then
-			if v.pc(2 downto 1) = "00" then
-				v.instr := pfetch_i.mem_rdata(31 downto 0);
-			elsif v.pc(2 downto 1) = "01" then
-				v.instr := pfetch_i.mem_rdata(47 downto 16);
-			elsif v.pc(2 downto 1) = "10" then
-				v.instr := pfetch_i.mem_rdata(63 downto 32);
-			elsif v.pc(2 downto 1) = "11" then
-				if and_reduce(pfetch_i.mem_rdata(49 downto 48)) = '0' then
-					v.instr := X"0000" & pfetch_i.mem_rdata(63 downto 48);
-				else
-					v.stall := '1';
-				end if;
-			end if;
-		elsif pfetch_i.mem_ready = '0' then
-			v.stall := '1';
-		end if;
-
-		pfetch_o.fpc <= v.fpc;
-		pfetch_o.instr <= v.instr;
-		pfetch_o.stall <= v.stall;
-
-		pbuffer_i.wren <= v.wrbuf;
-		pbuffer_i.waddr <= v.wid;
-		pbuffer_i.wdata <= pfetch_i.mem_rdata;
-
-		rin <= v;
-
-	end process;
-
-	process(clock)
-
-	begin
-
-		if rising_edge(clock) then
-
-			if reset = '0' then
-
-				r <= init_reg;
-
-			else
-
-				r <= rin;
-
-			end if;
-
-		end if;
-
-	end process;
+	prectrl_comp : prectrl
+		port map(
+			reset     => reset,
+			clock     => clock,
+			pctrl_i   => pfetch_i,
+			pctrl_o   => pfetch_o,
+			pbuffer_i => pbuffer_i,
+			pbuffer_o => pbuffer_o
+		);
 
 end architecture;
