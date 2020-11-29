@@ -27,40 +27,42 @@ end ctrl;
 
 architecture behavior of ctrl is
 
-	type state_type is (HIT,MISS,UPDATE);
+	type state_type is (HIT,MISS,UPDATE,INVALIDATE);
 
 	type ctrl_type is record
-		state : state_type;
-		count : integer range 0 to 3;
-		addr  : std_logic_vector(63 downto 0);
-		valid : std_logic;
-		tag   : std_logic_vector(58-set_depth downto 0);
-		cline : std_logic_vector(255 downto 0);
-		sid   : integer range 0 to 2**set_depth-1;
-		lid   : integer range 0 to 4;
-		wid   : integer range 0 to 7;
-		wvec  : std_logic_vector(7 downto 0);
-		hit   : std_logic;
-		miss  : std_logic;
-		en    : std_logic;
-		wen   : std_logic_vector(7 downto 0);
+		state   : state_type;
+		count   : integer range 0 to 3;
+		addr    : std_logic_vector(63 downto 0);
+		invalid : std_logic;
+		valid   : std_logic;
+		tag     : std_logic_vector(58-set_depth downto 0);
+		cline   : std_logic_vector(255 downto 0);
+		sid     : integer range 0 to 2**set_depth-1;
+		lid     : integer range 0 to 4;
+		wid     : integer range 0 to 7;
+		wvec    : std_logic_vector(7 downto 0);
+		hit     : std_logic;
+		miss    : std_logic;
+		en      : std_logic;
+		wen     : std_logic_vector(7 downto 0);
 	end record;
 
 	constant init_ctrl_type : ctrl_type := (
-		state => HIT,
-		count => 0,
-		addr  => (others => '0'),
-		valid => '0',
-		tag   => (others => '0'),
-		cline => (others => '0'),
-		sid   => 0,
-		lid   => 0,
-		wid   => 0,
-		wvec  => (others => '0'),
-		hit   => '0',
-		miss  => '0',
-		en    => '0',
-		wen   => (others => '0')
+		state   => HIT,
+		count   => 0,
+		addr    => (others => '0'),
+		valid   => '0',
+		invalid => '0',
+		tag     => (others => '0'),
+		cline   => (others => '0'),
+		sid     => 0,
+		lid     => 0,
+		wid     => 0,
+		wvec    => (others => '0'),
+		hit     => '0',
+		miss    => '0',
+		en      => '0',
+		wen     => (others => '0')
 	);
 
 	type data_type is record
@@ -98,6 +100,7 @@ begin
 
 		v.hit := '0';
 		v.miss := '0';
+		v.invalid := '0';
 
 		case r.state is
 
@@ -211,21 +214,40 @@ begin
 
 				end if;
 
-				if cache_i.mem_spec = '1' then
-					v.state := HIT;
-				end if;
-
 			when UPDATE =>
 
 				v.wen(v.wid) := '1';
 				v.wvec(v.wid) := '1';
 				v.state := HIT;
 
+			when INVALIDATE =>
+
+				v.wen := (others => '0');
+				v.wvec := (others => '0');
+				v.invalid := '1';
+				if v.sid = 2**set_depth-1 then
+					v.state := HIT;
+				else
+					v.sid := v.sid+1;
+				end if;
+
 			when others =>
 
 				null;
 
 		end case;
+
+		if reset = '1' then
+			v.sid := 0;
+			v.state := INVALIDATE;
+		elsif (cache_i.mem_valid and cache_i.mem_invalid) = '1' then
+			v.sid := 0;
+			v.state := INVALIDATE;
+		end if;
+
+		if (cache_i.mem_valid and cache_i.mem_spec) = '1' then
+			v.state := HIT;
+		end if;
 
 		ctrl_o.data0_i.waddr <= v.sid;
 		ctrl_o.data1_i.waddr <= v.sid;
@@ -282,7 +304,7 @@ begin
 		ctrl_o.tag7_i.wdata <= v.tag;
 
 		ctrl_o.valid_i.waddr <= v.sid;
-		ctrl_o.valid_i.wen <= or_reduce(v.wen);
+		ctrl_o.valid_i.wen <= or_reduce(v.wen) or v.invalid;
 		ctrl_o.valid_i.wdata <= v.wvec;
 
 		ctrl_o.lru_i.sid <= v.sid;
