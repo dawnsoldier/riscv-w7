@@ -127,20 +127,21 @@ $ANALYS $DIR/vhdl/cache/ctrl.vhd
 $SYNTAX $DIR/vhdl/cache/cache.vhd
 $ANALYS $DIR/vhdl/cache/cache.vhd
 
-$SYNTAX $DIR/vhdl/speedup/prefetch.vhd
-$ANALYS $DIR/vhdl/speedup/prefetch.vhd
-$SYNTAX $DIR/vhdl/speedup/prectrl.vhd
-$ANALYS $DIR/vhdl/speedup/prectrl.vhd
-$SYNTAX $DIR/vhdl/speedup/prebuffer.vhd
-$ANALYS $DIR/vhdl/speedup/prebuffer.vhd
-$SYNTAX $DIR/vhdl/speedup/bht.vhd
-$ANALYS $DIR/vhdl/speedup/bht.vhd
-$SYNTAX $DIR/vhdl/speedup/btb.vhd
-$ANALYS $DIR/vhdl/speedup/btb.vhd
-$SYNTAX $DIR/vhdl/speedup/ras.vhd
-$ANALYS $DIR/vhdl/speedup/ras.vhd
-$SYNTAX $DIR/vhdl/speedup/bp.vhd
-$ANALYS $DIR/vhdl/speedup/bp.vhd
+$SYNTAX $DIR/vhdl/prefetch/prefetch.vhd
+$ANALYS $DIR/vhdl/prefetch/prefetch.vhd
+$SYNTAX $DIR/vhdl/prefetch/prectrl.vhd
+$ANALYS $DIR/vhdl/prefetch/prectrl.vhd
+$SYNTAX $DIR/vhdl/prefetch/prebuffer.vhd
+$ANALYS $DIR/vhdl/prefetch/prebuffer.vhd
+
+$SYNTAX $DIR/vhdl/bp/bht.vhd
+$ANALYS $DIR/vhdl/bp/bht.vhd
+$SYNTAX $DIR/vhdl/bp/btb.vhd
+$ANALYS $DIR/vhdl/bp/btb.vhd
+$SYNTAX $DIR/vhdl/bp/ras.vhd
+$ANALYS $DIR/vhdl/bp/ras.vhd
+$SYNTAX $DIR/vhdl/bp/bp.vhd
+$ANALYS $DIR/vhdl/bp/bp.vhd
 
 $SYNTAX $DIR/vhdl/tb/bram_mem.vhd
 $ANALYS $DIR/vhdl/tb/bram_mem.vhd

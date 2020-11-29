@@ -11,8 +11,8 @@ use work.wire.all;
 
 entity cache is
 	generic(
-		icache_enable : boolean := icache_enable;
-		set_depth     : integer := set_depth
+		icache_enable    : boolean := icache_enable;
+		icache_set_depth : integer := icache_set_depth
 	);
 	port(
 		reset   : in  std_logic;

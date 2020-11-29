@@ -11,7 +11,7 @@ use work.wire.all;
 
 entity hit is
 	generic(
-		set_depth  : integer := set_depth
+		icache_set_depth : integer := icache_set_depth
 	);
 	port(
 		reset : in  std_logic;
