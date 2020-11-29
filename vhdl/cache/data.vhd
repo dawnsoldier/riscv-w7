@@ -27,9 +27,11 @@ architecture behavior of data is
 
 	signal data_array : data_type := (others => (others => '0'));
 
+	signal rdata : std_logic_vector(255 downto 0);
+
 begin
 
-	data_o.rdata <= data_array(data_i.raddr);
+	data_o.rdata <= rdata;
 
 	process(clock)
 
@@ -40,6 +42,8 @@ begin
 		if data_i.wen = '1' then
 			data_array(data_i.waddr) <= data_i.wdata;
 		end if;
+
+		rdata <= data_array(data_i.raddr);
 
 	end if;
 
