@@ -8,7 +8,7 @@ package configure is
 
 	constant bram_depth       : integer := 12;
 
-	constant icache_enable    : boolean := false;
+	constant icache_enable    : boolean := true;
 	constant icache_set_depth : integer := 6;
 
 	constant bp_enable        : boolean := true;
