@@ -467,25 +467,96 @@ size_t strnlen(const char *s, size_t n)
     p++;
   return p - s;
 }
-
 int strcmp(const char* s1, const char* s2)
 {
-  unsigned char c1, c2;
+  int inc = sizeof(long);
 
-  do {
-    c1 = *s1++;
-    c2 = *s2++;
-  } while (c1 != 0 && c1 == c2);
+  while ((((long)s1 | (long)s2) & 3) != 0)
+  {
+    char c1 = *(s1++);
+    char c2 = *(s2++);
 
-  return c1 - c2;
+    if (c1 != c2)
+      return c1 < c2 ? -1 : +1;
+    else if (!c1)
+      return 0;
+  }
+
+  while(1)
+  {
+    long v1 = *(long*)s1;
+    long v2 = *(long*)s2;
+
+    if (__builtin_expect(v1 != v2, 0))
+    {
+      char c1, c2;
+      int i = 0;
+
+      while(i<inc-1)
+      {
+        c1 = v1 & 0xff, c2 = v2 & 0xff;
+        if (c1 != c2)
+          return c1 < c2 ? -1 : +1;
+        if (!c1)
+          return 0;
+        v1 = v1 >> 8, v2 = v2 >> 8;
+
+        i++;
+      }
+
+      c1 = v1 & 0xff, c2 = v2 & 0xff;
+      if (c1 != c2)
+        return c1 < c2 ? -1 : +1;
+      return 0;
+    }
+
+    if (__builtin_expect((((v1) - 0x0101010101010101UL) & ~(v1) & 0x8080808080808080UL), 0))
+      return 0;
+
+    s1 += inc;
+    s2 += inc;
+
+  }
 }
 
 char* strcpy(char* dest, const char* src)
 {
-  char* d = dest;
-  while ((*d++ = *src++))
-    ;
-  return dest;
+  char* r = dest;
+  int inc = sizeof(long);
+
+  while ((((long)dest | (long)src) & 3) != 0)
+  {
+    char c = *(src++);
+    *(dest++) = c;
+    if (!c)
+      return r;
+  }
+
+  while(1)
+  {
+    long v = *(long*)src;
+    int i = 0;
+
+    if (__builtin_expect((((v) - 0x0101010101010101UL) & ~(v) & 0x8080808080808080UL), 0))
+    {
+      while(i<inc-1)
+      {
+        dest[i] = v & 0xff;
+        if ((v & 0xff) == 0)
+          return r;
+        v = v >> 8;
+
+        i++;
+      }
+      dest[i] = v & 0xff;
+      return r;
+    }
+
+    *(long*)dest = v;
+    src += inc;
+    dest += inc;
+
+  }
 }
 
 long atol(const char* str)
