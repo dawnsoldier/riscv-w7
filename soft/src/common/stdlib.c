@@ -467,96 +467,143 @@ size_t strnlen(const char *s, size_t n)
     p++;
   return p - s;
 }
-int strcmp(const char* s1, const char* s2)
+
+static __inline__ unsigned long detect_null_byte (unsigned long w)
 {
-  int inc = sizeof(long);
-
-  while ((((long)s1 | (long)s2) & 3) != 0)
-  {
-    char c1 = *(s1++);
-    char c2 = *(s2++);
-
-    if (c1 != c2)
-      return c1 < c2 ? -1 : +1;
-    else if (!c1)
-      return 0;
-  }
-
-  while(1)
-  {
-    long v1 = *(long*)s1;
-    long v2 = *(long*)s2;
-
-    if (__builtin_expect(v1 != v2, 0))
-    {
-      char c1, c2;
-      int i = 0;
-
-      while(i<inc-1)
-      {
-        c1 = v1 & 0xff, c2 = v2 & 0xff;
-        if (c1 != c2)
-          return c1 < c2 ? -1 : +1;
-        if (!c1)
-          return 0;
-        v1 = v1 >> 8, v2 = v2 >> 8;
-
-        i++;
-      }
-
-      c1 = v1 & 0xff, c2 = v2 & 0xff;
-      if (c1 != c2)
-        return c1 < c2 ? -1 : +1;
-      return 0;
-    }
-
-    if (__builtin_expect((((v1) - 0x0101010101010101UL) & ~(v1) & 0x8080808080808080UL), 0))
-      return 0;
-
-    s1 += inc;
-    s2 += inc;
-
-  }
+  unsigned long mask = 0x7f7f7f7f;
+  if (sizeof (long) == 8)
+    mask = ((mask << 16) << 16) | mask;
+  return ~(((w & mask) + mask) | w | mask);
 }
 
-char* strcpy(char* dest, const char* src)
+#undef strcmp
+
+int strcmp(const char* s1, const char* s2)
 {
-  char* r = dest;
-  int inc = sizeof(long);
-
-  while ((((long)dest | (long)src) & 3) != 0)
+  int misaligned = ((uintptr_t)s1 | (uintptr_t)s2) & (sizeof(long)-1);
+  if (__builtin_expect(!misaligned, 1))
   {
-    char c = *(src++);
-    *(dest++) = c;
-    if (!c)
-      return r;
-  }
+    const long* ls1 = (const long*)s1;
 
-  while(1)
-  {
-    long v = *(long*)src;
-    int i = 0;
-
-    if (__builtin_expect((((v) - 0x0101010101010101UL) & ~(v) & 0x8080808080808080UL), 0))
+    while(!detect_null_byte(*ls1))
     {
-      while(i<inc-1)
+      long v1 = *(long*)s1;
+      long v2 = *(long*)s2;
+
+      if (__builtin_expect(v1 != v2, 0))
       {
-        dest[i] = v & 0xff;
-        if ((v & 0xff) == 0)
-          return r;
-        v = v >> 8;
+        char c1,c2;
 
-        i++;
+        c1 = v1 & 0xff, c2 = v2 & 0xff;
+        if (c1 != c2) return c1 < c2 ? -1 : +1;
+        if (!c1) return 0;
+        v1 = v1 >> 8, v2 = v2 >> 8;
+
+        c1 = v1 & 0xff, c2 = v2 & 0xff;
+        if (c1 != c2) return c1 < c2 ? -1 : +1;
+        if (!c1) return 0;
+        v1 = v1 >> 8, v2 = v2 >> 8;
+
+        c1 = v1 & 0xff, c2 = v2 & 0xff;
+        if (c1 != c2) return c1 < c2 ? -1 : +1;
+        if (!c1) return 0;
+        v1 = v1 >> 8, v2 = v2 >> 8;
+
+        if (sizeof(long) == 4) goto out;
+
+        c1 = v1 & 0xff, c2 = v2 & 0xff;
+        if (c1 != c2) return c1 < c2 ? -1 : +1;
+        if (!c1) return 0;
+        v1 = v1 >> 8, v2 = v2 >> 8;
+
+        c1 = v1 & 0xff, c2 = v2 & 0xff;
+        if (c1 != c2) return c1 < c2 ? -1 : +1;
+        if (!c1) return 0;
+        v1 = v1 >> 8, v2 = v2 >> 8;
+
+        c1 = v1 & 0xff, c2 = v2 & 0xff;
+        if (c1 != c2) return c1 < c2 ? -1 : +1;
+        if (!c1) return 0;
+        v1 = v1 >> 8, v2 = v2 >> 8;
+
+        c1 = v1 & 0xff, c2 = v2 & 0xff;
+        if (c1 != c2) return c1 < c2 ? -1 : +1;
+        if (!c1) return 0;
+        v1 = v1 >> 8, v2 = v2 >> 8;
+
+  out:
+        c1 = v1 & 0xff, c2 = v2 & 0xff;
+        if (c1 != c2) return c1 < c2 ? -1 : +1;
+        return 0;
       }
-      dest[i] = v & 0xff;
-      return r;
+
+      s1 += sizeof(long);
+      s2 += sizeof(long);
     }
-
-    *(long*)dest = v;
-    src += inc;
-    dest += inc;
-
   }
+  char c1;
+  char c2;
+  do
+  {
+    c1 = *(s1++);
+  	c2 = *(s2++);
+    if (c1 != c2)
+    {
+      return c1 < c2 ? -1 : 1;
+    }
+  } while(c1);
+  return 0;
+}
+
+#undef strcpy
+
+char* strcpy(char* dst, const char* src)
+{
+  char* dst0 = dst;
+
+  int misaligned = ((uintptr_t)dst | (uintptr_t)src) & (sizeof(long)-1);
+  if (__builtin_expect(!misaligned, 1))
+  {
+    long* ldst = (long*)dst;
+    const long* lsrc = (const long*)src;
+
+    while (!detect_null_byte(*lsrc))
+      *ldst++ = *lsrc++;
+
+    dst = (char*)ldst;
+    src = (const char*)lsrc;
+
+    char c0 = src[0];
+    char c1 = src[1];
+    char c2 = src[2];
+    if (!(*dst++ = c0)) return dst0;
+    if (!(*dst++ = c1)) return dst0;
+    char c3 = src[3];
+    if (!(*dst++ = c2)) return dst0;
+    if (sizeof(long) == 4) goto out;
+    char c4 = src[4];
+    if (!(*dst++ = c3)) return dst0;
+    char c5 = src[5];
+    if (!(*dst++ = c4)) return dst0;
+    char c6 = src[6];
+    if (!(*dst++ = c5)) return dst0;
+    if (!(*dst++ = c6)) return dst0;
+
+out:
+    *dst++ = 0;
+    return dst0;
+  }
+
+  char ch;
+  do
+  {
+    ch = *src;
+    src++;
+    dst++;
+    *(dst-1) = ch;
+  } while(ch);
+
+  return dst0;
 }
 
 long atol(const char* str)
