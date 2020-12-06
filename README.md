@@ -1,6 +1,6 @@
 # RISCV Z7 CPU #
 
-RISCV Z7 CPU supports riscv64-imfdc instruction set architecture and is implemented with 5-stage pipeline. It contains dynamic branch prediction (gshare) and simple prefetching unit.
+RISCV Z7 CPU supports riscv64-imfdc instruction set architecture and is implemented with 5-stage pipeline. It contains dynamic branch prediction (gshare), simple prefetching unit and instruction cache.
 
 ## Dhrystone Benchmark ##
 | Cycles | Dhrystone/s/MHz | DMIPS/s/MHz | Iteration |
