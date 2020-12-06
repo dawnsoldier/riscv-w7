@@ -5,8 +5,8 @@ bld_dir = $(BASEDIR)/build/dhrystone/elf
 obj = $(wildcard $(src_dir)/common/*.S) $(wildcard $(src_dir)/common/*.c) $(wildcard $(src_dir)/dhrystone/*.c)
 
 RISCV_GCC ?= $(RISCV)/riscv64-unknown-elf-gcc
-RISCV_GCC_OPTS ?= -march=$(MARCH) -mabi=$(MABI) -g -DPREALLOCATE=1 -mcmodel=medany -static -std=gnu99 -O3 -ffast-math -fno-common -fno-builtin-printf
-RISCV_LINK_OPTS ?= -static -nostdlib -nostartfiles -lm -lgcc -T $(src_dir)/common/test.ld
+RISCV_GCC_OPTS ?= -march=$(MARCH) -mabi=$(MABI) -g -DPREALLOCATE=1 -mcmodel=medany -static -std=gnu99 -O3 -ffast-math -fno-common -fno-math-errno
+RISCV_LINK_OPTS ?= -static -nostdlib -nostartfiles -lm -lc -lgcc -T $(src_dir)/common/test.ld
 RISCV_OBJDUMP ?= $(RISCV)/riscv64-unknown-elf-objdump -S -Mnumeric,no-aliases --disassemble-all --disassemble-zeroes
 RISCV_OBJCOPY ?= $(RISCV)/riscv64-unknown-elf-objcopy -O binary
 RISCV_INCL ?= -I$(src_dir)/env -I$(src_dir)/dhrystone -I$(src_dir)/common

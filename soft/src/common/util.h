@@ -3,11 +3,12 @@
 #ifndef __UTIL_H
 #define __UTIL_H
 
-extern void setStats(int enable);
-
-#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 
 #define static_assert(cond) switch(0) { case 0: case !!(long)(cond): ; }
+
+extern void setStats(int enable);
 
 static int verify(int n, const volatile int* test, const int* verify)
 {

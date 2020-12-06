@@ -6,7 +6,7 @@ use ieee.numeric_std.all;
 
 package configure is
 
-	constant bram_depth       : integer := 13;
+	constant bram_depth       : integer := 14;
 
 	constant icache_enable    : boolean := true;
 	constant icache_set_depth : integer := 6;

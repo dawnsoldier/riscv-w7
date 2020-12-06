@@ -614,13 +614,13 @@ package wire is
 	end record;
 
 	type prefetch_in_type is record
-		pc        : std_logic_vector(63 downto 0);
-		npc       : std_logic_vector(63 downto 0);
-		jump      : std_logic;
-		fence     : std_logic;
-		valid     : std_logic;
-		mem_rdata : std_logic_vector(63 downto 0);
-		mem_ready : std_logic;
+		pc    : std_logic_vector(63 downto 0);
+		npc   : std_logic_vector(63 downto 0);
+		spec  : std_logic;
+		fence : std_logic;
+		valid : std_logic;
+		rdata : std_logic_vector(63 downto 0);
+		ready : std_logic;
 	end record;
 
 	type prefetch_out_type is record

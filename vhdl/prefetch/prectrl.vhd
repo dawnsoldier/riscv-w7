@@ -99,18 +99,18 @@ begin
 			v.rden := '1';
 		end if;
 
-		if pctrl_i.mem_ready = '1' then
+		if pctrl_i.ready = '1' then
 			if v.wren = '1' then
 				v.wrbuf := '1';
 				v.fpc := std_logic_vector(unsigned(v.fpc) + 8);
 			end if;
-		elsif pctrl_i.mem_ready = '0' then
+		elsif pctrl_i.ready = '0' then
 			if v.wren = '1' then
 				v.wrdis := '1';
 			end if;
 		end if;
 
-		if pctrl_i.jump = '1' then
+		if pctrl_i.spec = '1' then
 			v.fpc := v.npc(63 downto 3) & "000";
 		end if;
 
@@ -122,7 +122,7 @@ begin
 					if v.wrdis = '1' then
 						v.stall := '1';
 					else
-						v.instr := pctrl_i.mem_rdata(15 downto 0) & pbuffer_o.rdata(15 downto 0);
+						v.instr := pctrl_i.rdata(15 downto 0) & pbuffer_o.rdata(15 downto 0);
 					end if;
 				else
 					v.instr := pbuffer_o.rdata;
@@ -132,27 +132,27 @@ begin
 					if v.wrdis = '1' then
 						v.stall := '1';
 					else
-						v.instr := pctrl_i.mem_rdata(15 downto 0) & pbuffer_o.rdata(15 downto 0);
+						v.instr := pctrl_i.rdata(15 downto 0) & pbuffer_o.rdata(15 downto 0);
 					end if;
 				else
 					v.instr := pbuffer_o.rdata;
 				end if;
 			end if;
-		elsif pctrl_i.mem_ready = '1' then
+		elsif pctrl_i.ready = '1' then
 			if v.pc(2 downto 1) = "00" then
-				v.instr := pctrl_i.mem_rdata(31 downto 0);
+				v.instr := pctrl_i.rdata(31 downto 0);
 			elsif v.pc(2 downto 1) = "01" then
-				v.instr := pctrl_i.mem_rdata(47 downto 16);
+				v.instr := pctrl_i.rdata(47 downto 16);
 			elsif v.pc(2 downto 1) = "10" then
-				v.instr := pctrl_i.mem_rdata(63 downto 32);
+				v.instr := pctrl_i.rdata(63 downto 32);
 			elsif v.pc(2 downto 1) = "11" then
-				if and_reduce(pctrl_i.mem_rdata(49 downto 48)) = '0' then
-					v.instr := X"0000" & pctrl_i.mem_rdata(63 downto 48);
+				if and_reduce(pctrl_i.rdata(49 downto 48)) = '0' then
+					v.instr := X"0000" & pctrl_i.rdata(63 downto 48);
 				else
 					v.stall := '1';
 				end if;
 			end if;
-		elsif pctrl_i.mem_ready = '0' then
+		elsif pctrl_i.ready = '0' then
 			v.stall := '1';
 		end if;
 
@@ -162,7 +162,7 @@ begin
 
 		pbuffer_i.wren <= v.wrbuf;
 		pbuffer_i.waddr <= v.wid;
-		pbuffer_i.wdata <= pctrl_i.mem_rdata;
+		pbuffer_i.wdata <= pctrl_i.rdata;
 
 		rin <= v;
 

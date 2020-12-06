@@ -2,7 +2,7 @@ default: none
 
 GHDL ?= /opt/ghdl/bin/ghdl
 RISCV ?= /opt/riscv64/bin
-MARCH ?= rv64imfd
+MARCH ?= rv64imfdc
 MABI ?= lp64d
 ITER ?= 1
 CSMITH ?= /opt/csmith
@@ -10,7 +10,7 @@ CSMITH_INCL ?= $(shell ls -d $(CSMITH)/include/csmith-* | head -n1)
 GCC ?= /usr/bin/gcc
 PYTHON ?= /usr/bin/python2
 BASEDIR ?= $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
-OFFSET ?= 0x10000 # Number of dwords in blockram (address range is OFFSET * 8)
+OFFSET ?= 0x20000 # Number of dwords in blockram (address range is OFFSET * 8)
 TEST ?= dhrystone
 CYCLES ?= 1000000000
 WAVE ?= "" # "wave" for saving dump file

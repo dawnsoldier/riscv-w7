@@ -49,17 +49,20 @@ begin
 		v := r;
 
 		v.valid := not d.w.clear;
-		v.stall := not(icache_o.mem_ready) or d.d.stall or d.e.stall or d.m.stall or d.w.stall or d.w.clear;
+		-- v.stall := not(icache_o.mem_ready) or d.d.stall or d.e.stall or d.m.stall or d.w.stall or d.w.clear;
+		v.stall := pfetch_o.stall or d.d.stall or d.e.stall or d.m.stall or d.w.stall or d.w.clear;
 		v.clear := csr_eo.exc or csr_eo.mret or d.w.clear;
 
-		v.instr := nop;
-		if icache_o.mem_ready = '1' then
-			if v.pc(2) = '0' then
-				v.instr := icache_o.mem_rdata(31 downto 0);
-			elsif v.pc(2) = '1' then
-				v.instr := icache_o.mem_rdata(63 downto 32);
-			end if;
-		end if;
+		-- v.instr := nop;
+		-- if icache_o.mem_ready = '1' then
+		-- 	if v.pc(2) = '0' then
+		-- 		v.instr := icache_o.mem_rdata(31 downto 0);
+		-- 	elsif v.pc(2) = '1' then
+		-- 		v.instr := icache_o.mem_rdata(63 downto 32);
+		-- 	end if;
+		-- end if;
+
+		v.instr := pfetch_o.instr;
 
 		if and_reduce(v.instr(1 downto 0)) = '0' then
 			v.inc := "010";
@@ -124,11 +127,11 @@ begin
 
 		pfetch_i.pc <= r.pc;
 		pfetch_i.npc <= v.pc;
-		pfetch_i.jump <= v.spec;
+		pfetch_i.spec <= v.spec;
 		pfetch_i.fence <= d.d.fence;
 		pfetch_i.valid <= v.valid;
-		pfetch_i.mem_rdata <= icache_o.mem_rdata;
-		pfetch_i.mem_ready <= icache_o.mem_ready;
+		pfetch_i.rdata <= icache_o.mem_rdata;
+		pfetch_i.ready <= icache_o.mem_ready;
 
 		ipmp_i.mem_valid <= v.valid;
 		ipmp_i.mem_instr <= '1';
@@ -150,7 +153,8 @@ begin
 		icache_i.mem_instr <= '1';
 		icache_i.mem_spec <= v.spec;
 		icache_i.mem_invalid <= d.d.fence;
-		icache_i.mem_addr <= v.pc;
+		-- icache_i.mem_addr <= v.pc;
+		icache_i.mem_addr <= pfetch_o.fpc;
 		icache_i.mem_wdata <= (others => '0');
 		icache_i.mem_wstrb <= (others => '0');
 

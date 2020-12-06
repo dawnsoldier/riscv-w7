@@ -4,8 +4,8 @@ src_dir = $(BASEDIR)/soft/src
 bld_dir = $(BASEDIR)/build/coremark/elf
 obj = $(wildcard $(src_dir)/common/*.S) $(wildcard $(src_dir)/common/*.c) $(wildcard $(src_dir)/coremark/*.c) $(wildcard $(src_dir)/coremark_portme/*.c)
 RISCV_GCC ?= $(RISCV)/riscv64-unknown-elf-gcc
-RISCV_GCC_OPTS ?= -g -march=$(MARCH) -mabi=$(MABI) -DPREALLOCATE=1 -mcmodel=medany -static -std=gnu99 -O3 -funroll-all-loops -finline-functions -ffast-math -fno-common -fno-builtin-printf -fno-builtin
-RISCV_LINK_OPTS ?= -static -nostdlib -nostartfiles -lm -lgcc -T $(src_dir)/common/test.ld
+RISCV_GCC_OPTS ?= -g -march=$(MARCH) -mabi=$(MABI) -DPREALLOCATE=1 -mcmodel=medany -static -std=gnu99 -O3 -funroll-all-loops -finline-functions -ffast-math -fno-common -fno-math-errno
+RISCV_LINK_OPTS ?= -static -nostdlib -nostartfiles -lm -lc -lgcc -T $(src_dir)/common/test.ld
 RISCV_OBJDUMP ?= $(RISCV)/riscv64-unknown-elf-objdump -S -Mnumeric,no-aliases --disassemble-all --disassemble-zeroes
 RISCV_OBJCOPY ?= $(RISCV)/riscv64-unknown-elf-objcopy -O binary
 RISCV_INCL ?= -I$(src_dir)/env -I$(src_dir)/coremark -I$(src_dir)/coremark_portme -I$(src_dir)/common
