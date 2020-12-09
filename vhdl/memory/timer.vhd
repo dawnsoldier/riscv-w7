@@ -130,11 +130,7 @@ begin
 
 		if (rising_edge(rtc)) then
 
-			if (reset = '0') then
-				mtime <= (others => '0');
-			else
-				mtime <= std_logic_vector(unsigned(mtime) + 1);
-			end if;
+			mtime <= std_logic_vector(unsigned(mtime) + 1);
 
 		end if;
 
