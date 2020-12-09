@@ -44,29 +44,19 @@ begin
 	begin
 
 		if (rising_edge(clk)) then
-
-			if rst = '0' then
-				rtc   <= '0';
+			if count = clk_divider_rtc then
+				rtc <= not rtc;
 				count <= (others => '0');
-
-				clk_pll   <= '0'; 
-				count_pll <= (others => '0');
 			else
-				if count = clk_divider_rtc then
-					rtc <= not rtc;
-					count <= (others => '0');
-				else
-					count <= count + 1;
-				end if;
-
-				if count_pll = clk_divider_pll then
-					clk_pll <= not clk_pll;
-					count_pll <= (others => '0');
-				else
-					count_pll <= count_pll + 1;
-				end if;
+				count <= count + 1;
 			end if;
 
+			if count_pll = clk_divider_pll then
+				clk_pll <= not clk_pll;
+				count_pll <= (others => '0');
+			else
+				count_pll <= count_pll + 1;
+			end if;
 		end if;
 
 	end process;
