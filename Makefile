@@ -1,7 +1,7 @@
 default: none
 
 GHDL ?= /opt/ghdl/bin/ghdl
-RISCV ?= /opt/riscv64/bin
+RISCV ?= /opt/riscv/bin
 MARCH ?= rv64imfdc
 MABI ?= lp64d
 ITER ?= 1
