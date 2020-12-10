@@ -80,7 +80,7 @@ begin
 
 		v.ready_tx := '0';
 
-		if (uart_valid = '1' and or_reduce(uart_wstrb) = '1') then
+		if (uart_valid = '1' and or_reduce(uart_wstrb) = '1' and r_tx.state_tx = x"0") then
 			v.data_tx := "1" & uart_wdata(7 downto 0) & "0";
 			v.state_tx := x"1";
 		end if;
@@ -121,7 +121,7 @@ begin
 		v.ready_re := '0';
 		v.ready_rx := '0';
 
-		if (uart_valid = '1' and or_reduce(uart_wstrb) = '0') then
+		if (uart_valid = '1' and or_reduce(uart_wstrb) = '0' and r_rx.state_rx = x"0") then
 			v.state_re := '1';
 		end if;
 
