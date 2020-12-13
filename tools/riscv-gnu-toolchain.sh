@@ -12,7 +12,7 @@ sudo chown -R $USER $RISCV_PATH/
 
 sudo apt-get install git autoconf automake autotools-dev curl libmpc-dev \
   libmpfr-dev libgmp-dev gawk build-essential bison flex texinfo gperf libtool \
-  patchutils bc zlib1g-dev libexpat-dev texinfo
+  patchutils bc zlib1g-dev libexpat-dev texinfo python
 
 if [ -d "riscv-gnu-toolchain" ]; then
   rm -rf riscv-gnu-toolchain/
