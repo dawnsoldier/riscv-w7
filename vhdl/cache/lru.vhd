@@ -11,7 +11,8 @@ use work.wire.all;
 
 entity lru is
 	generic(
-		icache_set_depth : integer := icache_set_depth
+		cache_type      : integer;
+		cache_set_depth : integer
 	);
 	port(
 		reset : in  std_logic;
@@ -26,7 +27,7 @@ architecture behavior of lru is
 	constant LEFT  : std_logic := '0';
 	constant RIGHT : std_logic := '1';
 
-	type lru_type is array (0 to 2**icache_set_depth-1) of std_logic_vector(7 downto 0);
+	type lru_type is array (0 to 2**cache_set_depth-1) of std_logic_vector(7 downto 0);
 
 	signal lru_data : lru_type := (others => (others => '0'));
 
@@ -34,7 +35,7 @@ architecture behavior of lru is
 
 	procedure lru_update(
 		signal data  : inout lru_type;
-		signal index : in integer range 0 to 2**icache_set_depth-1;
+		signal index : in integer range 0 to 2**cache_set_depth-1;
 		k1 : integer range 0 to 7;
 		v1 : std_logic;
 		k2 : integer range 0 to 7;
@@ -50,7 +51,7 @@ architecture behavior of lru is
 
 	procedure lru_access(
 		signal data  : inout lru_type;
-		signal index : in integer range 0 to 2**icache_set_depth-1;
+		signal index : in integer range 0 to 2**cache_set_depth-1;
 		acc  : in integer range 0 to 7
 	) is
 	begin
@@ -75,7 +76,7 @@ architecture behavior of lru is
 
 	function lru_get (
 		signal data  : in lru_type;
-		signal index : in integer range 0 to 2**icache_set_depth-1
+		signal index : in integer range 0 to 2**cache_set_depth-1
 	) return integer is
 		variable seek1 : integer range 0 to 7;
 		variable seek2 : integer range 0 to 7;

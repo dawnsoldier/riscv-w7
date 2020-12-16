@@ -11,7 +11,8 @@ use work.wire.all;
 
 entity ctrl is
 	generic(
-		icache_set_depth : integer := icache_set_depth
+		cache_type      : integer;
+		cache_set_depth : integer
 	);
 	port(
 		reset   : in  std_logic;
@@ -35,9 +36,9 @@ architecture behavior of ctrl is
 		addr    : std_logic_vector(63 downto 0);
 		invalid : std_logic;
 		valid   : std_logic;
-		tag     : std_logic_vector(58-icache_set_depth downto 0);
+		tag     : std_logic_vector(58-cache_set_depth downto 0);
 		cline   : std_logic_vector(255 downto 0);
-		sid     : integer range 0 to 2**icache_set_depth-1;
+		sid     : integer range 0 to 2**cache_set_depth-1;
 		lid     : integer range 0 to 4;
 		wid     : integer range 0 to 7;
 		wvec    : std_logic_vector(7 downto 0);
@@ -109,8 +110,8 @@ begin
 				if cache_i.mem_valid = '1' then
 					v.en := cache_i.mem_valid;
 					v.addr := cache_i.mem_addr(63 downto 5) & "00000";
-					v.tag := cache_i.mem_addr(63 downto icache_set_depth+5);
-					v.sid := to_integer(unsigned(cache_i.mem_addr(icache_set_depth+4 downto 5)));
+					v.tag := cache_i.mem_addr(63 downto cache_set_depth+5);
+					v.sid := to_integer(unsigned(cache_i.mem_addr(cache_set_depth+4 downto 5)));
 					v.lid := to_integer(unsigned(cache_i.mem_addr(4 downto 3)));
 				else
 					v.en := '0';
@@ -296,7 +297,7 @@ begin
 		ctrl_o.lru_i.miss <= v.miss;
 
 		if r.state = INVALIDATE then
-			if v.sid = 2**icache_set_depth-1 then
+			if v.sid = 2**cache_set_depth-1 then
 				v.state := HIT;
 			else
 				v.sid := v.sid+1;

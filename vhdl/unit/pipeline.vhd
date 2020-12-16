@@ -210,6 +210,11 @@ architecture behavior of pipeline is
   end component;
 
 	component cache
+		generic(
+			cache_enable    : boolean;
+			cache_type      : integer;
+			cache_set_depth : integer
+		);
 		port(
 			reset   : in  std_logic;
 			clock   : in  std_logic;
@@ -492,6 +497,11 @@ begin
 		);
 
 	icache_comp : cache
+		generic map (
+			cache_enable    => icache_enable,
+			cache_type      => icache_type,
+			cache_set_depth => icache_set_depth
+		)
 		port map(
 			reset   => reset,
 			clock   => clock,

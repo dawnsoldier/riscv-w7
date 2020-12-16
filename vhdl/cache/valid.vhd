@@ -11,7 +11,8 @@ use work.wire.all;
 
 entity valid is
 	generic(
-		icache_set_depth : integer := icache_set_depth
+		cache_type      : integer;
+		cache_set_depth : integer
 	);
 	port(
 		reset   : in  std_logic;
@@ -23,7 +24,7 @@ end valid;
 
 architecture behavior of valid is
 
-	type valid_type is array (0 to 2**icache_set_depth-1) of std_logic_vector(7 downto 0);
+	type valid_type is array (0 to 2**cache_set_depth-1) of std_logic_vector(7 downto 0);
 
 	signal valid_array : valid_type := (others => (others => '0'));
 
