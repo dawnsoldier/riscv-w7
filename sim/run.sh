@@ -237,6 +237,9 @@ then
   if [ "$5" = 'wave' ]
   then
     WAVE="--wave=dhrystone.ghw"
+  elif [ "$5" = 'vcd' ]
+  then
+    WAVE="--vcd=dhrystone.vcd"
   fi
   cp $DIR/build/dhrystone/dat/dhrystone.dat bram_mem.dat
   $SIMULA top_cpu --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
@@ -245,6 +248,9 @@ then
   if [ "$5" = 'wave' ]
   then
     WAVE="--wave=coremark.ghw"
+  elif [ "$5" = 'vcd' ]
+  then
+    WAVE="--vcd=coremark.vcd"
   fi
   cp $DIR/build/coremark/dat/coremark.dat bram_mem.dat
   $SIMULA top_cpu --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
@@ -253,6 +259,9 @@ then
   if [ "$5" = 'wave' ]
   then
     WAVE="--wave=csmith.ghw"
+  elif [ "$5" = 'vcd' ]
+  then
+    WAVE="--vcd=csmith.vcd"
   fi
   cp $DIR/build/csmith/dat/csmith.dat bram_mem.dat
   $SIMULA top_cpu --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
@@ -261,6 +270,9 @@ then
   if [ "$5" = 'wave' ]
   then
     WAVE="--wave=torture.ghw"
+  elif [ "$5" = 'vcd' ]
+  then
+    WAVE="--vcd=torture.vcd"
   fi
   cp $DIR/build/torture/dat/torture.dat bram_mem.dat
   $SIMULA top_cpu --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
@@ -273,6 +285,9 @@ then
     if [ "$5" = 'wave' ]
     then
       WAVE="--wave=${filename}.ghw"
+    elif [ "$5" = 'vcd' ]
+    then
+      WAVE="--vcd=${filename}.vcd"
     fi
     echo "${filename}"
     $SIMULA top_cpu --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
@@ -286,6 +301,9 @@ then
     if [ "$5" = 'wave' ]
     then
       WAVE="--wave=${filename}.ghw"
+    elif [ "$5" = 'vcd' ]
+    then
+      WAVE="--vcd=${filename}.vcd"
     fi
     echo "${filename}"
     $SIMULA top_cpu --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
@@ -299,6 +317,9 @@ then
     if [ "$5" = 'wave' ]
     then
       WAVE="--wave=${filename}.ghw"
+    elif [ "$5" = 'vcd' ]
+    then
+      WAVE="--vcd=${filename}.vcd"
     fi
     echo "${filename}"
     $SIMULA top_cpu --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
@@ -312,6 +333,9 @@ then
     if [ "$5" = 'wave' ]
     then
       WAVE="--wave=${filename}.ghw"
+    elif [ "$5" = 'vcd' ]
+    then
+      WAVE="--vcd=${filename}.vcd"
     fi
     echo "${filename}"
     $SIMULA top_cpu --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
@@ -325,6 +349,9 @@ then
     if [ "$5" = 'wave' ]
     then
       WAVE="--wave=${filename}.ghw"
+    elif [ "$5" = 'vcd' ]
+    then
+      WAVE="--vcd=${filename}.vcd"
     fi
     echo "${filename}"
     $SIMULA top_cpu --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
@@ -338,6 +365,9 @@ then
     if [ "$5" = 'wave' ]
     then
       WAVE="--wave=${filename}.ghw"
+    elif [ "$5" = 'vcd' ]
+    then
+      WAVE="--vcd=${filename}.vcd"
     fi
     echo "${filename}"
     $SIMULA top_cpu --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
@@ -351,6 +381,9 @@ then
     if [ "$5" = 'wave' ]
     then
       WAVE="--wave=${filename}.ghw"
+    elif [ "$5" = 'vcd' ]
+    then
+      WAVE="--vcd=${filename}.vcd"
     fi
     echo "${filename}"
     $SIMULA top_cpu --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
@@ -362,6 +395,9 @@ else
   if [ "$5" = 'wave' ]
   then
     WAVE="--wave=${filename}.ghw"
+  elif [ "$5" = 'vcd' ]
+  then
+    WAVE="--vcd=${filename}.vcd"
   fi
   echo "${filename}"
   $SIMULA top_cpu --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
