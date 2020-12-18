@@ -733,6 +733,17 @@ package wire is
 		rdata :  std_logic_vector(7 downto 0);
 	end record;
 
+	type dirty_in_type is record
+		raddr : integer range 0 to 2**icache_set_depth-1;
+		wen   : std_logic;
+		waddr : integer range 0 to 2**icache_set_depth-1;
+		wdata : std_logic_vector(7 downto 0);
+	end record;
+
+	type dirty_out_type is record
+		rdata :  std_logic_vector(7 downto 0);
+	end record;
+
 	type lru_in_type is record
 		sid   : integer range 0 to 2**icache_set_depth-1;
 		wid   : integer range 0 to 7;
@@ -781,6 +792,7 @@ package wire is
 		tag6_o  : tag_out_type;
 		tag7_o  : tag_out_type;
 		valid_o : valid_out_type;
+		dirty_o : dirty_out_type;
 		lru_o   : lru_out_type;
 		hit_o   : hit_out_type;
 	end record;
@@ -803,6 +815,7 @@ package wire is
 		tag6_i  : tag_in_type;
 		tag7_i  : tag_in_type;
 		valid_i : valid_in_type;
+		dirty_i : dirty_in_type;
 		lru_i   : lru_in_type;
 		hit_i   : hit_in_type;
 	end record;

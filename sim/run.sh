@@ -118,12 +118,16 @@ $SYNTAX $DIR/vhdl/cache/tag.vhd
 $ANALYS $DIR/vhdl/cache/tag.vhd
 $SYNTAX $DIR/vhdl/cache/valid.vhd
 $ANALYS $DIR/vhdl/cache/valid.vhd
+$SYNTAX $DIR/vhdl/cache/dirty.vhd
+$ANALYS $DIR/vhdl/cache/dirty.vhd
 $SYNTAX $DIR/vhdl/cache/hit.vhd
 $ANALYS $DIR/vhdl/cache/hit.vhd
 $SYNTAX $DIR/vhdl/cache/lru.vhd
 $ANALYS $DIR/vhdl/cache/lru.vhd
-$SYNTAX $DIR/vhdl/cache/ctrl.vhd
-$ANALYS $DIR/vhdl/cache/ctrl.vhd
+$SYNTAX $DIR/vhdl/cache/ictrl.vhd
+$ANALYS $DIR/vhdl/cache/ictrl.vhd
+$SYNTAX $DIR/vhdl/cache/dctrl.vhd
+$ANALYS $DIR/vhdl/cache/dctrl.vhd
 $SYNTAX $DIR/vhdl/cache/cache.vhd
 $ANALYS $DIR/vhdl/cache/cache.vhd
 

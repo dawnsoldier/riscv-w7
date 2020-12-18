@@ -66,6 +66,19 @@ architecture behavior of cache is
 		);
 	end component;
 
+	component dirty
+		generic(
+			cache_type      : integer;
+			cache_set_depth : integer
+		);
+		port(
+			reset   : in  std_logic;
+			clock   : in  std_logic;
+			dirty_i : in  dirty_in_type;
+			dirty_o : out dirty_out_type
+		);
+	end component;
+
 	component lru
 		generic(
 			cache_type      : integer;
@@ -92,15 +105,32 @@ architecture behavior of cache is
 		);
 	end component;
 
-	component ctrl
+	component ictrl
 		generic(
 			cache_type      : integer;
 			cache_set_depth : integer
 		);
 		port(
-			reset  : in  std_logic;
-			clock  : in  std_logic;
-			ctrl_i : in  ctrl_in_type;
+			reset   : in  std_logic;
+			clock   : in  std_logic;
+			ctrl_i  : in  ctrl_in_type;
+			ctrl_o  : out ctrl_out_type;
+			cache_i : in  cache_in_type;
+			cache_o : out cache_out_type;
+			mem_o   : in  mem_out_type;
+			mem_i   : out mem_in_type
+		);
+	end component;
+
+	component dctrl
+		generic(
+			cache_type      : integer;
+			cache_set_depth : integer
+		);
+		port(
+			reset   : in  std_logic;
+			clock   : in  std_logic;
+			ctrl_i  : in  ctrl_in_type;
 			ctrl_o  : out ctrl_out_type;
 			cache_i : in  cache_in_type;
 			cache_o : out cache_out_type;
@@ -136,11 +166,23 @@ begin
 
 		valid_comp : valid generic map (cache_type => cache_type, cache_set_depth => cache_set_depth) port map(reset => reset, clock => clock, valid_i => ctrl_o.valid_i, valid_o => ctrl_i.valid_o);
 
+		dirty_comp : dirty generic map (cache_type => cache_type, cache_set_depth => cache_set_depth) port map(reset => reset, clock => clock, dirty_i => ctrl_o.dirty_i, dirty_o => ctrl_i.dirty_o);
+
 		hit_comp : hit generic map (cache_type => cache_type, cache_set_depth => cache_set_depth) port map(reset => reset, clock => clock, hit_i => ctrl_o.hit_i, hit_o => ctrl_i.hit_o);
 
 		lru_comp : lru generic map (cache_type => cache_type, cache_set_depth => cache_set_depth) port map(reset => reset, clock => clock, lru_i => ctrl_o.lru_i, lru_o => ctrl_i.lru_o);
 
-		ctrl_comp : ctrl generic map (cache_type => cache_type, cache_set_depth => cache_set_depth) port map (reset => reset, clock => clock, ctrl_i => ctrl_i, ctrl_o => ctrl_o, cache_i => cache_i, cache_o => cache_o, mem_o => mem_o, mem_i => mem_i);
+		ICACHE : if cache_type = 0 generate
+
+			ictrl_comp : ictrl generic map (cache_type => cache_type, cache_set_depth => cache_set_depth) port map (reset => reset, clock => clock, ctrl_i => ctrl_i, ctrl_o => ctrl_o, cache_i => cache_i, cache_o => cache_o, mem_o => mem_o, mem_i => mem_i);
+
+		end generate ICACHE;
+
+		DCACHE : if cache_type = 1 generate
+
+			dctrl_comp : dctrl generic map (cache_type => cache_type, cache_set_depth => cache_set_depth) port map (reset => reset, clock => clock, ctrl_i => ctrl_i, ctrl_o => ctrl_o, cache_i => cache_i, cache_o => cache_o, mem_o => mem_o, mem_i => mem_i);
+
+		end generate DCACHE;
 
 	end generate CACHE_ENABLED;
 

@@ -92,7 +92,7 @@ architecture behavior of pipeline is
 			csr_eo         : in  csr_exception_out_type;
 			fpu_exe_o      : in  fpu_exe_out_type;
 			fpu_exe_i      : out fpu_exe_in_type;
-			dmem_i         : out mem_in_type;
+			dcache_i       : out cache_in_type;
 			dpmp_o         : in  pmp_out_type;
 			dpmp_i         : out pmp_in_type;
 			time_irpt      : in  std_logic;
@@ -110,7 +110,7 @@ architecture behavior of pipeline is
 			clock     : in  std_logic;
 			csr_eo    : in  csr_exception_out_type;
 			fpu_mem_i : out fpu_mem_in_type;
-			dmem_o    : in  mem_out_type;
+			dcache_o  : in  cache_out_type;
 			a         : in  memory_in_type;
 			d         : in  memory_in_type;
 			y         : out memory_out_type;
@@ -284,6 +284,9 @@ architecture behavior of pipeline is
 	signal icache_i : cache_in_type;
 	signal icache_o : cache_out_type;
 
+	signal dcache_i : cache_in_type;
+	signal dcache_o : cache_out_type;
+
 	signal fpu_dec_i : fpu_dec_in_type;
 	signal fpu_dec_o : fpu_dec_out_type;
 
@@ -366,7 +369,7 @@ begin
 			csr_eo         => csr_unit_o.csr_eo,
 			fpu_exe_o      => fpu_exe_o,
 			fpu_exe_i      => fpu_exe_i,
-			dmem_i         => dmem_i,
+			dcache_i       => dcache_i,
 			dpmp_o         => dpmp_o,
 			dpmp_i         => dpmp_i,
 			time_irpt      => time_irpt,
@@ -391,7 +394,7 @@ begin
 			clock     => clock,
 			csr_eo    => csr_unit_o.csr_eo,
 			fpu_mem_i => fpu_mem_i,
-			dmem_o    => dmem_o,
+			dcache_o  => dcache_o,
 			a.f       => fetch_y,
 			a.d       => decode_y,
 			a.e       => execute_y,
@@ -509,6 +512,21 @@ begin
 			cache_o => icache_o,
 			mem_o   => imem_o,
 			mem_i   => imem_i
+		);
+
+	dcache_comp : cache
+		generic map (
+			cache_enable    => dcache_enable,
+			cache_type      => dcache_type,
+			cache_set_depth => dcache_set_depth
+		)
+		port map(
+			reset   => reset,
+			clock   => clock,
+			cache_i => dcache_i,
+			cache_o => dcache_o,
+			mem_o   => dmem_o,
+			mem_i   => dmem_i
 		);
 
 	FP_Unit : if fpu_enable = true generate

@@ -9,7 +9,7 @@ use work.configure.all;
 use work.constants.all;
 use work.wire.all;
 
-entity ctrl is
+entity ictrl is
 	generic(
 		cache_type      : integer;
 		cache_set_depth : integer
@@ -24,9 +24,9 @@ entity ctrl is
 		mem_o   : in  mem_out_type;
 		mem_i   : out mem_in_type
 	);
-end ctrl;
+end ictrl;
 
-architecture behavior of ctrl is
+architecture behavior of ictrl is
 
 	type state_type is (HIT,MISS,UPDATE,INVALIDATE);
 

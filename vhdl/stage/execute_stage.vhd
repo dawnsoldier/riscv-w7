@@ -31,7 +31,7 @@ entity execute_stage is
 		csr_eo         : in  csr_exception_out_type;
 		fpu_exe_o      : in  fpu_exe_out_type;
 		fpu_exe_i      : out fpu_exe_in_type;
-		dmem_i         : out mem_in_type;
+		dcache_i       : out cache_in_type;
 		dpmp_o         : in  pmp_out_type;
 		dpmp_i         : out pmp_in_type;
 		time_irpt      : in  std_logic;
@@ -272,11 +272,13 @@ begin
 			v.stall := '0';
 		end if;
 
-		dmem_i.mem_valid <= v.load or v.fpu_load or v.store or v.fpu_store;
-		dmem_i.mem_instr <= '0';
-		dmem_i.mem_addr <= v.address;
-		dmem_i.mem_wdata <= store_data(v.sdata, v.store_op);
-		dmem_i.mem_wstrb <= v.strobe;
+		dcache_i.mem_valid <= v.load or v.fpu_load or v.store or v.fpu_store;
+		dcache_i.mem_instr <= '0';
+		dcache_i.mem_spec <= '0';
+		dcache_i.mem_invalid <= '0';
+		dcache_i.mem_addr <= v.address;
+		dcache_i.mem_wdata <= store_data(v.sdata, v.store_op);
+		dcache_i.mem_wstrb <= v.strobe;
 
 		csr_ei.d_epc <= v.pc;
 		csr_ei.e_epc <= d.e.pc;
