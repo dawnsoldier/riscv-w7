@@ -28,9 +28,11 @@ architecture behavior of tag is
 
 	signal tag_array : tag_type := (others => (others => '0'));
 
+	signal rdata : std_logic_vector(58-cache_set_depth downto 0) := (others => '0');
+
 begin
 
-	tag_o.rdata <= tag_array(tag_i.raddr);
+	tag_o.rdata <= rdata;
 
 	process(clock)
 
@@ -41,6 +43,8 @@ begin
 			if tag_i.wen = '1' then
 				tag_array(tag_i.waddr) <= tag_i.wdata;
 			end if;
+
+			rdata <= tag_array(tag_i.raddr);
 
 		end if;
 

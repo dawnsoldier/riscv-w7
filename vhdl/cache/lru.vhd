@@ -109,6 +109,7 @@ begin
 			elsif lru_i.miss = '1' then
 				lru_access(lru_data,lru_i.sid,lru_wid);
 			end if;
+
 			lru_o.wid <= lru_wid;
 
 		end if;

@@ -138,10 +138,6 @@ begin
 					v.wren := '0';
 				end if;
 
-			when MISS =>
-
-
-
 			when UPDATE =>
 
 				v.rden := '0';

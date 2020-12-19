@@ -28,9 +28,11 @@ architecture behavior of valid is
 
 	signal valid_array : valid_type := (others => (others => '0'));
 
+	signal rdata : std_logic_vector(7 downto 0) := (others => '0');
+
 begin
 
-	valid_o.rdata <= valid_array(valid_i.raddr);
+	valid_o.rdata <= rdata;
 
 	process(clock)
 
@@ -41,6 +43,8 @@ begin
 			if valid_i.wen = '1' then
 				valid_array(valid_i.waddr) <= valid_i.wdata;
 			end if;
+
+			rdata <= valid_array(valid_i.raddr);
 
 		end if;
 

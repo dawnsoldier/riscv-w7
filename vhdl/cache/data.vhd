@@ -28,7 +28,7 @@ architecture behavior of data is
 
 	signal data_array : data_type := (others => (others => '0'));
 
-	signal rdata : std_logic_vector(255 downto 0);
+	signal rdata : std_logic_vector(255 downto 0) := (others => '0');
 
 begin
 
