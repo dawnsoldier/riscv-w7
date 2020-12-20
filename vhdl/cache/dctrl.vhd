@@ -35,6 +35,7 @@ architecture behavior of dctrl is
 		tag     : std_logic_vector(58-cache_set_depth downto 0);
 		sid     : integer range 0 to 2**cache_set_depth-1;
 		lid     : integer range 0 to 4;
+		invalid : std_logic;
 		rden    : std_logic;
 		wren    : std_logic;
 	end record;
@@ -44,6 +45,7 @@ architecture behavior of dctrl is
 		tag     => (others => '0'),
 		sid     => 0,
 		lid     => 0,
+		invalid => '0',
 		rden    => '0',
 		wren    => '0'
 	);
@@ -117,16 +119,21 @@ begin
 
 		v := r;
 
+		v.invalid := '0';
 		v.rden := '0';
 		v.wren := '0';
 
 		if cache_i.mem_valid = '1' then
-			v.rden := nor_reduce(cache_i.mem_wstrb);
-			v.wren := or_reduce(cache_i.mem_wstrb);
-			v.addr := cache_i.mem_addr(63 downto 5) & "00000";
-			v.tag := cache_i.mem_addr(63 downto cache_set_depth+5);
-			v.sid := to_integer(unsigned(cache_i.mem_addr(cache_set_depth+4 downto 5)));
-			v.lid := to_integer(unsigned(cache_i.mem_addr(4 downto 3)));
+			if cache_i.mem_invalid = '1' then
+				v.invalid := '1';
+			else
+				v.rden := nor_reduce(cache_i.mem_wstrb);
+				v.wren := or_reduce(cache_i.mem_wstrb);
+				v.addr := cache_i.mem_addr(63 downto 5) & "00000";
+				v.tag := cache_i.mem_addr(63 downto cache_set_depth+5);
+				v.sid := to_integer(unsigned(cache_i.mem_addr(cache_set_depth+4 downto 5)));
+				v.lid := to_integer(unsigned(cache_i.mem_addr(4 downto 3)));
+			end if;
 		end if;
 
 		ctrl_o.data0_i.raddr <= v.sid;
@@ -169,13 +176,18 @@ begin
 		v.miss := '0';
 		v.invalid := '0';
 
-		if r_next.state = HIT then
+		if v.state = HIT then
 			v.rden := r.rden;
 			v.wren := r.wren;
 			v.addr := r.addr;
 			v.tag := r.tag;
 			v.sid := r.sid;
 			v.lid := r.lid;
+		end if;
+
+		if (r.invalid) = '1' then
+			v.sid := 0;
+			v.state := INVALIDATE;
 		end if;
 
 		ctrl_o.hit_i.tag <= v.tag;
@@ -189,7 +201,7 @@ begin
 		ctrl_o.hit_i.tag7 <= ctrl_i.tag7_o.rdata;
 		ctrl_o.hit_i.valid <= ctrl_i.valid_o.rdata;
 
-		case r_next.state is
+		case v.state is
 
 			when HIT =>
 
@@ -398,11 +410,6 @@ begin
 			else
 				v.sid := v.sid+1;
 			end if;
-		end if;
-
-		if (cache_i.mem_valid and cache_i.mem_invalid) = '1' then
-			v.sid := 0;
-			v.state := INVALIDATE;
 		end if;
 
 		if v.lid = 0 then

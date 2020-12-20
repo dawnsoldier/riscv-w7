@@ -152,7 +152,7 @@ begin
 		icache_i.mem_valid <= v.valid;
 		icache_i.mem_instr <= '1';
 		icache_i.mem_spec <= v.spec;
-		icache_i.mem_invalid <= d.d.fence;
+		icache_i.mem_invalid <= a.d.fence;
 		-- icache_i.mem_addr <= v.pc;
 		icache_i.mem_addr <= pfetch_o.fpc;
 		icache_i.mem_wdata <= (others => '0');

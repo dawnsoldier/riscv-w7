@@ -35,6 +35,8 @@ architecture behavior of ictrl is
 		tag     : std_logic_vector(58-cache_set_depth downto 0);
 		sid     : integer range 0 to 2**cache_set_depth-1;
 		lid     : integer range 0 to 4;
+		invalid : std_logic;
+		spec    : std_logic;
 		en      : std_logic;
 	end record;
 
@@ -43,6 +45,8 @@ architecture behavior of ictrl is
 		tag     => (others => '0'),
 		sid     => 0,
 		lid     => 0,
+		invalid => '0',
+		spec    => '0',
 		en      => '0'
 	);
 
@@ -102,13 +106,20 @@ begin
 		v := r;
 
 		v.en := '0';
+		v.invalid := '0';
+		v.spec := '0';
 
 		if cache_i.mem_valid = '1' then
-			v.en := cache_i.mem_valid;
-			v.addr := cache_i.mem_addr(63 downto 5) & "00000";
-			v.tag := cache_i.mem_addr(63 downto cache_set_depth+5);
-			v.sid := to_integer(unsigned(cache_i.mem_addr(cache_set_depth+4 downto 5)));
-			v.lid := to_integer(unsigned(cache_i.mem_addr(4 downto 3)));
+			if cache_i.mem_invalid = '1' then
+				v.invalid := cache_i.mem_invalid;
+			else
+				v.spec := cache_i.mem_spec;
+				v.en := cache_i.mem_valid;
+				v.addr := cache_i.mem_addr(63 downto 5) & "00000";
+				v.tag := cache_i.mem_addr(63 downto cache_set_depth+5);
+				v.sid := to_integer(unsigned(cache_i.mem_addr(cache_set_depth+4 downto 5)));
+				v.lid := to_integer(unsigned(cache_i.mem_addr(4 downto 3)));
+			end if;
 		end if;
 
 		ctrl_o.data0_i.raddr <= v.sid;
@@ -148,12 +159,17 @@ begin
 		v.miss := '0';
 		v.invalid := '0';
 
-		if r_next.state = HIT then
+		if v.state = HIT then
 			v.en := r.en;
 			v.addr := r.addr;
 			v.tag := r.tag;
 			v.sid := r.sid;
 			v.lid := r.lid;
+		end if;
+
+		if (r.invalid) = '1' then
+			v.sid := 0;
+			v.state := INVALIDATE;
 		end if;
 
 		ctrl_o.hit_i.tag <= v.tag;
@@ -167,7 +183,7 @@ begin
 		ctrl_o.hit_i.tag7 <= ctrl_i.tag7_o.rdata;
 		ctrl_o.hit_i.valid <= ctrl_i.valid_o.rdata;
 
-		case r_next.state is
+		case v.state is
 
 			when HIT =>
 
@@ -325,12 +341,7 @@ begin
 			end if;
 		end if;
 
-		if (cache_i.mem_valid and cache_i.mem_invalid) = '1' then
-			v.sid := 0;
-			v.state := INVALIDATE;
-		end if;
-
-		if (cache_i.mem_valid and cache_i.mem_spec) = '1' then
+		if (r.spec) = '1' then
 			v.spec := '1';
 		end if;
 
