@@ -24,16 +24,32 @@ architecture behavior of cpu is
 		port(
 			reset     : in  std_logic;
 			clock     : in  std_logic;
-			imem_o    : in  mem_out_type;
-			imem_i    : out mem_in_type;
-			dmem_o    : in  mem_out_type;
-			dmem_i    : out mem_in_type;
+			icache_o  : in  cache_out_type;
+			icache_i  : out cache_in_type;
+			dcache_o  : in  cache_out_type;
+			dcache_i  : out cache_in_type;
 			ipmp_o    : in  pmp_out_type;
 			ipmp_i    : out pmp_in_type;
 			dpmp_o    : in  pmp_out_type;
 			dpmp_i    : out pmp_in_type;
 			time_irpt : in  std_logic;
 			ext_irpt  : in  std_logic
+		);
+	end component;
+
+	component cache
+		generic(
+			cache_enable    : boolean;
+			cache_type      : integer;
+			cache_set_depth : integer
+		);
+		port(
+			reset   : in  std_logic;
+			clock   : in  std_logic;
+			cache_i : in  cache_in_type;
+			cache_o : out cache_out_type;
+			mem_o   : in  mem_out_type;
+			mem_i   : out mem_in_type
 		);
 	end component;
 
@@ -112,6 +128,12 @@ architecture behavior of cpu is
 			uart_tx    : out std_logic
 		);
 	end component;
+
+	signal icache_i : cache_in_type;
+	signal icache_o : cache_out_type;
+
+	signal dcache_i : cache_in_type;
+	signal dcache_o : cache_out_type;
 
 	signal imem_i : mem_in_type;
 	signal imem_o : mem_out_type;
@@ -222,16 +244,46 @@ begin
 		port map(
 			reset     => reset,
 			clock     => clock,
-			imem_o    => imem_o,
-			imem_i    => imem_i,
-			dmem_o    => dmem_o,
-			dmem_i    => dmem_i,
+			icache_o  => icache_o,
+			icache_i  => icache_i,
+			dcache_o  => dcache_o,
+			dcache_i  => dcache_i,
 			ipmp_o    => ipmp_o,
 			ipmp_i    => ipmp_i,
 			dpmp_o    => dpmp_o,
 			dpmp_i    => dpmp_i,
 			time_irpt => timer_irpt,
 			ext_irpt  => '0'
+		);
+
+	icache_comp : cache
+		generic map (
+			cache_enable    => icache_enable,
+			cache_type      => icache_type,
+			cache_set_depth => icache_set_depth
+		)
+		port map(
+			reset   => reset,
+			clock   => clock,
+			cache_i => icache_i,
+			cache_o => icache_o,
+			mem_o   => imem_o,
+			mem_i   => imem_i
+		);
+
+	dcache_comp : cache
+		generic map (
+			cache_enable    => dcache_enable,
+			cache_type      => dcache_type,
+			cache_set_depth => dcache_set_depth
+		)
+		port map(
+			reset   => reset,
+			clock   => clock,
+			cache_i => dcache_i,
+			cache_o => dcache_o,
+			mem_o   => dmem_o,
+			mem_i   => dmem_i
 		);
 
 	ipmp_comp : pmp

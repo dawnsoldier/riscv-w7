@@ -28,9 +28,11 @@ architecture behavior of dirty is
 
 	signal dirty_array : dirty_type := (others => (others => '0'));
 
+	signal rdata : std_logic_vector(7 downto 0) := (others => '0');
+
 begin
 
-	dirty_o.rdata <= dirty_array(dirty_i.raddr);
+	dirty_o.rdata <= rdata;
 
 	process(clock)
 
@@ -41,6 +43,8 @@ begin
 			if dirty_i.wen = '1' then
 				dirty_array(dirty_i.waddr) <= dirty_i.wdata;
 			end if;
+
+			rdata <= dirty_array(dirty_i.raddr);
 
 		end if;
 

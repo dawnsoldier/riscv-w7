@@ -63,6 +63,7 @@ architecture behavior of ictrl is
 		hit     : std_logic;
 		miss    : std_logic;
 		en      : std_logic;
+		spec    : std_logic;
 		ready   : std_logic;
 	end record;
 
@@ -83,9 +84,9 @@ architecture behavior of ictrl is
 		hit     => '0',
 		miss    => '0',
 		en      => '0',
+		spec    => '0',
 		ready   => '0'
 	);
-
 
 	signal r,rin : ctrl_type := init_ctrl_type;
 	signal r_next,rin_next : data_type := init_data_type;
@@ -202,6 +203,8 @@ begin
 					v.valid := '0';
 				end if;
 
+				v.spec := '0';
+
 			when MISS =>
 
 				if r_next.miss = '1' then
@@ -235,12 +238,14 @@ begin
 
 				v.wen(v.wid) := '1';
 				v.wvec(v.wid) := '1';
+				v.valid := '0';
 				v.state := HIT;
 
 			when INVALIDATE =>
 
 				v.wen := (others => '0');
 				v.wvec := (others => '0');
+				v.valid := '0';
 				v.invalid := '1';
 
 			when others =>
@@ -320,6 +325,15 @@ begin
 			end if;
 		end if;
 
+		if (cache_i.mem_valid and cache_i.mem_invalid) = '1' then
+			v.sid := 0;
+			v.state := INVALIDATE;
+		end if;
+
+		if (cache_i.mem_valid and cache_i.mem_spec) = '1' then
+			v.spec := '1';
+		end if;
+
 		if v.lid = 0 then
 			v.rdata := v.cline(63 downto 0);
 		elsif v.lid = 1 then
@@ -333,7 +347,7 @@ begin
 		if v.state = HIT then
 			v.ready := v.en;
 		elsif v.state = UPDATE then
-			v.ready := '1';
+			v.ready := not v.spec;
 		else
 			v.ready := '0';
 		end if;
@@ -346,15 +360,6 @@ begin
 
 		cache_o.mem_rdata <= v.rdata;
 		cache_o.mem_ready <= v.ready;
-
-		if (cache_i.mem_valid and cache_i.mem_invalid) = '1' then
-			v.sid := 0;
-			v.state := INVALIDATE;
-		end if;
-
-		if (cache_i.mem_valid and cache_i.mem_spec) = '1' then
-			v.state := HIT;
-		end if;
 
 		rin_next <= v;
 
