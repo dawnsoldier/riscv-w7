@@ -197,7 +197,7 @@ architecture behavior of cpu is
 		if data = X"0A" then
 			write(buf, info);
 			writeline(output, buf);
-			write(buf,to_string(now, ns));
+			write(buf,integer'image(now/ 1 ns) & " ns");
 			writeline(output, buf);
 			info <= (others => character'val(0));
 			counter <= 1;
