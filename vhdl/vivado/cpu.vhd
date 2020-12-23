@@ -129,6 +129,9 @@ architecture behavior of cpu is
 		);
 	end component;
 
+	signal icache_mem_valid : std_logic := '0';
+	signal dcache_mem_valid : std_logic := '0';
+
 	signal icache_i : mem_in_type;
 	signal icache_o : mem_out_type;
 	signal dcache_i : mem_in_type;
@@ -248,7 +251,7 @@ begin
 
 	end process;
 
-	process(imem_i,io_mem_i,ia_mem_o,icache_i,icache_o)
+	process(imem_i,io_mem_i,ia_mem_o,icache_i,icache_o,icache_mem_valid)
 
 	begin
 
@@ -296,10 +299,10 @@ begin
 			ia_mem_i.mem_wstrb <= (others => '0');
 		end if;
 
-		if (icache_i.mem_valid = '1' and icache_o.mem_ready = '1') then
+		if (icache_mem_valid = '1' and icache_o.mem_ready = '1') then
 			imem_o.mem_rdata <= icache_o.mem_rdata;
 			imem_o.mem_ready <= icache_o.mem_ready;
-		elsif (icache_i.mem_valid = '0' and ia_mem_o.mem_ready = '1') then
+		elsif (icache_mem_valid = '0' and ia_mem_o.mem_ready = '1') then
 			imem_o.mem_rdata <= ia_mem_o.mem_rdata;
 			imem_o.mem_ready <= ia_mem_o.mem_ready;
 		else
@@ -316,11 +319,12 @@ begin
 	begin
 
 		if rising_edge(clock) then
+			icache_mem_valid <= icache_i.mem_valid;
 		end if;
 
 	end process;
 
-	process(dmem_i,do_mem_i,da_mem_o,dcache_i,dcache_o)
+	process(dmem_i,do_mem_i,da_mem_o,dcache_i,dcache_o,dcache_mem_valid)
 
 	begin
 
@@ -368,10 +372,10 @@ begin
 			da_mem_i.mem_wstrb <= (others => '0');
 		end if;
 
-		if (dcache_i.mem_valid = '1' and dcache_o.mem_ready = '1') then
+		if (dcache_mem_valid = '1' and dcache_o.mem_ready = '1') then
 			dmem_o.mem_rdata <= dcache_o.mem_rdata;
 			dmem_o.mem_ready <= dcache_o.mem_ready;
-		elsif (dcache_i.mem_valid = '0' and da_mem_o.mem_ready = '1') then
+		elsif (dcache_mem_valid = '0' and da_mem_o.mem_ready = '1') then
 			dmem_o.mem_rdata <= da_mem_o.mem_rdata;
 			dmem_o.mem_ready <= da_mem_o.mem_ready;
 		else
@@ -380,6 +384,16 @@ begin
 		end if;
 		do_mem_o.mem_rdata <= da_mem_o.mem_rdata;
 		do_mem_o.mem_ready <= da_mem_o.mem_ready;
+
+	end process;
+
+	process (clock)
+
+	begin
+
+		if rising_edge(clock) then
+			dcache_mem_valid <= dcache_i.mem_valid;
+		end if;
 
 	end process;
 
