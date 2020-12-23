@@ -24,10 +24,10 @@ architecture behavior of cpu is
 		port(
 			reset     : in  std_logic;
 			clock     : in  std_logic;
-			icache_o  : in  cache_out_type;
-			icache_i  : out cache_in_type;
-			dcache_o  : in  cache_out_type;
-			dcache_i  : out cache_in_type;
+			imem_o    : in  mem_out_type;
+			imem_i    : out mem_in_type;
+			dmem_o    : in  mem_out_type;
+			dmem_i    : out mem_in_type;
 			ipmp_o    : in  pmp_out_type;
 			ipmp_i    : out pmp_in_type;
 			dpmp_o    : in  pmp_out_type;
@@ -46,8 +46,8 @@ architecture behavior of cpu is
 		port(
 			reset   : in  std_logic;
 			clock   : in  std_logic;
-			cache_i : in  cache_in_type;
-			cache_o : out cache_out_type;
+			cache_i : in  mem_in_type;
+			cache_o : out mem_out_type;
 			mem_o   : in  mem_out_type;
 			mem_i   : out mem_in_type
 		);
@@ -129,17 +129,25 @@ architecture behavior of cpu is
 		);
 	end component;
 
-	signal icache_i : cache_in_type;
-	signal icache_o : cache_out_type;
-
-	signal dcache_i : cache_in_type;
-	signal dcache_o : cache_out_type;
+	signal icache_i : mem_in_type;
+	signal icache_o : mem_out_type;
+	signal dcache_i : mem_in_type;
+	signal dcache_o : mem_out_type;
 
 	signal imem_i : mem_in_type;
 	signal imem_o : mem_out_type;
-
 	signal dmem_i : mem_in_type;
 	signal dmem_o : mem_out_type;
+
+	signal io_mem_i : mem_in_type;
+	signal io_mem_o : mem_out_type;
+	signal do_mem_i : mem_in_type;
+	signal do_mem_o : mem_out_type;
+
+	signal ia_mem_i : mem_in_type;
+	signal ia_mem_o : mem_out_type;
+	signal da_mem_i : mem_in_type;
+	signal da_mem_o : mem_out_type;
 
 	signal ipmp_i : pmp_in_type;
 	signal ipmp_o : pmp_out_type;
@@ -240,14 +248,149 @@ begin
 
 	end process;
 
+	process(imem_i,io_mem_i,ia_mem_o,icache_i,icache_o)
+
+	begin
+
+		if imem_i.mem_valid = '1' then
+			if (unsigned(imem_i.mem_addr) >= unsigned(bram_base_addr) and
+					unsigned(imem_i.mem_addr) < unsigned(bram_top_addr)) then
+				icache_i.mem_valid <= '1';
+			else
+				icache_i.mem_valid <= '0';
+			end if;
+		else
+			icache_i.mem_valid <= '0';
+		end if;
+
+		icache_i.mem_instr <= imem_i.mem_instr;
+		icache_i.mem_spec <= imem_i.mem_spec;
+		icache_i.mem_invalid <= imem_i.mem_invalid;
+		icache_i.mem_addr <= imem_i.mem_addr;
+		icache_i.mem_wdata <= imem_i.mem_wdata;
+		icache_i.mem_wstrb <= imem_i.mem_wstrb;
+
+		if icache_i.mem_valid = '1' and io_mem_i.mem_valid = '1' then
+			ia_mem_i.mem_valid <= io_mem_i.mem_valid;
+			ia_mem_i.mem_instr <= io_mem_i.mem_instr;
+			ia_mem_i.mem_spec <= io_mem_i.mem_spec;
+			ia_mem_i.mem_invalid <= io_mem_i.mem_invalid;
+			ia_mem_i.mem_addr <= io_mem_i.mem_addr;
+			ia_mem_i.mem_wdata <= io_mem_i.mem_wdata;
+			ia_mem_i.mem_wstrb <= io_mem_i.mem_wstrb;
+		elsif icache_i.mem_valid = '0' and imem_i.mem_valid = '1' then
+			ia_mem_i.mem_valid <= imem_i.mem_valid;
+			ia_mem_i.mem_instr <= imem_i.mem_instr;
+			ia_mem_i.mem_spec <= imem_i.mem_spec;
+			ia_mem_i.mem_invalid <= imem_i.mem_invalid;
+			ia_mem_i.mem_addr <= imem_i.mem_addr;
+			ia_mem_i.mem_wdata <= imem_i.mem_wdata;
+			ia_mem_i.mem_wstrb <= imem_i.mem_wstrb;
+		else
+			ia_mem_i.mem_valid <= '0';
+			ia_mem_i.mem_instr <= '0';
+			ia_mem_i.mem_spec <= '0';
+			ia_mem_i.mem_invalid <= '0';
+			ia_mem_i.mem_addr <= (others => '0');
+			ia_mem_i.mem_wdata <= (others => '0');
+			ia_mem_i.mem_wstrb <= (others => '0');
+		end if;
+
+		if (icache_i.mem_valid = '1' and icache_o.mem_ready = '1') then
+			imem_o.mem_rdata <= icache_o.mem_rdata;
+			imem_o.mem_ready <= icache_o.mem_ready;
+		elsif (icache_i.mem_valid = '0' and ia_mem_o.mem_ready = '1') then
+			imem_o.mem_rdata <= ia_mem_o.mem_rdata;
+			imem_o.mem_ready <= ia_mem_o.mem_ready;
+		else
+			imem_o.mem_rdata <= (others => '0');
+			imem_o.mem_ready <= '0';
+		end if;
+		io_mem_o.mem_rdata <= ia_mem_o.mem_rdata;
+		io_mem_o.mem_ready <= ia_mem_o.mem_ready;
+
+	end process;
+
+	process (clock)
+
+	begin
+
+		if rising_edge(clock) then
+		end if;
+
+	end process;
+
+	process(dmem_i,do_mem_i,da_mem_o,dcache_i,dcache_o)
+
+	begin
+
+		if dmem_i.mem_valid = '1' then
+			if (unsigned(dmem_i.mem_addr) >= unsigned(bram_base_addr) and
+					unsigned(dmem_i.mem_addr) < unsigned(bram_top_addr)) then
+				dcache_i.mem_valid <= '1';
+			else
+				dcache_i.mem_valid <= '0';
+			end if;
+		else
+			dcache_i.mem_valid <= '0';
+		end if;
+
+		dcache_i.mem_instr <= dmem_i.mem_instr;
+		dcache_i.mem_spec <= dmem_i.mem_spec;
+		dcache_i.mem_invalid <= dmem_i.mem_invalid;
+		dcache_i.mem_addr <= dmem_i.mem_addr;
+		dcache_i.mem_wdata <= dmem_i.mem_wdata;
+		dcache_i.mem_wstrb <= dmem_i.mem_wstrb;
+
+		if dcache_i.mem_valid = '1' and do_mem_i.mem_valid = '1' then
+			da_mem_i.mem_valid <= do_mem_i.mem_valid;
+			da_mem_i.mem_instr <= do_mem_i.mem_instr;
+			da_mem_i.mem_spec <= do_mem_i.mem_spec;
+			da_mem_i.mem_invalid <= do_mem_i.mem_invalid;
+			da_mem_i.mem_addr <= do_mem_i.mem_addr;
+			da_mem_i.mem_wdata <= do_mem_i.mem_wdata;
+			da_mem_i.mem_wstrb <= do_mem_i.mem_wstrb;
+		elsif dcache_i.mem_valid = '0' and dmem_i.mem_valid = '1' then
+			da_mem_i.mem_valid <= dmem_i.mem_valid;
+			da_mem_i.mem_instr <= dmem_i.mem_instr;
+			da_mem_i.mem_spec <= dmem_i.mem_spec;
+			da_mem_i.mem_invalid <= dmem_i.mem_invalid;
+			da_mem_i.mem_addr <= dmem_i.mem_addr;
+			da_mem_i.mem_wdata <= dmem_i.mem_wdata;
+			da_mem_i.mem_wstrb <= dmem_i.mem_wstrb;
+		else
+			da_mem_i.mem_valid <= '0';
+			da_mem_i.mem_instr <= '0';
+			da_mem_i.mem_spec <= '0';
+			da_mem_i.mem_invalid <= '0';
+			da_mem_i.mem_addr <= (others => '0');
+			da_mem_i.mem_wdata <= (others => '0');
+			da_mem_i.mem_wstrb <= (others => '0');
+		end if;
+
+		if (dcache_i.mem_valid = '1' and dcache_o.mem_ready = '1') then
+			dmem_o.mem_rdata <= dcache_o.mem_rdata;
+			dmem_o.mem_ready <= dcache_o.mem_ready;
+		elsif (dcache_i.mem_valid = '0' and da_mem_o.mem_ready = '1') then
+			dmem_o.mem_rdata <= da_mem_o.mem_rdata;
+			dmem_o.mem_ready <= da_mem_o.mem_ready;
+		else
+			dmem_o.mem_rdata <= (others => '0');
+			dmem_o.mem_ready <= '0';
+		end if;
+		do_mem_o.mem_rdata <= da_mem_o.mem_rdata;
+		do_mem_o.mem_ready <= da_mem_o.mem_ready;
+
+	end process;
+
 	pipeline_comp : pipeline
 		port map(
 			reset     => reset,
 			clock     => clock,
-			icache_o  => icache_o,
-			icache_i  => icache_i,
-			dcache_o  => dcache_o,
-			dcache_i  => dcache_i,
+			imem_o    => imem_o,
+			imem_i    => imem_i,
+			dmem_o    => dmem_o,
+			dmem_i    => dmem_i,
 			ipmp_o    => ipmp_o,
 			ipmp_i    => ipmp_i,
 			dpmp_o    => dpmp_o,
@@ -267,8 +410,8 @@ begin
 			clock   => clock,
 			cache_i => icache_i,
 			cache_o => icache_o,
-			mem_o   => imem_o,
-			mem_i   => imem_i
+			mem_o   => io_mem_o,
+			mem_i   => io_mem_i
 		);
 
 	dcache_comp : cache
@@ -282,8 +425,8 @@ begin
 			clock   => clock,
 			cache_i => dcache_i,
 			cache_o => dcache_o,
-			mem_o   => dmem_o,
-			mem_i   => dmem_i
+			mem_o   => do_mem_o,
+			mem_i   => do_mem_i
 		);
 
 	ipmp_comp : pmp
@@ -306,10 +449,10 @@ begin
 		port map(
 			reset         => reset,
 			clock         => clock,
-			imem_i        => imem_i,
-			imem_o        => imem_o,
-			dmem_i        => dmem_i,
-			dmem_o        => dmem_o,
+			imem_i        => ia_mem_i,
+			imem_o        => ia_mem_o,
+			dmem_i        => da_mem_i,
+			dmem_o        => da_mem_o,
 			memory_valid  => memory_valid,
 			memory_ready  => memory_ready,
 			memory_instr  => memory_instr,

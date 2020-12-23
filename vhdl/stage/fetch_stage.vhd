@@ -22,8 +22,8 @@ entity fetch_stage is
 		bp_i     : out bp_in_type;
 		pfetch_o : in  prefetch_out_type;
 		pfetch_i : out prefetch_in_type;
-		icache_o : in  cache_out_type;
-		icache_i : out cache_in_type;
+		imem_o   : in  mem_out_type;
+		imem_i   : out mem_in_type;
 		ipmp_o   : in  pmp_out_type;
 		ipmp_i   : out pmp_in_type;
 		a        : in  fetch_in_type;
@@ -40,7 +40,7 @@ architecture behavior of fetch_stage is
 
 begin
 
-	combinational : process(a, d, r, csr_eo, bp_o, pfetch_o, icache_o, ipmp_o)
+	combinational : process(a, d, r, csr_eo, bp_o, pfetch_o, imem_o, ipmp_o)
 
 		variable v : fetch_reg_type;
 
@@ -49,16 +49,16 @@ begin
 		v := r;
 
 		v.valid := not d.w.clear;
-		-- v.stall := not(icache_o.mem_ready) or d.d.stall or d.e.stall or d.m.stall or d.w.stall or d.w.clear;
+		-- v.stall := not(imem_o.mem_ready) or d.d.stall or d.e.stall or d.m.stall or d.w.stall or d.w.clear;
 		v.stall := pfetch_o.stall or d.d.stall or d.e.stall or d.m.stall or d.w.stall or d.w.clear;
 		v.clear := csr_eo.exc or csr_eo.mret or d.w.clear;
 
 		-- v.instr := nop;
-		-- if icache_o.mem_ready = '1' then
+		-- if imem_o.mem_ready = '1' then
 		-- 	if v.pc(2) = '0' then
-		-- 		v.instr := icache_o.mem_rdata(31 downto 0);
+		-- 		v.instr := imem_o.mem_rdata(31 downto 0);
 		-- 	elsif v.pc(2) = '1' then
-		-- 		v.instr := icache_o.mem_rdata(63 downto 32);
+		-- 		v.instr := imem_o.mem_rdata(63 downto 32);
 		-- 	end if;
 		-- end if;
 
@@ -130,8 +130,8 @@ begin
 		pfetch_i.spec <= v.spec;
 		pfetch_i.fence <= d.d.fence;
 		pfetch_i.valid <= v.valid;
-		pfetch_i.rdata <= icache_o.mem_rdata;
-		pfetch_i.ready <= icache_o.mem_ready;
+		pfetch_i.rdata <= imem_o.mem_rdata;
+		pfetch_i.ready <= imem_o.mem_ready;
 
 		ipmp_i.mem_valid <= v.valid;
 		ipmp_i.mem_instr <= '1';
@@ -149,14 +149,14 @@ begin
 			v.valid := '0';
 		end if;
 
-		icache_i.mem_valid <= v.valid;
-		icache_i.mem_instr <= '1';
-		icache_i.mem_spec <= v.spec;
-		icache_i.mem_invalid <= a.d.fence;
-		-- icache_i.mem_addr <= v.pc;
-		icache_i.mem_addr <= pfetch_o.fpc;
-		icache_i.mem_wdata <= (others => '0');
-		icache_i.mem_wstrb <= (others => '0');
+		imem_i.mem_valid <= v.valid;
+		imem_i.mem_instr <= '1';
+		imem_i.mem_spec <= v.spec;
+		imem_i.mem_invalid <= a.d.fence;
+		-- imem_i.mem_addr <= v.pc;
+		imem_i.mem_addr <= pfetch_o.fpc;
+		imem_i.mem_wdata <= (others => '0');
+		imem_i.mem_wstrb <= (others => '0');
 
 		rin <= v;
 

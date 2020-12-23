@@ -19,7 +19,7 @@ entity memory_stage is
 		clock     : in  std_logic;
 		csr_eo    : in  csr_exception_out_type;
 		fpu_mem_i : out fpu_mem_in_type;
-		dcache_o  : in  cache_out_type;
+		dmem_o    : in  mem_out_type;
 		a         : in  memory_in_type;
 		d         : in  memory_in_type;
 		y         : out memory_out_type;
@@ -34,7 +34,7 @@ architecture behavior of memory_stage is
 
 begin
 
-	combinational : process(a, d, r, csr_eo, dcache_o)
+	combinational : process(a, d, r, csr_eo, dmem_o)
 
 		variable v : memory_reg_type;
 
@@ -81,15 +81,15 @@ begin
 		v.clear := d.w.clear;
 
 		if (v.load or v.fpu_load) = '1' then
-			v.wdata := load_data(dcache_o.mem_rdata, v.byteenable, v.load_op);
-			v.stall := not dcache_o.mem_ready;
+			v.wdata := load_data(dmem_o.mem_rdata, v.byteenable, v.load_op);
+			v.stall := not dmem_o.mem_ready;
 			if v.int = '1' then
 				v.istall := v.stall;
 			elsif v.fpu = '1' then
 				v.fstall := v.stall;
 			end if;
 		elsif (v.store or v.fpu_store) = '1' then
-			v.stall := not dcache_o.mem_ready;
+			v.stall := not dmem_o.mem_ready;
 			if v.int = '1' then
 				v.istall := v.stall;
 			elsif v.fpu = '1' then
@@ -97,7 +97,7 @@ begin
 			end if;
 		end if;
 
-		if dcache_o.mem_ready = '1' then
+		if dmem_o.mem_ready = '1' then
 			if v.istall = '1' then
 				v.istall := '0';
 				v.int := '1';

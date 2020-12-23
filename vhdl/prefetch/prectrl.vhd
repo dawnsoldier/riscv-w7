@@ -42,9 +42,9 @@ architecture behavior of prectrl is
 	end record;
 
 	constant init_reg : reg_type := (
-		pc     => start_base_addr,
-		npc    => start_base_addr,
-		fpc    => start_base_addr,
+		pc     => bram_base_addr,
+		npc    => bram_base_addr,
+		fpc    => bram_base_addr,
 		instr  => nop,
 		wren   => '0',
 		rden   => '0',

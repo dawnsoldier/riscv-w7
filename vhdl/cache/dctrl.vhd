@@ -19,8 +19,8 @@ entity dctrl is
 		clock   : in  std_logic;
 		ctrl_i  : in  ctrl_in_type;
 		ctrl_o  : out ctrl_out_type;
-		cache_i : in  cache_in_type;
-		cache_o : out cache_out_type;
+		cache_i : in  mem_in_type;
+		cache_o : out mem_out_type;
 		mem_o   : in  mem_out_type;
 		mem_i   : out mem_in_type
 	);
@@ -432,6 +432,8 @@ begin
 
 		mem_i.mem_valid <= v.valid;
 		mem_i.mem_instr <= '0';
+		mem_i.mem_invalid <= '0';
+		mem_i.mem_spec <= '0';
 		mem_i.mem_addr <= v.addr;
 		mem_i.mem_wdata <= v.wdata;
 		mem_i.mem_wstrb <= v.wstrb;

@@ -18,8 +18,8 @@ entity cache is
 	port(
 		reset   : in  std_logic;
 		clock   : in  std_logic;
-		cache_i : in  cache_in_type;
-		cache_o : out cache_out_type;
+		cache_i : in  mem_in_type;
+		cache_o : out mem_out_type;
 		mem_o   : in  mem_out_type;
 		mem_i   : out mem_in_type
 	);
@@ -115,8 +115,8 @@ architecture behavior of cache is
 			clock   : in  std_logic;
 			ctrl_i  : in  ctrl_in_type;
 			ctrl_o  : out ctrl_out_type;
-			cache_i : in  cache_in_type;
-			cache_o : out cache_out_type;
+			cache_i : in  mem_in_type;
+			cache_o : out mem_out_type;
 			mem_o   : in  mem_out_type;
 			mem_i   : out mem_in_type
 		);
@@ -132,8 +132,8 @@ architecture behavior of cache is
 			clock   : in  std_logic;
 			ctrl_i  : in  ctrl_in_type;
 			ctrl_o  : out ctrl_out_type;
-			cache_i : in  cache_in_type;
-			cache_o : out cache_out_type;
+			cache_i : in  mem_in_type;
+			cache_o : out mem_out_type;
 			mem_o   : in  mem_out_type;
 			mem_i   : out mem_in_type
 		);
@@ -188,14 +188,9 @@ begin
 
 	CACHE_DISABLED : if cache_enable = false generate
 
-		mem_i.mem_valid <= cache_i.mem_valid;
-		mem_i.mem_instr <= cache_i.mem_instr;
-		mem_i.mem_addr <= cache_i.mem_addr;
-		mem_i.mem_wdata <= cache_i.mem_wdata;
-		mem_i.mem_wstrb <= cache_i.mem_wstrb;
+		mem_i <= cache_i;
 
-		cache_o.mem_rdata <= mem_o.mem_rdata;
-		cache_o.mem_ready <= mem_o.mem_ready;
+		cache_o <= mem_o;
 
 	end generate CACHE_DISABLED;
 

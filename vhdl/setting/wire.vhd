@@ -37,7 +37,7 @@ package wire is
 	end record;
 
 	constant init_fetch_reg : fetch_reg_type := (
-		pc     => start_base_addr,
+		pc     => bram_base_addr,
 		instr  => (others => '0'),
 		taken  => '0',
 		spec   => '0',
@@ -820,7 +820,7 @@ package wire is
 		hit_i   : hit_in_type;
 	end record;
 
-	type cache_in_type is record
+	type mem_in_type is record
 		mem_valid   : std_logic;
 		mem_instr   : std_logic;
 		mem_spec    : std_logic;
@@ -828,19 +828,6 @@ package wire is
 		mem_addr    : std_logic_vector(63 downto 0);
 		mem_wdata   : std_logic_vector(63 downto 0);
 		mem_wstrb   : std_logic_vector(7 downto 0);
-	end record;
-
-	type cache_out_type is record
-		mem_ready : std_logic;
-		mem_rdata : std_logic_vector(63 downto 0);
-	end record;
-
-	type mem_in_type is record
-		mem_valid : std_logic;
-		mem_instr : std_logic;
-		mem_addr  : std_logic_vector(63 downto 0);
-		mem_wdata : std_logic_vector(63 downto 0);
-		mem_wstrb : std_logic_vector(7 downto 0);
 	end record;
 
 	type mem_out_type is record
