@@ -134,8 +134,13 @@ architecture behavior of cpu is
 		);
 	end component;
 
-	signal icache_mem_valid : std_logic := '0';
-	signal dcache_mem_valid : std_logic := '0';
+	type access_type is (CACHE_ACCESS, IO_MEM_ACCESS, NO_ACCESS);
+
+	signal pre_imem_access : access_type;
+	signal pre_dmem_access : access_type;
+
+	signal post_imem_access : access_type;
+	signal post_dmem_access : access_type;
 
 	signal icache_i : mem_in_type;
 	signal icache_o : mem_out_type;
@@ -218,6 +223,41 @@ architecture behavior of cpu is
 		end if;
 	end procedure print;
 
+	procedure check(
+		addr : in std_logic_vector(63 downto 0);
+		strb : in std_logic_vector(7 downto 0);
+		data : in std_logic_vector(63 downto 0)) is
+		variable buf : line;
+		variable ok : std_logic;
+		constant succ : string := "TEST SUCCEEDED";
+		constant fail : string := "TEST FAILED";
+	begin
+		ok := '0';
+		if (addr = X"0000000000001000") and (or_reduce(strb) = '1') then
+			ok := '1';
+		end if;
+		if ok = '1' then
+			if data(31 downto 0) = X"00000001" then
+				write(buf, succ);
+				writeline(output, buf);
+				finish;
+			elsif or_reduce(data(31 downto 0)) = '1' then
+				write(buf, fail);
+				writeline(output, buf);
+				finish;
+			end if;
+		end if;
+	end procedure check;
+
+	procedure exceed is
+		variable buf : line;
+		constant exc : string := "ADDRESS EXCEEDS MEMORY";
+	begin
+		write(buf, exc);
+		writeline(output, buf);
+		finish;
+	end procedure exceed;
+
 begin
 
 	process(memory_valid,memory_instr,memory_addr,memory_wdata,memory_wstrb,
@@ -236,8 +276,13 @@ begin
 				bram_valid <= '0';
 				uart_valid <= memory_valid;
 				timer_valid <= '0';
-			else
+			elsif (unsigned(memory_addr) >= unsigned(bram_base_addr) and
+					unsigned(memory_addr) < unsigned(bram_top_addr)) then
 				bram_valid <= memory_valid;
+				uart_valid <= '0';
+				timer_valid <= '0';
+			else
+				bram_valid <= '0';
 				uart_valid <= '0';
 				timer_valid <= '0';
 			end if;
@@ -248,7 +293,7 @@ begin
 		end if;
 
 		bram_instr <= memory_instr;
-		bram_addr <= memory_addr;
+		bram_addr <= memory_addr xor bram_base_addr;
 		bram_wdata <= memory_wdata;
 		bram_wstrb <= memory_wstrb;
 
@@ -278,7 +323,23 @@ begin
 
 	end process;
 
-	process(imem_i,io_mem_i,ia_mem_o,icache_i,icache_o,icache_mem_valid)
+	process (clock)
+
+	begin
+
+		if rising_edge(clock) then
+			if uart_valid = '1' and or_reduce(uart_addr) = '0' and or_reduce(uart_wstrb) = '1' then
+				print(massage,index,memory_wdata(7 downto 0));
+			elsif memory_valid = '1' then
+				if (bram_valid or timer_valid or uart_valid) = '0' then
+					exceed;
+				end if;
+			end if;
+		end if;
+
+	end process;
+
+	process(imem_i,io_mem_i,ia_mem_o,icache_i,icache_o,pre_imem_access,post_imem_access)
 
 	begin
 
@@ -286,11 +347,14 @@ begin
 			if (unsigned(imem_i.mem_addr) >= unsigned(bram_base_addr) and
 					unsigned(imem_i.mem_addr) < unsigned(bram_top_addr)) then
 				icache_i.mem_valid <= '1';
+				pre_imem_access <= CACHE_ACCESS;
 			else
 				icache_i.mem_valid <= '0';
+				pre_imem_access <= IO_MEM_ACCESS;
 			end if;
 		else
 			icache_i.mem_valid <= '0';
+			pre_imem_access <= NO_ACCESS;
 		end if;
 
 		icache_i.mem_instr <= imem_i.mem_instr;
@@ -300,7 +364,7 @@ begin
 		icache_i.mem_wdata <= imem_i.mem_wdata;
 		icache_i.mem_wstrb <= imem_i.mem_wstrb;
 
-		if icache_i.mem_valid = '1' and io_mem_i.mem_valid = '1' then
+		if post_imem_access = CACHE_ACCESS then
 			ia_mem_i.mem_valid <= io_mem_i.mem_valid;
 			ia_mem_i.mem_instr <= io_mem_i.mem_instr;
 			ia_mem_i.mem_spec <= io_mem_i.mem_spec;
@@ -308,7 +372,7 @@ begin
 			ia_mem_i.mem_addr <= io_mem_i.mem_addr;
 			ia_mem_i.mem_wdata <= io_mem_i.mem_wdata;
 			ia_mem_i.mem_wstrb <= io_mem_i.mem_wstrb;
-		elsif icache_i.mem_valid = '0' and imem_i.mem_valid = '1' then
+		elsif pre_imem_access = IO_MEM_ACCESS then
 			ia_mem_i.mem_valid <= imem_i.mem_valid;
 			ia_mem_i.mem_instr <= imem_i.mem_instr;
 			ia_mem_i.mem_spec <= imem_i.mem_spec;
@@ -326,10 +390,10 @@ begin
 			ia_mem_i.mem_wstrb <= (others => '0');
 		end if;
 
-		if (icache_mem_valid = '1' and icache_o.mem_ready = '1') then
+		if post_imem_access = CACHE_ACCESS then
 			imem_o.mem_rdata <= icache_o.mem_rdata;
 			imem_o.mem_ready <= icache_o.mem_ready;
-		elsif (icache_mem_valid = '0' and ia_mem_o.mem_ready = '1') then
+		elsif post_imem_access = IO_MEM_ACCESS then
 			imem_o.mem_rdata <= ia_mem_o.mem_rdata;
 			imem_o.mem_ready <= ia_mem_o.mem_ready;
 		else
@@ -346,12 +410,18 @@ begin
 	begin
 
 		if rising_edge(clock) then
-			icache_mem_valid <= icache_i.mem_valid;
+			if reset = '0' then
+				post_imem_access <= CACHE_ACCESS;
+			else
+				if imem_i.mem_valid = '1' then
+					post_imem_access <= pre_imem_access;
+				end if;
+			end if;
 		end if;
 
 	end process;
 
-	process(dmem_i,do_mem_i,da_mem_o,dcache_i,dcache_o,dcache_mem_valid)
+	process(dmem_i,do_mem_i,da_mem_o,dcache_i,dcache_o,pre_dmem_access,post_dmem_access)
 
 	begin
 
@@ -359,11 +429,14 @@ begin
 			if (unsigned(dmem_i.mem_addr) >= unsigned(bram_base_addr) and
 					unsigned(dmem_i.mem_addr) < unsigned(bram_top_addr)) then
 				dcache_i.mem_valid <= '1';
+				pre_dmem_access <= CACHE_ACCESS;
 			else
 				dcache_i.mem_valid <= '0';
+				pre_dmem_access <= IO_MEM_ACCESS;
 			end if;
 		else
 			dcache_i.mem_valid <= '0';
+			pre_dmem_access <= NO_ACCESS;
 		end if;
 
 		dcache_i.mem_instr <= dmem_i.mem_instr;
@@ -373,7 +446,7 @@ begin
 		dcache_i.mem_wdata <= dmem_i.mem_wdata;
 		dcache_i.mem_wstrb <= dmem_i.mem_wstrb;
 
-		if dcache_i.mem_valid = '1' and do_mem_i.mem_valid = '1' then
+		if pre_dmem_access = CACHE_ACCESS then
 			da_mem_i.mem_valid <= do_mem_i.mem_valid;
 			da_mem_i.mem_instr <= do_mem_i.mem_instr;
 			da_mem_i.mem_spec <= do_mem_i.mem_spec;
@@ -381,7 +454,7 @@ begin
 			da_mem_i.mem_addr <= do_mem_i.mem_addr;
 			da_mem_i.mem_wdata <= do_mem_i.mem_wdata;
 			da_mem_i.mem_wstrb <= do_mem_i.mem_wstrb;
-		elsif dcache_i.mem_valid = '0' and dmem_i.mem_valid = '1' then
+		elsif pre_dmem_access = IO_MEM_ACCESS then
 			da_mem_i.mem_valid <= dmem_i.mem_valid;
 			da_mem_i.mem_instr <= dmem_i.mem_instr;
 			da_mem_i.mem_spec <= dmem_i.mem_spec;
@@ -399,10 +472,10 @@ begin
 			da_mem_i.mem_wstrb <= (others => '0');
 		end if;
 
-		if (dcache_mem_valid = '1' and dcache_o.mem_ready = '1') then
+		if post_dmem_access = CACHE_ACCESS then
 			dmem_o.mem_rdata <= dcache_o.mem_rdata;
 			dmem_o.mem_ready <= dcache_o.mem_ready;
-		elsif (dcache_mem_valid = '0' and da_mem_o.mem_ready = '1') then
+		elsif post_dmem_access = IO_MEM_ACCESS then
 			dmem_o.mem_rdata <= da_mem_o.mem_rdata;
 			dmem_o.mem_ready <= da_mem_o.mem_ready;
 		else
@@ -419,7 +492,13 @@ begin
 	begin
 
 		if rising_edge(clock) then
-			dcache_mem_valid <= dcache_i.mem_valid;
+			if reset = '0' then
+				post_dmem_access <= CACHE_ACCESS;
+			else
+				if dmem_i.mem_valid = '1' then
+					post_dmem_access <= pre_dmem_access;
+				end if;
+			end if;
 		end if;
 
 	end process;
@@ -429,8 +508,8 @@ begin
 	begin
 
 		if rising_edge(clock) then
-			if uart_valid = '1' and or_reduce(uart_addr) = '0' and or_reduce(uart_wstrb) = '1' then
-				print(massage,index,memory_wdata(7 downto 0));
+			if dcache_i.mem_valid = '1' then
+				check(dcache_i.mem_addr,dcache_i.mem_wstrb,dcache_i.mem_wdata);
 			end if;
 		end if;
 

@@ -159,7 +159,7 @@ begin
 		v.miss := '0';
 		v.invalid := '0';
 
-		if v.state = HIT then
+		if r_next.state = HIT then
 			v.en := r.en;
 			v.addr := r.addr;
 			v.tag := r.tag;
@@ -183,7 +183,7 @@ begin
 		ctrl_o.hit_i.tag7 <= ctrl_i.tag7_o.rdata;
 		ctrl_o.hit_i.valid <= ctrl_i.valid_o.rdata;
 
-		case v.state is
+		case r_next.state is
 
 			when HIT =>
 
@@ -238,8 +238,10 @@ begin
 							v.cline(191 downto 128) := mem_o.mem_rdata;
 						when 3 =>
 							v.cline(255 downto 192) := mem_o.mem_rdata;
-							v.state := UPDATE;
+							v.wen(v.wid) := '1';
+							v.wvec(v.wid) := '1';
 							v.valid := '0';
+							v.state := UPDATE;
 						when others =>
 							null;
 					end case;
@@ -253,8 +255,8 @@ begin
 
 			when UPDATE =>
 
-				v.wen(v.wid) := '1';
-				v.wvec(v.wid) := '1';
+				v.wen := (others => '0');
+				v.wvec := (others => '0');
 				v.valid := '0';
 				v.state := HIT;
 
@@ -334,7 +336,7 @@ begin
 		ctrl_o.valid_i.wen <= or_reduce(v.wen) or v.invalid;
 		ctrl_o.valid_i.wdata <= v.wvec;
 
-		if v.state = INVALIDATE then
+		if r_next.state = INVALIDATE then
 			if v.sid = 2**cache_set_depth-1 then
 				v.state := HIT;
 			else
@@ -356,9 +358,9 @@ begin
 			v.rdata := v.cline(255 downto 192);
 		end if;
 
-		if v.state = HIT then
-			v.ready := v.en;
-		elsif v.state = UPDATE then
+		if r_next.state = HIT then
+			v.ready := v.en and v.hit;
+		elsif r_next.state = UPDATE then
 			v.ready := not v.spec;
 		else
 			v.ready := '0';

@@ -32,6 +32,8 @@ architecture behavior of dctrl is
 
 	type ctrl_type is record
 		addr    : std_logic_vector(63 downto 0);
+		wdata   : std_logic_vector(63 downto 0);
+		wstrb   : std_logic_vector(7 downto 0);
 		tag     : std_logic_vector(58-cache_set_depth downto 0);
 		sid     : integer range 0 to 2**cache_set_depth-1;
 		lid     : integer range 0 to 4;
@@ -42,6 +44,8 @@ architecture behavior of dctrl is
 
 	constant init_ctrl_type : ctrl_type := (
 		addr    => (others => '0'),
+		wdata   => (others => '0'),
+		wstrb   => (others => '0'),
 		tag     => (others => '0'),
 		sid     => 0,
 		lid     => 0,
@@ -129,6 +133,8 @@ begin
 			else
 				v.rden := nor_reduce(cache_i.mem_wstrb);
 				v.wren := or_reduce(cache_i.mem_wstrb);
+				v.wdata := cache_i.mem_wdata;
+				v.wstrb := cache_i.mem_wstrb;
 				v.addr := cache_i.mem_addr(63 downto 5) & "00000";
 				v.tag := cache_i.mem_addr(63 downto cache_set_depth+5);
 				v.sid := to_integer(unsigned(cache_i.mem_addr(cache_set_depth+4 downto 5)));
@@ -172,14 +178,17 @@ begin
 
 		v.rden := '0';
 		v.wren := '0';
+		v.den := '0';
 		v.hit := '0';
 		v.miss := '0';
 		v.invalid := '0';
 
-		if v.state = HIT then
+		if r_next.state = HIT then
 			v.rden := r.rden;
 			v.wren := r.wren;
 			v.addr := r.addr;
+			v.wdata := r.wdata;
+			v.wstrb := r.wstrb;
 			v.tag := r.tag;
 			v.sid := r.sid;
 			v.lid := r.lid;
@@ -201,7 +210,7 @@ begin
 		ctrl_o.hit_i.tag7 <= ctrl_i.tag7_o.rdata;
 		ctrl_o.hit_i.valid <= ctrl_i.valid_o.rdata;
 
-		case v.state is
+		case r_next.state is
 
 			when HIT =>
 
@@ -216,9 +225,10 @@ begin
 				if v.miss = '1' then
 					v.state := MISS;
 					v.count := 0;
-					v.wstrb := (others => '0');
 					v.valid := '1';
 				elsif v.hit = '1' then
+					v.wen(v.wid) := v.wren;
+					v.wvec(v.wid) := v.wren;
 					v.dvec(v.wid) := v.wren;
 					v.den := v.wren;
 					if v.wid = 0 then
@@ -239,6 +249,9 @@ begin
 							v.cline := ctrl_i.data7_o.rdata;
 					end if;
 					v.valid := '0';
+					if v.wren = '1' then
+						v.state := UPDATE;
+					end if;
 				else
 					v.valid := '0';
 				end if;
@@ -288,6 +301,9 @@ begin
 						when 3 =>
 							v.cline(255 downto 192) := mem_o.mem_rdata;
 							if v.dirty = '0' then
+								v.wen(v.wid) := '1';
+								v.wvec(v.wid) := '1';
+								v.valid := '0';
 								v.state := UPDATE;
 							elsif v.dirty = '1' then
 								v.addr := v.dtag & std_logic_vector(to_unsigned(v.sid,cache_set_depth)) & "00000";
@@ -301,6 +317,9 @@ begin
 							v.wdata := v.dline(191 downto 128);
 						when 7 =>
 							v.wdata := v.dline(255 downto 192);
+							v.wen(v.wid) := '1';
+							v.wvec(v.wid) := '1';
+							v.valid := '0';
 							v.state := UPDATE;
 						when others =>
 							null;
@@ -318,8 +337,9 @@ begin
 
 			when UPDATE =>
 
-				v.wen(v.wid) := '1';
-				v.wvec(v.wid) := '1';
+				v.wen := (others => '0');
+				v.wvec := (others => '0');
+				v.dvec := (others => '0');
 				v.valid := '0';
 				v.state := HIT;
 
@@ -336,6 +356,16 @@ begin
 				null;
 
 		end case;
+
+		for i in 0 to 3 loop
+			if v.lid = i then
+				for j in 0 to 7 loop
+					if v.wstrb(j) = '1' then
+						v.cline(i*64+(j+1)*8-1 downto i*64+j*8) := v.wdata((j+1)*8-1 downto j*8);
+					end if;
+				end loop;
+			end if;
+		end loop;
 
 		ctrl_o.data0_i.waddr <= v.sid;
 		ctrl_o.data1_i.waddr <= v.sid;
@@ -422,9 +452,9 @@ begin
 			v.rdata := v.cline(255 downto 192);
 		end if;
 
-		if v.state = HIT then
-			v.ready := v.rden;
-		elsif v.state = UPDATE then
+		if r_next.state = HIT then
+			v.ready := (v.rden or v.wren) and v.hit;
+		elsif r_next.state = UPDATE then
 			v.ready := '1';
 		else
 			v.ready := '0';
