@@ -39,6 +39,9 @@ generate_timer:
 generate_float:
 	soft/float.sh ${RISCV} ${MARCH} ${MABI} ${ITER} ${PYTHON} ${OFFSET} ${BASEDIR}
 
+generate_cache:
+	soft/cache.sh ${RISCV} ${MARCH} ${MABI} ${ITER} ${PYTHON} ${OFFSET} ${BASEDIR}
+
 simulate:
 	sim/run.sh ${BASEDIR} ${GHDL} ${TEST} ${CYCLES} ${WAVE}
 
