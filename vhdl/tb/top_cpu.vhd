@@ -43,16 +43,11 @@ begin
 
 		if (rising_edge(clock)) then
 
-			if reset = '0' then
+			if count = clk_divider_rtc then
+				rtc <= not rtc;
 				count <= (others => '0');
-				rtc   <= '0';
 			else
-				if count = clk_divider_rtc then
-					rtc <= not rtc;
-					count <= (others => '0');
-				else
-					count <= count + 1;
-				end if;
+				count <= count + 1;
 			end if;
 
 		end if;
