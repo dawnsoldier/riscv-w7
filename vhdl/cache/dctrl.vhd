@@ -32,8 +32,8 @@ architecture behavior of dctrl is
 
 	type ctrl_type is record
 		addr    : std_logic_vector(63 downto 0);
-		wdata   : std_logic_vector(63 downto 0);
-		wstrb   : std_logic_vector(7 downto 0);
+		data    : std_logic_vector(63 downto 0);
+		strb    : std_logic_vector(7 downto 0);
 		tag     : std_logic_vector(58-cache_set_depth downto 0);
 		sid     : integer range 0 to 2**cache_set_depth-1;
 		lid     : integer range 0 to 4;
@@ -44,8 +44,8 @@ architecture behavior of dctrl is
 
 	constant init_ctrl_type : ctrl_type := (
 		addr    => (others => '0'),
-		wdata   => (others => '0'),
-		wstrb   => (others => '0'),
+		data    => (others => '0'),
+		strb    => (others => '0'),
 		tag     => (others => '0'),
 		sid     => 0,
 		lid     => 0,
@@ -57,6 +57,8 @@ architecture behavior of dctrl is
 	type data_type is record
 		state   : state_type;
 		addr    : std_logic_vector(63 downto 0);
+		data    : std_logic_vector(63 downto 0);
+		strb    : std_logic_vector(7 downto 0);
 		rdata   : std_logic_vector(63 downto 0);
 		wdata   : std_logic_vector(63 downto 0);
 		wstrb   : std_logic_vector(7 downto 0);
@@ -85,6 +87,8 @@ architecture behavior of dctrl is
 	constant init_data_type : data_type := (
 		state   => INVALIDATE,
 		addr    => (others => '0'),
+		data    => (others => '0'),
+		strb    => (others => '0'),
 		rdata   => (others => '0'),
 		wdata   => (others => '0'),
 		wstrb   => (others => '0'),
@@ -133,8 +137,8 @@ begin
 			else
 				v.rden := nor_reduce(cache_i.mem_wstrb);
 				v.wren := or_reduce(cache_i.mem_wstrb);
-				v.wdata := cache_i.mem_wdata;
-				v.wstrb := cache_i.mem_wstrb;
+				v.data := cache_i.mem_wdata;
+				v.strb := cache_i.mem_wstrb;
 				v.addr := cache_i.mem_addr(63 downto 5) & "00000";
 				v.tag := cache_i.mem_addr(63 downto cache_set_depth+5);
 				v.sid := to_integer(unsigned(cache_i.mem_addr(cache_set_depth+4 downto 5)));
@@ -182,13 +186,14 @@ begin
 		v.hit := '0';
 		v.miss := '0';
 		v.invalid := '0';
+		v.wstrb := X"00";
 
 		if r_next.state = HIT then
 			v.rden := r.rden;
 			v.wren := r.wren;
 			v.addr := r.addr;
-			v.wdata := r.wdata;
-			v.wstrb := r.wstrb;
+			v.data := r.data;
+			v.strb := r.strb;
 			v.tag := r.tag;
 			v.sid := r.sid;
 			v.lid := r.lid;
@@ -261,7 +266,7 @@ begin
 				if r_next.miss = '1' then
 					v.wid := ctrl_i.lru_o.wid;
 					v.dirty := v.dvec(v.wid);
-					v.dvec(v.wid) := not v.dirty;
+					v.dvec(v.wid) := r_next.wren;
 					v.den := '1';
 					if v.wid = 0 then
 						v.dline := ctrl_i.data0_o.rdata;
@@ -308,16 +313,19 @@ begin
 								v.state := UPDATE;
 							elsif v.dirty = '1' then
 								v.addr := v.dtag & std_logic_vector(to_unsigned(v.sid,cache_set_depth)) & "00000";
-								v.wstrb := (others => '1');
+								v.wdata := v.dline(63 downto 0);
+								v.wstrb := X"FF";
 							end if;
 						when 4 =>
-							v.wdata := v.dline(63 downto 0);
-						when 5 =>
 							v.wdata := v.dline(127 downto 64);
-						when 6 =>
+							v.wstrb := X"FF";
+						when 5 =>
 							v.wdata := v.dline(191 downto 128);
-						when 7 =>
+							v.wstrb := X"FF";
+						when 6 =>
 							v.wdata := v.dline(255 downto 192);
+							v.wstrb := X"FF";
+						when 7 =>
 							v.wen(v.wid) := '1';
 							v.wvec(v.wid) := '1';
 							v.valid := '0';
@@ -361,8 +369,8 @@ begin
 		for i in 0 to 3 loop
 			if v.lid = i then
 				for j in 0 to 7 loop
-					if v.wstrb(j) = '1' then
-						v.cline(i*64+(j+1)*8-1 downto i*64+j*8) := v.wdata((j+1)*8-1 downto j*8);
+					if v.strb(j) = '1' then
+						v.cline(i*64+(j+1)*8-1 downto i*64+j*8) := v.data((j+1)*8-1 downto j*8);
 					end if;
 				end loop;
 			end if;

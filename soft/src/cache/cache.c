@@ -5,6 +5,7 @@
 #define UART_BASE_ADDRESS 0x100000
 #define MTIMECMP 0x200000
 #define MTIME 0x200008
+#define HOST_ADDRESS 0x1000
 
 #define CACHE_LINE 4
 #define SET_SIZE 64
@@ -32,8 +33,13 @@ void write(long long counter,long long size)
 void read(long long counter,long long size)
 {
   unsigned long long volatile * const port = (unsigned long long*) STACK_ADDRESS;
+  unsigned long long volatile * const host = (unsigned long long*) HOST_ADDRESS;
   unsigned long long offset;
   unsigned long long result;
+  unsigned char a;
+  unsigned char b;
+  unsigned char c;
+  int cond = 0;
   for (int i=0; i<size; i++)
   {
     for (int j=0; j<counter; j++)
@@ -42,24 +48,32 @@ void read(long long counter,long long size)
       result = *(port+offset);
       if (result != (i+1)*(j+1))
       {
-        putch('F');
-        putch('A');
-        putch('L');
-        putch('S');
-        putch('E');
+        a = '0' + result;
+        b = '0' + i;
+        c = '0' + j;
+        putch(a);
+        putch(' ');
+        putch('=');
+        putch(' ');
+        putch(b);
+        putch(' ');
+        putch('*');
+        putch(' ');
+        putch(c);
         putch('\r');
         putch('\n');
-        while(1)
-        {};
+        cond = 1;
       }
     }
   }
-  putch('T');
-  putch('R');
-  putch('U');
-  putch('E');
-  putch('\r');
-  putch('\n');
+  if (cond == 1)
+  {
+    *(host) = 0xFF;
+  }
+  else
+  {
+    *(host) = 0x1;
+  }
 }
 
 int main()
