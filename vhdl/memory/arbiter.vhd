@@ -69,17 +69,25 @@ begin
 		end if;
 
 		if release_type = instr_access then
+			imem_o.mem_hit <= '0';
+			imem_o.mem_miss <= '0';
 			imem_o.mem_ready <= memory_ready;
 			imem_o.mem_rdata <= memory_rdata;
 		else
+			imem_o.mem_hit <= '0';
+			imem_o.mem_miss <= '0';
 			imem_o.mem_ready <= '0';
 			imem_o.mem_rdata <= (others => '0');
 		end if;
 
 		if release_type = data_access then
+			dmem_o.mem_hit <= '0';
+			dmem_o.mem_miss <= '0';
 			dmem_o.mem_ready <= memory_ready;
 			dmem_o.mem_rdata <= memory_rdata;
 		else
+			dmem_o.mem_hit <= '0';
+			dmem_o.mem_miss <= '0';
 			dmem_o.mem_ready <= '0';
 			dmem_o.mem_rdata <= (others => '0');
 		end if;

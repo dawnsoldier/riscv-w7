@@ -261,7 +261,8 @@ begin
 				if r_next.miss = '1' then
 					v.wid := ctrl_i.lru_o.wid;
 					v.dirty := v.dvec(v.wid);
-					v.dvec(v.wid) := '0';
+					v.dvec(v.wid) := not v.dirty;
+					v.den := '1';
 					if v.wid = 0 then
 						v.dline := ctrl_i.data0_o.rdata;
 						v.dtag := ctrl_i.tag0_o.rdata;
@@ -470,6 +471,8 @@ begin
 
 		cache_o.mem_rdata <= v.rdata;
 		cache_o.mem_ready <= v.ready;
+		cache_o.mem_hit <= v.hit;
+		cache_o.mem_miss <= v.miss;
 
 		rin_next <= v;
 

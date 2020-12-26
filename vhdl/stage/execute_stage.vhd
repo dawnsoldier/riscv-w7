@@ -245,6 +245,34 @@ begin
 			end if;
 		end if;
 
+		if (v.int_op.mcycle or v.fpu_op.fmcycle) = '0' then
+			if (d.m.stall or d.w.stall) = '1' then
+				v.int_wren := v.int_wren_n;
+				v.fpu_wren := v.fpu_wren_n;
+				v.csr_wren := v.csr_wren_n;
+				v.int := v.int_n;
+				v.fpu := v.fpu_n;
+				v.csr := v.csr_n;
+				v.comp := v.comp_n;
+				v.load := v.load_n;
+				v.store := v.store_n;
+				v.fpu_load := v.fpu_load_n;
+				v.fpu_store := v.fpu_store_n;
+			end if;
+		end if;
+
+		v.int_wren_n := v.int_wren;
+		v.fpu_wren_n := v.fpu_wren;
+		v.csr_wren_n := v.csr_wren;
+		v.int_n := v.int;
+		v.fpu_n := v.fpu;
+		v.csr_n := v.csr;
+		v.comp_n := v.comp;
+		v.load_n := v.load;
+		v.store_n := v.store;
+		v.fpu_load_n := v.fpu_load;
+		v.fpu_store_n := v.fpu_store;
+
 		if (v.stall or v.clear) = '1' then
 			v.int_wren := '0';
 			v.fpu_wren := '0';
