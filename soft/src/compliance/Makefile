@@ -22,7 +22,7 @@ vpath %.S $(src_dir)
 define compile_template
 
 $$($(1)_tests): $(1)-%: $(1)/src/%.S
-	$$(RISCV_GCC) $$(RISCV_GCC_OPTS) $$(RISCV_INCL) $$(RISCV_LINK_OPTS) $$< -o $(3)/$$@.elf
+	$$(RISCV_GCC) $$(RISCV_GCC_OPTS) $(4) $$(RISCV_INCL) $$(RISCV_LINK_OPTS) $$< -o $(3)/$$@.elf
 	$$(RISCV_NM) $(3)/$$@.elf | grep -sw 'tohost' | sed -e 's/.*:\(.*\) D.*/\1/' > $(3)/$$@.host
 	$$(RISCV_OBJDUMP) $(3)/$$@.elf > $(3)/$$@.dump
 	$$(RISCV_OBJCOPY) $(3)/$$@.elf $(3)/$$@.bin
@@ -33,7 +33,7 @@ endef
 $(eval $(call compile_template,rv64c,$(src_dir),$(bld_dir)))
 $(eval $(call compile_template,rv64i,$(src_dir),$(bld_dir)))
 $(eval $(call compile_template,rv64m,$(src_dir),$(bld_dir)))
-$(eval $(call compile_template,rv64p,$(src_dir),$(bld_dir)))
+$(eval $(call compile_template,rv64p,$(src_dir),$(bld_dir),-Drvtest_mtrap_routine=True))
 $(eval $(call compile_template,rv64z,$(src_dir),$(bld_dir)))
 
 all: $(tests)

@@ -6,7 +6,7 @@ use ieee.numeric_std.all;
 
 package configure is
 
-	constant bram_depth       : integer := 14;
+	constant bram_depth       : integer := 15;
 
 	constant icache_enable    : boolean := true;
 	constant icache_type      : integer := 0;
@@ -31,7 +31,7 @@ package configure is
 	constant pmp_regions      : integer := 8;
 
 	constant bram_base_addr  : std_logic_vector(63 downto 0) := X"0000000000000000";
-	constant bram_top_addr   : std_logic_vector(63 downto 0) := X"0000000000020000";
+	constant bram_top_addr   : std_logic_vector(63 downto 0) := X"0000000000040000";
 
 	constant uart_base_addr   : std_logic_vector(63 downto 0) := X"0000000000100000";
 	constant uart_top_addr    : std_logic_vector(63 downto 0) := X"0000000000100004";
