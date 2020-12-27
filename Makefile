@@ -2,6 +2,7 @@ default: none
 
 GHDL ?= /opt/ghdl/bin/ghdl
 RISCV ?= /opt/riscv/bin
+XLEN ?= 64
 MARCH ?= rv64imfdc
 MABI ?= lp64d
 ITER ?= 1
@@ -17,6 +18,9 @@ WAVE ?= "" # "wave" for saving dump file
 
 generate_isa:
 	soft/isa.sh ${RISCV} ${MARCH} ${MABI} ${PYTHON} ${OFFSET} ${BASEDIR}
+
+generate_compliance:
+	soft/compliance.sh ${RISCV} ${MARCH} ${MABI} ${XLEN} ${PYTHON} ${OFFSET} ${BASEDIR}
 
 generate_dhrystone:
 	soft/dhrystone.sh ${RISCV} ${MARCH} ${MABI} ${ITER} ${PYTHON} ${OFFSET} ${BASEDIR}

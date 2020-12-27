@@ -21,6 +21,7 @@ then
      [ ! "$3" = 'ui' ] && [ ! "$3" = 'um' ] && \
      [ ! "$3" = 'uf' ] && [ ! "$3" = 'ud' ] && \
      [ ! "$3" = 'uc' ] && \
+     [ ! "$3" = 'compliance' ] && \
      [ ! "$3" = 'dhrystone' ] && \
      [ ! "$3" = 'coremark' ] && \
      [ ! "$3" = 'csmith' ] && \
@@ -280,6 +281,22 @@ then
   fi
   cp $DIR/build/torture/dat/torture.dat bram_mem.dat
   $SIMULA top_cpu --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
+elif [ "$3" = 'compliance' ]
+then
+  for filename in $DIR/build/compliance/dat/*.dat; do
+    cp $filename bram_mem.dat
+    filename=${filename##*/}
+    filename=${filename%.dat}
+    if [ "$5" = 'wave' ]
+    then
+      WAVE="--wave=${filename}.ghw"
+    elif [ "$5" = 'vcd' ]
+    then
+      WAVE="--vcd=${filename}.vcd"
+    fi
+    echo "${filename}"
+    $SIMULA top_cpu --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
+  done
 elif [ "$3" = 'all' ]
 then
   for filename in $DIR/build/isa/dat/*.dat; do
