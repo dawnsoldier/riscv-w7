@@ -247,6 +247,7 @@ then
     WAVE="--vcd=dhrystone.vcd"
   fi
   cp $DIR/build/dhrystone/dat/dhrystone.dat bram_mem.dat
+  cp $DIR/build/dhrystone/elf/dhrystone.host host.dat
   $SIMULA top_cpu --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
 elif [ "$3" = 'coremark' ]
 then
@@ -258,6 +259,7 @@ then
     WAVE="--vcd=coremark.vcd"
   fi
   cp $DIR/build/coremark/dat/coremark.dat bram_mem.dat
+  cp $DIR/build/coremark/elf/coremark.host host.dat
   $SIMULA top_cpu --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
 elif [ "$3" = 'csmith' ]
 then
@@ -269,6 +271,7 @@ then
     WAVE="--vcd=csmith.vcd"
   fi
   cp $DIR/build/csmith/dat/csmith.dat bram_mem.dat
+  cp $DIR/build/csmith/elf/csmith.host host.dat
   $SIMULA top_cpu --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
 elif [ "$3" = 'torture' ]
 then
@@ -280,6 +283,7 @@ then
     WAVE="--vcd=torture.vcd"
   fi
   cp $DIR/build/torture/dat/torture.dat bram_mem.dat
+  cp $DIR/build/torture/elf/torture.host host.dat
   $SIMULA top_cpu --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
 elif [ "$3" = 'compliance' ]
 then
@@ -287,6 +291,7 @@ then
     cp $filename bram_mem.dat
     filename=${filename##*/}
     filename=${filename%.dat}
+    cp $DIR/build/compliance/elf/${filename}.host host.dat
     if [ "$5" = 'wave' ]
     then
       WAVE="--wave=${filename}.ghw"
@@ -303,6 +308,7 @@ then
     cp $filename bram_mem.dat
     filename=${filename##*/}
     filename=${filename%.dat}
+    cp $DIR/build/isa/elf/${filename}.host host.dat
     if [ "$5" = 'wave' ]
     then
       WAVE="--wave=${filename}.ghw"
@@ -319,6 +325,7 @@ then
     cp $filename bram_mem.dat
     filename=${filename##*/}
     filename=${filename%.dat}
+    cp $DIR/build/isa/elf/${filename}.host host.dat
     if [ "$5" = 'wave' ]
     then
       WAVE="--wave=${filename}.ghw"
@@ -335,6 +342,7 @@ then
     cp $filename bram_mem.dat
     filename=${filename##*/}
     filename=${filename%.dat}
+    cp $DIR/build/isa/elf/${filename}.host host.dat
     if [ "$5" = 'wave' ]
     then
       WAVE="--wave=${filename}.ghw"
@@ -351,6 +359,7 @@ then
     cp $filename bram_mem.dat
     filename=${filename##*/}
     filename=${filename%.dat}
+    cp $DIR/build/isa/elf/${filename}.host host.dat
     if [ "$5" = 'wave' ]
     then
       WAVE="--wave=${filename}.ghw"
@@ -367,6 +376,7 @@ then
     cp $filename bram_mem.dat
     filename=${filename##*/}
     filename=${filename%.dat}
+    cp $DIR/build/isa/elf/${filename}.host host.dat
     if [ "$5" = 'wave' ]
     then
       WAVE="--wave=${filename}.ghw"
@@ -383,6 +393,7 @@ then
     cp $filename bram_mem.dat
     filename=${filename##*/}
     filename=${filename%.dat}
+    cp $DIR/build/isa/elf/${filename}.host host.dat
     if [ "$5" = 'wave' ]
     then
       WAVE="--wave=${filename}.ghw"
@@ -399,6 +410,7 @@ then
     cp $filename bram_mem.dat
     filename=${filename##*/}
     filename=${filename%.dat}
+    cp $DIR/build/isa/elf/${filename}.host host.dat
     if [ "$5" = 'wave' ]
     then
       WAVE="--wave=${filename}.ghw"
@@ -411,8 +423,11 @@ then
   done
 else
   filename="$3"
+  dirname="$3"
   filename=${filename##*/}
   filename=${filename%.dat}
+  subpath=${dirname%/dat*}
+  cp $DIR/${subpath}/elf/${filename}.host host.dat
   if [ "$5" = 'wave' ]
   then
     WAVE="--wave=${filename}.ghw"

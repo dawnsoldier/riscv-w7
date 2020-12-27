@@ -234,9 +234,14 @@ architecture behavior of cpu is
 		variable ok : std_logic;
 		constant succ : string := "TEST SUCCEEDED";
 		constant fail : string := "TEST FAILED";
+		file host_file : text open read_mode is "host.dat";
+		variable host_line  : line;
+		variable host_address : std_logic_vector(63 downto 0);
 	begin
+		readline(host_file,host_line);
+		hread(host_line,host_address);
 		ok := '0';
-		if (addr = X"0000000000001000") and (or_reduce(strb) = '1') then
+		if (addr = host_address) and (or_reduce(strb) = '1') then
 			ok := '1';
 		end if;
 		if ok = '1' then
