@@ -479,8 +479,6 @@ begin
 
 		cache_o.mem_rdata <= v.rdata;
 		cache_o.mem_ready <= v.ready;
-		cache_o.mem_hit <= v.hit;
-		cache_o.mem_miss <= v.miss;
 
 		rin_next <= v;
 
