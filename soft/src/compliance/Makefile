@@ -10,7 +10,7 @@ include $(src_dir)/rv64p/Makefrag
 include $(src_dir)/rv64z/Makefrag
 
 RISCV_GCC ?= $(RISCV)/riscv64-unknown-elf-gcc
-RISCV_GCC_OPTS ?= -march=$(MARCH) -mabi=$(MABI) -DXLEN=$(XLEN) -static -mcmodel=medany -fvisibility=hidden -nostdlib -nostartfiles
+RISCV_GCC_OPTS ?= -static -mcmodel=medany -fvisibility=hidden -nostdlib -nostartfiles
 RISCV_INCL ?= -I $(src_dir)/env
 RISCV_LINK_OPTS ?= -T $(src_dir)/env/link.ld
 RISCV_OBJDUMP ?= $(RISCV)/riscv64-unknown-elf-objdump -Mnumeric,no-aliases --disassemble-all --disassemble-zeroes
@@ -30,11 +30,11 @@ tests += $$($(1)_tests)
 
 endef
 
-$(eval $(call compile_template,rv64c,$(src_dir),$(bld_dir)))
-$(eval $(call compile_template,rv64i,$(src_dir),$(bld_dir)))
-$(eval $(call compile_template,rv64m,$(src_dir),$(bld_dir)))
-$(eval $(call compile_template,rv64p,$(src_dir),$(bld_dir),-Drvtest_mtrap_routine=True))
-$(eval $(call compile_template,rv64z,$(src_dir),$(bld_dir)))
+$(eval $(call compile_template,rv64c,$(src_dir),$(bld_dir),-march=rv64ic -mabi=lp64 -DXLEN=64))
+$(eval $(call compile_template,rv64i,$(src_dir),$(bld_dir),-march=rv64i -mabi=lp64 -DXLEN=64))
+$(eval $(call compile_template,rv64m,$(src_dir),$(bld_dir),-march=rv64im -mabi=lp64 -DXLEN=64))
+$(eval $(call compile_template,rv64p,$(src_dir),$(bld_dir),-march=rv64i -mabi=lp64 -DXLEN=64 -Drvtest_mtrap_routine=True))
+$(eval $(call compile_template,rv64z,$(src_dir),$(bld_dir),-march=rv64i -mabi=lp64 -DXLEN=64))
 
 all: $(tests)
 
