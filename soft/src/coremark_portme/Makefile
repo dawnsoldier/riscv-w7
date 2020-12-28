@@ -37,4 +37,4 @@ coremark.bin: $(bld_dir)/coremark.elf
 
 # Default
 
-all: coremark.elf coremark.dump coremark.bin
+all: coremark.elf coremark.host coremark.dump coremark.bin
