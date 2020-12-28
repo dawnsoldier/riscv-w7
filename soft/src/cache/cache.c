@@ -1,5 +1,6 @@
 #include "encoding.h"
 #include <stdint.h>
+#include <math.h>
 
 #define CYCLES_PER_SECONDS 50000000
 #define UART_BASE_ADDRESS 0x100000
@@ -14,6 +15,44 @@
 void putch(char ch)
 {
   *((volatile char*)UART_BASE_ADDRESS) = ch;
+}
+
+void print_number(int i)
+{
+  unsigned char res;
+  int power;
+  int div;
+  int rem;
+  power = 1;
+  while(1)
+  {
+    if (power*10 <= i)
+    {
+      power = power*10;
+    }
+    else
+    {
+      break;
+    }
+  }
+  while(1)
+  {
+    if (power == 1)
+    {
+      rem = i % 10;
+      res = '0' + rem;
+      putch(res);
+      break;
+    }
+    else
+    {
+      div = i / power;
+      i = i - div * power;
+      power = power / 10;
+      res = '0' + div;
+      putch(res);
+    }
+  }
 }
 
 void write(long long counter,long long size)
@@ -36,9 +75,6 @@ void read(long long counter,long long size)
   unsigned long long volatile * const host = (unsigned long long*) HOST_ADDRESS;
   unsigned long long offset;
   unsigned long long result;
-  unsigned char a;
-  unsigned char b;
-  unsigned char c;
   int cond = 0;
   for (int i=0; i<size; i++)
   {
@@ -48,18 +84,15 @@ void read(long long counter,long long size)
       result = *(port+offset);
       if (result != (i+1)*(j+1))
       {
-        a = '0' + result;
-        b = '0' + i;
-        c = '0' + j;
-        putch(a);
+        print_number(result);
         putch(' ');
         putch('=');
         putch(' ');
-        putch(b);
+        print_number(i+1);
         putch(' ');
         putch('*');
         putch(' ');
-        putch(c);
+        print_number(j+1);
         putch('\r');
         putch('\n');
         cond = 1;

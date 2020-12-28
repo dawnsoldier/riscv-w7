@@ -15,6 +15,7 @@ RISCV_INCL ?= -I$(src_dir)/env -I$(src_dir)/float -I$(src_dir)/common
 
 float.elf: $(objs)
 	$(RISCV_GCC) $(RISCV_INCL) $(RISCV_GCC_OPTS) $^ -o $(bld_dir)/$@ $(RISCV_LINK_OPTS)
+	cp $(BASEDIR)/soft/src/float/float.host $(bld_dir)
 	mv $^ $(bld_dir)
 
 %.o: %.c
