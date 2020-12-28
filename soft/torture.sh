@@ -13,11 +13,12 @@ cd -
 
 RISCV_GCC=$RISCV/riscv64-unknown-elf-gcc
 RISCV_GCC_OPTS="-march=$MARCH -mabi=$MABI -DPREALLOCATE=1 -mcmodel=medany -static -std=gnu99 -O2 -ffast-math -fno-common -fno-builtin-printf"
-RISCV_LINK_OPTS="-static -nostdlib -nostartfiles -lm -lgcc -T $BASEDIR/tools/riscv-torture/env/p/link.ld"
+RISCV_LINK_OPTS="-static -nostdlib -nostartfiles -lm -lgcc -T $BASEDIR/soft/src/env/link.ld"
 RISCV_OBJDUMP="$RISCV/riscv64-unknown-elf-objdump -Mnumeric,no-aliases --disassemble-all --disassemble-zeroes"
 RISCV_OBJCOPY="$RISCV/riscv64-unknown-elf-objcopy -O binary"
 RISCV_INCL="-I $BASEDIR/soft/src/common -I $BASEDIR/soft/src/env"
 RISCV_SRC="$BASEDIR/tools/riscv-torture/output/test.S"
+RISCV_NM="$RISCV/riscv64-unknown-elf-nm -A"
 
 ELF2COE=$BASEDIR/soft/py/elf2coe.py
 ELF2DAT=$BASEDIR/soft/py/elf2dat.py
@@ -40,6 +41,7 @@ mkdir ${BASEDIR}/build/torture/mif
 mkdir ${BASEDIR}/build/torture/hex
 
 $RISCV_GCC $RISCV_GCC_OPTS $RISCV_LINK_OPTS -o ${BASEDIR}/build/torture/elf/torture.elf $RISCV_SRC $RISCV_INCL
+$RISCV_NM ${BASEDIR}/build/torture/elf/torture.elf | grep -sw 'tohost' | sed -e 's/.*:\(.*\) D.*/\1/' > ${BASEDIR}/build/torture/elf/torture.host
 $RISCV_OBJCOPY ${BASEDIR}/build/torture/elf/torture.elf ${BASEDIR}/build/torture/elf/torture.bin
 $RISCV_OBJDUMP ${BASEDIR}/build/torture/elf/torture.elf > ${BASEDIR}/build/torture/dump/torture.dump
 
