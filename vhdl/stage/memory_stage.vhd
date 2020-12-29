@@ -123,6 +123,8 @@ begin
 			v.fpu := '0';
 			v.csr := '0';
 			v.exc := '0';
+			v.ecall := '0';
+			v.ebreak := '0';
 			v.mret := '0';
 			v.valid := '0';
 		end if;

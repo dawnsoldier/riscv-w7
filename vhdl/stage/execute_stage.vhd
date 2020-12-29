@@ -125,13 +125,34 @@ begin
 
 		if (d.e.stall or d.m.stall or d.w.stall) = '1' then
 			v := r;
+			v.int_wren := v.int_wren_n;
+			v.fpu_wren := v.fpu_wren_n;
+			v.csr_wren := v.csr_wren_n;
+			v.int := v.int_n;
+			v.fpu := v.fpu_n;
+			v.csr := v.csr_n;
+			v.comp := v.comp_n;
+			v.load := v.load_n;
+			v.store := v.store_n;
+			v.fpu_load := v.fpu_load_n;
+			v.fpu_store := v.fpu_store_n;
+			v.return_pop := v.return_pop_n;
+			v.return_push := v.return_push_n;
+			v.jump_uncond := v.jump_uncond_n;
+			v.jump_rest := v.jump_rest_n;
+			v.taken := v.taken_n;
+			v.exc := v.exc_n;
+			v.ecall := v.ecall_n;
+			v.ebreak := v.ebreak_n;
+			v.mret := v.mret_n;
+			v.valid := v.valid_n;
 		end if;
 
 		v.stall := '0';
 
-		v.clear := csr_eo.exc or csr_eo.mret or d.e.jump or d.w.clear;
+		v.clear := csr_eo.exc or csr_eo.mret or d.e.jump or a.m.stall or d.w.clear;
 
-		v.enable := not(d.e.stall or d.m.stall or d.w.stall or d.w.clear);
+		v.enable := not(v.clear);
 
 		fpu_exe_i.idata <= v.rdata1;
 
@@ -219,15 +240,7 @@ begin
 			if v.ready = '0' then
 				if (d.m.stall or d.w.stall) = '0' then
 					v.stall := '1';
-				else
-					v.int := '1';
-					v.int_wren := or_reduce(r.waddr);
-					v.wdata := r.wdata;
 				end if;
-			elsif v.ready = '1' then
-				v.int := '1';
-				v.int_wren := or_reduce(v.waddr);
-				v.wdata := v.idata;
 			end if;
 		end if;
 
@@ -235,29 +248,10 @@ begin
 		fpu_exe_i.clear <= v.clear;
 
 		if v.fpu_op.fmcycle = '1' then
-			if fpu_exe_o.stall = '0' then
-				v.stall := '0';
-				v.fpu := '1';
-			elsif fpu_exe_o.stall = '1' then
+			if fpu_exe_o.stall = '1' then
 				if (d.m.stall or d.w.stall) = '0' then
 					v.stall := '1';
 				end if;
-			end if;
-		end if;
-
-		if (v.int_op.mcycle or v.fpu_op.fmcycle) = '0' then
-			if (d.m.stall or d.w.stall) = '1' then
-				v.int_wren := v.int_wren_n;
-				v.fpu_wren := v.fpu_wren_n;
-				v.csr_wren := v.csr_wren_n;
-				v.int := v.int_n;
-				v.fpu := v.fpu_n;
-				v.csr := v.csr_n;
-				v.comp := v.comp_n;
-				v.load := v.load_n;
-				v.store := v.store_n;
-				v.fpu_load := v.fpu_load_n;
-				v.fpu_store := v.fpu_store_n;
 			end if;
 		end if;
 
@@ -272,6 +266,16 @@ begin
 		v.store_n := v.store;
 		v.fpu_load_n := v.fpu_load;
 		v.fpu_store_n := v.fpu_store;
+		v.return_pop_n := v.return_pop;
+		v.return_push_n := v.return_push;
+		v.jump_uncond_n := v.jump_uncond;
+		v.jump_rest_n := v.jump_rest;
+		v.taken_n := v.taken;
+		v.exc_n := v.exc;
+		v.ecall_n := v.ecall;
+		v.ebreak_n := v.ebreak;
+		v.mret_n := v.mret;
+		v.valid_n := v.valid;
 
 		if (v.stall or v.clear) = '1' then
 			v.int_wren := '0';
@@ -291,6 +295,8 @@ begin
 			v.jump_rest := '0';
 			v.taken := '0';
 			v.exc := '0';
+			v.ecall := '0';
+			v.ebreak := '0';
 			v.mret := '0';
 			v.jump := '0';
 			v.valid := '0';

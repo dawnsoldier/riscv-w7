@@ -324,6 +324,8 @@ begin
 			v.fpu_store := '0';
 			v.taken := '0';
 			v.exc := '0';
+			v.ecall := '0';
+			v.ebreak := '0';
 			v.mret := '0';
 			v.fence := '0';
 			v.valid := '0';
