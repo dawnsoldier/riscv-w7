@@ -76,7 +76,7 @@ begin
 
 		v.stall := '0';
 
-		v.clear := csr_eo.exc or csr_eo.mret or d.w.clear;
+		v.clear := csr_eo.exc or csr_eo.mret or a.m.stall or d.w.clear;
 
 		if d.e.jump = '1' and d.f.taken = '0' then
 			v.clear := '1';
@@ -272,10 +272,10 @@ begin
 		if (d.d.csr_wren or d.e.csr_wren) = '1' then
 			v.stall := '1';
 		elsif (d.d.load) = '1' then
-			if (nor_reduce(d.d.waddr xor v.raddr1) and ((d.d.int_wren and v.int_rden1))) = '1' then
+			if (nor_reduce(d.d.waddr xor v.raddr1) and v.int_rden1) = '1' then
 				v.stall := '1';
 			end if;
-			if (nor_reduce(d.d.waddr xor v.raddr2) and ((d.d.int_wren and v.int_rden2))) = '1' then
+			if (nor_reduce(d.d.waddr xor v.raddr2) and v.int_rden2) = '1' then
 				v.stall := '1';
 			end if;
 		elsif (v.csr_rden) = '1' then
@@ -284,17 +284,6 @@ begin
 			end if;
 		elsif (d.d.int_op.mcycle) = '1' then
 			v.stall := '1';
-		end if;
-
-		if (d.m.stall or d.w.stall) = '1' then
-			if d.e.load = '1' then
-				if (nor_reduce(d.e.waddr xor d.d.raddr1) and ((d.e.int_wren and d.d.int_rden1))) = '1' then
-					v.stall := '1';
-				end if;
-				if (nor_reduce(d.e.waddr xor d.d.raddr2) and ((d.e.int_wren and d.d.int_rden2))) = '1' then
-					v.stall := '1';
-				end if;
-			end if;
 		end if;
 
 		fpu_dec_i.stall <= v.stall;

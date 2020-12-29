@@ -271,6 +271,8 @@ package wire is
 		imm           : std_logic_vector(63 downto 0);
 		fmt           : std_logic_vector(1 downto 0);
 		rm            : std_logic_vector(2 downto 0);
+		int_rden1     : std_logic;
+		int_rden2     : std_logic;
 		csr_rden      : std_logic;
 		int_wren      : std_logic;
 		fpu_wren      : std_logic;
@@ -279,6 +281,7 @@ package wire is
 		fpu_wren_n    : std_logic;
 		csr_wren_n    : std_logic;
 		raddr1        : std_logic_vector(4 downto 0);
+		raddr2        : std_logic_vector(4 downto 0);
 		waddr         : std_logic_vector(4 downto 0);
 		caddr         : std_logic_vector(11 downto 0);
 		rdata1        : std_logic_vector(63 downto 0);
@@ -348,6 +351,8 @@ package wire is
 		imm           => (others => '0'),
 		fmt           => (others => '0'),
 		rm            => (others => '0'),
+		int_rden1     => '0',
+		int_rden2     => '0',
 		csr_rden      => '0',
 		int_wren      => '0',
 		fpu_wren      => '0',
@@ -356,6 +361,7 @@ package wire is
 		fpu_wren_n    => '0',
 		csr_wren_n    => '0',
 		raddr1        => (others => '0'),
+		raddr2        => (others => '0'),
 		waddr         => (others => '0'),
 		caddr         => (others => '0'),
 		rdata1        => (others => '0'),

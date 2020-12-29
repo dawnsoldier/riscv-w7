@@ -65,11 +65,14 @@ begin
 		v.fmt := d.d.fmt;
 		v.rm := d.d.rm;
 		v.imm := d.d.imm;
+		v.int_rden1 := d.d.int_rden1;
+		v.int_rden2 := d.d.int_rden2;
 		v.csr_rden := d.d.csr_rden;
 		v.int_wren := d.d.int_wren;
 		v.fpu_wren := d.d.fpu_wren;
 		v.csr_wren := d.d.csr_wren;
 		v.raddr1 := d.d.raddr1;
+		v.raddr2 := d.d.raddr2;
 		v.waddr := d.d.waddr;
 		v.caddr := d.d.caddr;
 		v.load := d.d.load;
@@ -96,32 +99,6 @@ begin
 		v.ebreak := d.d.ebreak;
 		v.mret := d.d.mret;
 		v.valid := d.d.valid;
-
-		int_reg_ri.rden1 <= d.d.int_rden1;
-		int_reg_ri.rden2 <= d.d.int_rden2;
-		int_reg_ri.raddr1 <= d.d.raddr1;
-		int_reg_ri.raddr2 <= d.d.raddr2;
-
-		csr_ri.rden <= d.d.csr_rden;
-		csr_ri.raddr <= d.d.caddr;
-
-		int_for_i.reg_en1 <= d.d.int_rden1;
-		int_for_i.reg_en2 <= d.d.int_rden2;
-		int_for_i.reg_addr1 <= d.d.raddr1;
-		int_for_i.reg_addr2 <= d.d.raddr2;
-		int_for_i.reg_data1 <= int_reg_o.data1;
-		int_for_i.reg_data2 <= int_reg_o.data2;
-		int_for_i.exe_en <= d.e.int_wren;
-		int_for_i.mem_en <= d.m.int_wren;
-		int_for_i.exe_addr <= d.e.waddr;
-		int_for_i.mem_addr <= d.m.waddr;
-		int_for_i.exe_data <= d.e.wdata;
-		int_for_i.mem_data <= d.m.wdata;
-
-		v.cdata := csr_o.data;
-
-		v.rdata1 := int_for_o.data1;
-		v.rdata2 := int_for_o.data2;
 
 		if (d.e.stall or d.m.stall or d.w.stall) = '1' then
 			v := r;
@@ -153,6 +130,32 @@ begin
 		v.clear := csr_eo.exc or csr_eo.mret or d.e.jump or a.m.stall or d.w.clear;
 
 		v.enable := not(v.clear);
+
+		int_reg_ri.rden1 <= v.int_rden1;
+		int_reg_ri.rden2 <= v.int_rden2;
+		int_reg_ri.raddr1 <= v.raddr1;
+		int_reg_ri.raddr2 <= v.raddr2;
+
+		csr_ri.rden <= v.csr_rden;
+		csr_ri.raddr <= v.caddr;
+
+		int_for_i.reg_en1 <= v.int_rden1;
+		int_for_i.reg_en2 <= v.int_rden2;
+		int_for_i.reg_addr1 <= v.raddr1;
+		int_for_i.reg_addr2 <= v.raddr2;
+		int_for_i.reg_data1 <= int_reg_o.data1;
+		int_for_i.reg_data2 <= int_reg_o.data2;
+		int_for_i.exe_en <= d.e.int_wren;
+		int_for_i.mem_en <= d.m.int_wren;
+		int_for_i.exe_addr <= d.e.waddr;
+		int_for_i.mem_addr <= d.m.waddr;
+		int_for_i.exe_data <= d.e.wdata;
+		int_for_i.mem_data <= d.m.wdata;
+
+		v.cdata := csr_o.data;
+
+		v.rdata1 := int_for_o.data1;
+		v.rdata2 := int_for_o.data2;
 
 		fpu_exe_i.idata <= v.rdata1;
 
@@ -252,6 +255,15 @@ begin
 				if (d.m.stall or d.w.stall) = '0' then
 					v.stall := '1';
 				end if;
+			end if;
+		end if;
+
+		if d.e.load = '1' then
+			if (nor_reduce(d.e.waddr xor v.raddr1) and v.int_rden1) = '1' then
+				v.stall := '1';
+			end if;
+			if (nor_reduce(d.e.waddr xor v.raddr2) and v.int_rden2) = '1' then
+				v.stall := '1';
 			end if;
 		end if;
 
