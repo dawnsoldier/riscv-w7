@@ -18,7 +18,6 @@ entity memory_stage is
 		reset     : in  std_logic;
 		clock     : in  std_logic;
 		csr_eo    : in  csr_exception_out_type;
-		fpu_mem_i : out fpu_mem_in_type;
 		dmem_o    : in  mem_out_type;
 		a         : in  memory_in_type;
 		d         : in  memory_in_type;
@@ -109,11 +108,11 @@ begin
 			end if;
 		end if;
 
-		fpu_mem_i.wdata <= v.wdata;
-		fpu_mem_i.nbox <= v.load_op.mem_lw;
-
-		fpu_mem_i.stall <= v.stall;
-		fpu_mem_i.clear <= v.clear;
+		if v.fpu_load = '1' then
+			if v.load_op.mem_lw = '1' then
+				v.wdata(63 downto 32) := X"FFFFFFFF"; -- NaN Boxing
+			end if;
+		end if;
 
 		if (v.stall or v.clear) = '1' then
 			v.int_wren := '0';

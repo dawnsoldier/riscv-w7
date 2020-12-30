@@ -9,12 +9,17 @@ use ieee.std_logic_misc.all;
 use work.configure.all;
 use work.constants.all;
 use work.wire.all;
+use work.fp_wire.all;
 
 library std;
 use std.textio.all;
 use std.env.all;
 
 entity cpu is
+	generic(
+		fpu_enable      : boolean := fpu_enable;
+		fpu_performance : boolean := fpu_performance
+	);
 	port(
 		reset : in  std_logic;
 		clock : in  std_logic;
@@ -38,6 +43,8 @@ architecture behavior of cpu is
 			ipmp_i    : out pmp_in_type;
 			dpmp_o    : in  pmp_out_type;
 			dpmp_i    : out pmp_in_type;
+			fpu_o     : in  fpu_out_type;
+			fpu_i     : out fpu_in_type;
 			time_irpt : in  std_logic;
 			ext_irpt  : in  std_logic
 		);
@@ -65,6 +72,15 @@ architecture behavior of cpu is
 			clock  : in  std_logic;
 			pmp_i  : in  pmp_in_type;
 			pmp_o  : out pmp_out_type
+		);
+	end component;
+
+	component fpu
+		port(
+			reset     : in  std_logic;
+			clock     : in  std_logic;
+			fpu_i     : in  fpu_in_type;
+			fpu_o     : out fpu_out_type
 		);
 	end component;
 
@@ -170,6 +186,9 @@ architecture behavior of cpu is
 	signal ipmp_o : pmp_out_type;
 	signal dpmp_i : pmp_in_type;
 	signal dpmp_o : pmp_out_type;
+
+	signal fpu_o : fpu_out_type;
+	signal fpu_i : fpu_in_type;
 
 	signal memory_valid : std_logic;
 	signal memory_ready : std_logic;
@@ -586,6 +605,8 @@ begin
 			ipmp_i    => ipmp_i,
 			dpmp_o    => dpmp_o,
 			dpmp_i    => dpmp_i,
+			fpu_o     => fpu_o,
+			fpu_i     => fpu_i,
 			time_irpt => timer_irpt,
 			ext_irpt  => '0'
 		);
@@ -635,6 +656,18 @@ begin
 			pmp_i  => dpmp_i,
 			pmp_o  => dpmp_o
 		);
+
+	FP_Unit : if fpu_enable = true generate
+
+		fpu_comp : fpu
+			port map(
+				reset => reset,
+				clock => clock,
+				fpu_i => fpu_i,
+				fpu_o => fpu_o
+			);
+
+	end generate FP_Unit;
 
 	arbiter_comp : arbiter
 		port map(

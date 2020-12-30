@@ -16,27 +16,12 @@ entity fpu is
 	port(
 		reset     : in  std_logic;
 		clock     : in  std_logic;
-		fpu_dec_i : in  fpu_dec_in_type;
-		fpu_dec_o : out fpu_dec_out_type;
-		fpu_exe_i : in  fpu_exe_in_type;
-		fpu_exe_o : out fpu_exe_out_type;
-		fpu_mem_i : in  fpu_mem_in_type;
-		fp_dec_i  : in  fp_dec_in_type;
-		fp_dec_o  : out fp_dec_out_type
+		fpu_i     : in  fpu_in_type;
+		fpu_o     : out fpu_out_type
 	);
 end fpu;
 
 architecture behavior of fpu is
-
-	signal fp_exe_o : fp_exe_out_type;
-	signal fp_exe_i : fp_exe_in_type;
-
-	signal fp_reg_ri : fp_reg_read_in_type;
-	signal fp_reg_wi : fp_reg_write_in_type;
-	signal fp_reg_o  : fp_reg_out_type;
-
-	signal fp_for_i : fp_for_in_type;
-	signal fp_for_o : fp_for_out_type;
 
 	signal lzc1_64_i : lzc_64_in_type;
 	signal lzc1_64_o : lzc_64_out_type;
@@ -86,14 +71,14 @@ begin
 
 	fp_dec_comp : fp_dec
 		port map(
-			fp_dec_i => fp_dec_i,
-			fp_dec_o => fp_dec_o
+			fp_dec_i => fpu_i.fp_dec_i,
+			fp_dec_o => fpu_o.fp_dec_o
 		);
 
 	fp_exe_comp : fp_exe
 		port map(
-			fp_exe_i     => fp_exe_i,
-			fp_exe_o     => fp_exe_o,
+			fp_exe_i     => fpu_i.fp_exe_i,
+			fp_exe_o     => fpu_o.fp_exe_o,
 			fp_ext1_o    => fp_ext1_o,
 			fp_ext1_i    => fp_ext1_i,
 			fp_ext2_o    => fp_ext2_o,
@@ -120,37 +105,19 @@ begin
 			fp_rnd_i     => fp_rnd_i
 		);
 
-	fp_pipe_comp : fp_pipe
-		port map(
-			reset     => reset,
-			clock     => clock,
-			fpu_dec_i => fpu_dec_i,
-			fpu_dec_o => fpu_dec_o,
-			fpu_exe_i => fpu_exe_i,
-			fpu_exe_o => fpu_exe_o,
-			fpu_mem_i => fpu_mem_i,
-			fp_exe_o  => fp_exe_o,
-			fp_exe_i  => fp_exe_i,
-			fp_reg_o  => fp_reg_o,
-			fp_reg_ri => fp_reg_ri,
-			fp_reg_wi => fp_reg_wi,
-			fp_for_o  => fp_for_o,
-			fp_for_i  => fp_for_i
-		);
-
 	fp_reg_comp : fp_reg
 		port map(
 			reset     => reset,
 			clock     => clock,
-			fp_reg_ri => fp_reg_ri,
-			fp_reg_wi => fp_reg_wi,
-			fp_reg_o  => fp_reg_o
+			fp_reg_ri => fpu_i.fp_reg_ri,
+			fp_reg_wi => fpu_i.fp_reg_wi,
+			fp_reg_o  => fpu_o.fp_reg_o
 		);
 
 	fp_for_comp : fp_for
 		port map(
-			fp_for_i => fp_for_i,
-			fp_for_o => fp_for_o
+			fp_for_i => fpu_i.fp_for_i,
+			fp_for_o => fpu_o.fp_for_o
 		);
 
 	lzc1_64_comp : lzc_64

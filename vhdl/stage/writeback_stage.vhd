@@ -17,6 +17,7 @@ entity writeback_stage is
 		reset      : in  std_logic;
 		clock      : in  std_logic;
 		int_reg_wi : out int_register_write_in_type;
+		fp_reg_wi  : out fp_reg_write_in_type;
 		csr_wi     : out csr_write_in_type;
 		csr_ci     : out csr_counter_in_type;
 		csr_eo     : in  csr_exception_out_type;
@@ -101,6 +102,10 @@ begin
 		int_reg_wi.wren <= v.int_wren;
 		int_reg_wi.waddr <= v.waddr;
 		int_reg_wi.wdata <= v.wdata;
+
+		fp_reg_wi.wren <= v.fpu_wren;
+		fp_reg_wi.waddr <= v.waddr;
+		fp_reg_wi.wdata <= v.wdata;
 
 		csr_wi.wren <= v.csr_wren;
 		csr_wi.waddr <= v.caddr;

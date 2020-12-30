@@ -12,10 +12,6 @@ use work.int_wire.all;
 use work.fp_wire.all;
 
 entity pipeline is
-	generic(
-		fpu_enable      : boolean := fpu_enable;
-		fpu_performance : boolean := fpu_performance
-	);
 	port(
 		reset     : in  std_logic;
 		clock     : in  std_logic;
@@ -27,6 +23,8 @@ entity pipeline is
 		ipmp_i    : out pmp_in_type;
 		dpmp_o    : in  pmp_out_type;
 		dpmp_i    : out pmp_in_type;
+		fpu_o     : in  fpu_out_type;
+		fpu_i     : out fpu_in_type;
 		time_irpt : in  std_logic;
 		ext_irpt  : in  std_logic
 	);
@@ -65,8 +63,6 @@ architecture behavior of pipeline is
 			fp_dec_i      : out fp_dec_in_type;
 			fp_dec_o      : in  fp_dec_out_type;
 			csr_eo        : in  csr_exception_out_type;
-			fpu_dec_o     : in  fpu_dec_out_type;
-			fpu_dec_i     : out fpu_dec_in_type;
 			a             : in  decode_in_type;
 			d             : in  decode_in_type;
 			y             : out decode_out_type;
@@ -90,8 +86,12 @@ architecture behavior of pipeline is
 			csr_alu_i      : out csr_alu_in_type;
 			csr_alu_o      : in  csr_alu_out_type;
 			csr_eo         : in  csr_exception_out_type;
-			fpu_exe_o      : in  fpu_exe_out_type;
-			fpu_exe_i      : out fpu_exe_in_type;
+			fp_reg_o       : in  fp_reg_out_type;
+			fp_reg_ri      : out fp_reg_read_in_type;
+			fp_for_o       : in  fp_for_out_type;
+			fp_for_i       : out fp_for_in_type;
+			fp_exe_o       : in  fp_exe_out_type;
+			fp_exe_i       : out fp_exe_in_type;
 			dmem_i         : out mem_in_type;
 			dpmp_o         : in  pmp_out_type;
 			dpmp_i         : out pmp_in_type;
@@ -109,7 +109,6 @@ architecture behavior of pipeline is
 			reset     : in  std_logic;
 			clock     : in  std_logic;
 			csr_eo    : in  csr_exception_out_type;
-			fpu_mem_i : out fpu_mem_in_type;
 			dmem_o    : in  mem_out_type;
 			a         : in  memory_in_type;
 			d         : in  memory_in_type;
@@ -123,6 +122,7 @@ architecture behavior of pipeline is
 			reset      : in  std_logic;
 			clock      : in  std_logic;
 			int_reg_wi : out int_register_write_in_type;
+			fp_reg_wi  : out fp_reg_write_in_type;
 			csr_wi     : out csr_write_in_type;
 			csr_ci     : out csr_counter_in_type;
 			csr_eo     : in  csr_exception_out_type;
@@ -209,20 +209,6 @@ architecture behavior of pipeline is
   	);
   end component;
 
-	component fpu
-		port(
-			reset     : in  std_logic;
-			clock     : in  std_logic;
-			fpu_dec_i : in  fpu_dec_in_type;
-			fpu_dec_o : out fpu_dec_out_type;
-			fpu_exe_i : in  fpu_exe_in_type;
-			fpu_exe_o : out fpu_exe_out_type;
-			fpu_mem_i : in  fpu_mem_in_type;
-			fp_dec_i  : in  fp_dec_in_type;
-			fp_dec_o  : out fp_dec_out_type
-		);
-	end component;
-
 	signal fetch_y     : fetch_out_type;
 	signal decode_y    : decode_out_type;
 	signal execute_y   : execute_out_type;
@@ -237,9 +223,6 @@ architecture behavior of pipeline is
 
 	signal comp_decode_i : comp_decode_in_type;
 	signal comp_decode_o : comp_decode_out_type;
-
-	signal fp_dec_i : fp_dec_in_type;
-	signal fp_dec_o : fp_dec_out_type;
 
 	signal csr_unit_i : csr_unit_in_type;
 	signal csr_unit_o : csr_unit_out_type;
@@ -264,14 +247,6 @@ architecture behavior of pipeline is
 
 	signal pbuffer_i : prebuffer_in_type;
 	signal pbuffer_o : prebuffer_out_type;
-
-	signal fpu_dec_i : fpu_dec_in_type;
-	signal fpu_dec_o : fpu_dec_out_type;
-
-	signal fpu_exe_i : fpu_exe_in_type;
-	signal fpu_exe_o : fpu_exe_out_type;
-
-	signal fpu_mem_i : fpu_mem_in_type;
 
 begin
 
@@ -310,11 +285,9 @@ begin
 			int_decode_o  => int_unit_o.int_decode_o,
 			comp_decode_i => comp_decode_i,
 			comp_decode_o => comp_decode_o,
-			fp_dec_i      => fp_dec_i,
-			fp_dec_o      => fp_dec_o,
+			fp_dec_i      => fpu_i.fp_dec_i,
+			fp_dec_o      => fpu_o.fp_dec_o,
 			csr_eo        => csr_unit_o.csr_eo,
-			fpu_dec_o     => fpu_dec_o,
-			fpu_dec_i     => fpu_dec_i,
 			a.f           => fetch_y,
 			a.d           => decode_y,
 			a.e           => execute_y,
@@ -345,8 +318,12 @@ begin
 			csr_alu_i      => csr_unit_i.csr_alu_i,
 			csr_alu_o      => csr_unit_o.csr_alu_o,
 			csr_eo         => csr_unit_o.csr_eo,
-			fpu_exe_o      => fpu_exe_o,
-			fpu_exe_i      => fpu_exe_i,
+			fp_reg_o       => fpu_o.fp_reg_o,
+			fp_reg_ri      => fpu_i.fp_reg_ri,
+			fp_for_o       => fpu_o.fp_for_o,
+			fp_for_i       => fpu_i.fp_for_i,
+			fp_exe_o       => fpu_o.fp_exe_o,
+			fp_exe_i       => fpu_i.fp_exe_i,
 			dmem_i         => dmem_i,
 			dpmp_o         => dpmp_o,
 			dpmp_i         => dpmp_i,
@@ -371,7 +348,6 @@ begin
 			reset     => reset,
 			clock     => clock,
 			csr_eo    => csr_unit_o.csr_eo,
-			fpu_mem_i => fpu_mem_i,
 			dmem_o    => dmem_o,
 			a.f       => fetch_y,
 			a.d       => decode_y,
@@ -392,6 +368,7 @@ begin
 			reset      => reset,
 			clock      => clock,
 			int_reg_wi => int_unit_i.int_reg_wi,
+			fp_reg_wi  => fpu_i.fp_reg_wi,
 			csr_wi     => csr_unit_i.csr_wi,
 			csr_ci     => csr_unit_i.csr_ci,
 			csr_eo     => csr_unit_o.csr_eo,
@@ -476,22 +453,5 @@ begin
 			pfetch_i  => pfetch_i,
 			pfetch_o  => pfetch_o
 		);
-
-	FP_Unit : if fpu_enable = true generate
-
-		fpu_comp : fpu
-			port map(
-				reset     => reset,
-				clock     => clock,
-				fpu_dec_i => fpu_dec_i,
-				fpu_dec_o => fpu_dec_o,
-				fpu_exe_i => fpu_exe_i,
-				fpu_exe_o => fpu_exe_o,
-				fpu_mem_i => fpu_mem_i,
-				fp_dec_i  => fp_dec_i,
-				fp_dec_o  => fp_dec_o
-			);
-
-	end generate FP_Unit;
 
 end architecture;

@@ -29,8 +29,12 @@ entity execute_stage is
 		csr_alu_i      : out csr_alu_in_type;
 		csr_alu_o      : in  csr_alu_out_type;
 		csr_eo         : in  csr_exception_out_type;
-		fpu_exe_o      : in  fpu_exe_out_type;
-		fpu_exe_i      : out fpu_exe_in_type;
+		fp_reg_o       : in  fp_reg_out_type;
+		fp_reg_ri      : out fp_reg_read_in_type;
+		fp_for_o       : in  fp_for_out_type;
+		fp_for_i       : out fp_for_in_type;
+		fp_exe_o       : in  fp_exe_out_type;
+		fp_exe_i       : out fp_exe_in_type;
 		dmem_i         : out mem_in_type;
 		dpmp_o         : in  pmp_out_type;
 		dpmp_i         : out pmp_in_type;
@@ -50,7 +54,7 @@ architecture behavior of execute_stage is
 
 begin
 
-	combinational : process(a, d, r, int_for_o, int_reg_o, csr_o, csr_eo, int_pipeline_o, csr_alu_o, fpu_exe_o, dpmp_o, time_irpt, ext_irpt)
+	combinational : process(a, d, r, int_for_o, int_reg_o, csr_o, csr_eo, int_pipeline_o, fp_reg_o, fp_for_o, fp_exe_o, csr_alu_o, dpmp_o, time_irpt, ext_irpt)
 
 		variable v : execute_reg_type;
 
@@ -67,12 +71,16 @@ begin
 		v.imm := d.d.imm;
 		v.int_rden1 := d.d.int_rden1;
 		v.int_rden2 := d.d.int_rden2;
+		v.fpu_rden1 := d.d.fpu_rden1;
+		v.fpu_rden2 := d.d.fpu_rden2;
+		v.fpu_rden3 := d.d.fpu_rden3;
 		v.csr_rden := d.d.csr_rden;
 		v.int_wren := d.d.int_wren;
 		v.fpu_wren := d.d.fpu_wren;
 		v.csr_wren := d.d.csr_wren;
 		v.raddr1 := d.d.raddr1;
 		v.raddr2 := d.d.raddr2;
+		v.raddr3 := d.d.raddr3;
 		v.waddr := d.d.waddr;
 		v.caddr := d.d.caddr;
 		v.load := d.d.load;
@@ -136,6 +144,13 @@ begin
 		int_reg_ri.raddr1 <= v.raddr1;
 		int_reg_ri.raddr2 <= v.raddr2;
 
+		fp_reg_ri.rden1 <= v.fpu_rden1;
+		fp_reg_ri.rden2 <= v.fpu_rden2;
+		fp_reg_ri.rden3 <= v.fpu_rden3;
+		fp_reg_ri.raddr1 <= v.raddr1;
+		fp_reg_ri.raddr2 <= v.raddr2;
+		fp_reg_ri.raddr3 <= v.raddr3;
+
 		csr_ri.rden <= v.csr_rden;
 		csr_ri.raddr <= v.caddr;
 
@@ -152,20 +167,36 @@ begin
 		int_for_i.exe_data <= d.e.wdata;
 		int_for_i.mem_data <= d.m.wdata;
 
+		fp_for_i.reg_en1 <= v.fpu_rden1;
+		fp_for_i.reg_en2 <= v.fpu_rden2;
+		fp_for_i.reg_en2 <= v.fpu_rden2;
+		fp_for_i.reg_addr1 <= v.raddr1;
+		fp_for_i.reg_addr2 <= v.raddr2;
+		fp_for_i.reg_addr3 <= v.raddr3;
+		fp_for_i.reg_data1 <= fp_reg_o.data1;
+		fp_for_i.reg_data2 <= fp_reg_o.data2;
+		fp_for_i.reg_data3 <= fp_reg_o.data3;
+		fp_for_i.exe_en <= d.e.fpu_wren;
+		fp_for_i.mem_en <= d.m.fpu_wren;
+		fp_for_i.exe_addr <= d.e.waddr;
+		fp_for_i.mem_addr <= d.m.waddr;
+		fp_for_i.exe_data <= d.e.wdata;
+		fp_for_i.mem_data <= d.m.wdata;
+
 		v.cdata := csr_o.data;
 
 		v.rdata1 := int_for_o.data1;
 		v.rdata2 := int_for_o.data2;
 
-		fpu_exe_i.idata <= v.rdata1;
+		v.frdata1 := fp_for_o.data1;
+		v.frdata2 := fp_for_o.data2;
+		v.frdata3 := fp_for_o.data3;
 
 		if v.fpu_store = '1' then
-			v.sdata := fpu_exe_o.sdata;
-		else
+			v.sdata := v.frdata2;
+		elsif v.store = '1' then
 			v.sdata := v.rdata2;
 		end if;
-
-		v.flags := fpu_exe_o.flags;
 
 		int_pipeline_i.pc <= v.pc;
 		int_pipeline_i.npc <= v.npc;
@@ -181,18 +212,32 @@ begin
 		int_pipeline_i.enable <= v.enable;
 		int_pipeline_i.clear <= v.clear;
 
+		fp_exe_i.idata <= v.rdata1;
+		fp_exe_i.data1 <= v.frdata1;
+		fp_exe_i.data2 <= v.frdata2;
+		fp_exe_i.data3 <= v.frdata3;
+		fp_exe_i.op <= v.fpu_op;
+		fp_exe_i.fmt <= v.fmt;
+		fp_exe_i.rm <= v.rm;
+		fp_exe_i.enable <= v.enable;
+		fp_exe_i.clear  <= v.clear;
+
 		v.idata := int_pipeline_o.result;
 		v.jump := int_pipeline_o.jump;
 		v.address := int_pipeline_o.mem_addr;
 		v.byteenable := int_pipeline_o.mem_byte;
 		v.ready := int_pipeline_o.ready;
 
+		v.fdata := fp_exe_o.result;
+		v.flags := fp_exe_o.flags;
+		v.fready := fp_exe_o.ready;
+
 		if v.csr = '1' then
 			v.wdata := v.cdata;
 		elsif v.int = '1' then
 			v.wdata := v.idata;
 		elsif v.fpu = '1' then
-			v.wdata := fpu_exe_o.wdata;
+			v.wdata := v.fdata;
 		end if;
 
 		csr_alu_i.rs1 <= v.rdata1;
@@ -247,11 +292,8 @@ begin
 			end if;
 		end if;
 
-		fpu_exe_i.stall <= v.stall;
-		fpu_exe_i.clear <= v.clear;
-
 		if v.fpu_op.fmcycle = '1' then
-			if fpu_exe_o.stall = '1' then
+			if v.fready = '0' then
 				if (d.m.stall or d.w.stall) = '0' then
 					v.stall := '1';
 				end if;
@@ -263,6 +305,18 @@ begin
 				v.stall := '1';
 			end if;
 			if (nor_reduce(d.e.waddr xor v.raddr2) and v.int_rden2) = '1' then
+				v.stall := '1';
+			end if;
+		end if;
+
+		if d.e.fpu_load = '1' then
+			if (nor_reduce(d.e.waddr xor v.raddr1) and v.fpu_rden1) = '1' then
+				v.stall := '1';
+			end if;
+			if (nor_reduce(d.e.waddr xor v.raddr2) and v.fpu_rden2) = '1' then
+				v.stall := '1';
+			end if;
+			if (nor_reduce(d.e.waddr xor v.raddr3) and v.fpu_rden3) = '1' then
 				v.stall := '1';
 			end if;
 		end if;

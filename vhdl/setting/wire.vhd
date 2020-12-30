@@ -60,6 +60,9 @@ package wire is
 		imm         : std_logic_vector(63 downto 0);
 		int_rden1   : std_logic;
 		int_rden2   : std_logic;
+		fpu_rden1   : std_logic;
+		fpu_rden2   : std_logic;
+		fpu_rden3   : std_logic;
 		csr_rden    : std_logic;
 		int_wren    : std_logic;
 		fpu_wren    : std_logic;
@@ -273,6 +276,9 @@ package wire is
 		rm            : std_logic_vector(2 downto 0);
 		int_rden1     : std_logic;
 		int_rden2     : std_logic;
+		fpu_rden1     : std_logic;
+		fpu_rden2     : std_logic;
+		fpu_rden3     : std_logic;
 		csr_rden      : std_logic;
 		int_wren      : std_logic;
 		fpu_wren      : std_logic;
@@ -282,13 +288,18 @@ package wire is
 		csr_wren_n    : std_logic;
 		raddr1        : std_logic_vector(4 downto 0);
 		raddr2        : std_logic_vector(4 downto 0);
+		raddr3        : std_logic_vector(4 downto 0);
 		waddr         : std_logic_vector(4 downto 0);
 		caddr         : std_logic_vector(11 downto 0);
 		rdata1        : std_logic_vector(63 downto 0);
 		rdata2        : std_logic_vector(63 downto 0);
+		frdata1       : std_logic_vector(63 downto 0);
+		frdata2       : std_logic_vector(63 downto 0);
+		frdata3       : std_logic_vector(63 downto 0);
 		wdata         : std_logic_vector(63 downto 0);
 		sdata         : std_logic_vector(63 downto 0);
 		idata         : std_logic_vector(63 downto 0);
+		fdata         : std_logic_vector(63 downto 0);
 		cdata         : std_logic_vector(63 downto 0);
 		flags         : std_logic_vector(4 downto 0);
 		load          : std_logic;
@@ -327,6 +338,7 @@ package wire is
 		strobe        : std_logic_vector(7 downto 0);
 		enable        : std_logic;
 		ready         : std_logic;
+		fready        : std_logic;
 		etval         : std_logic_vector(63 downto 0);
 		ecause        : std_logic_vector(3 downto 0);
 		exc           : std_logic;
@@ -353,6 +365,9 @@ package wire is
 		rm            => (others => '0'),
 		int_rden1     => '0',
 		int_rden2     => '0',
+		fpu_rden1     => '0',
+		fpu_rden2     => '0',
+		fpu_rden3     => '0',
 		csr_rden      => '0',
 		int_wren      => '0',
 		fpu_wren      => '0',
@@ -362,13 +377,18 @@ package wire is
 		csr_wren_n    => '0',
 		raddr1        => (others => '0'),
 		raddr2        => (others => '0'),
+		raddr3        => (others => '0'),
 		waddr         => (others => '0'),
 		caddr         => (others => '0'),
 		rdata1        => (others => '0'),
 		rdata2        => (others => '0'),
+		frdata1       => (others => '0'),
+		frdata2       => (others => '0'),
+		frdata3       => (others => '0'),
 		wdata         => (others => '0'),
 		sdata         => (others => '0'),
 		idata         => (others => '0'),
+		fdata         => (others => '0'),
 		cdata         => (others => '0'),
 		flags         => (others => '0'),
 		load          => '0',
@@ -407,6 +427,7 @@ package wire is
 		strobe        => (others => '0'),
 		enable        => '0',
 		ready         => '0',
+		fready        => '0',
 		etval         => (others => '0'),
 		ecause        => (others => '0'),
 		exc           => '0',

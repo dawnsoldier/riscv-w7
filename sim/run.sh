@@ -202,8 +202,6 @@ $SYNTAX $DIR/vhdl/float/fp_dec.vhd
 $ANALYS $DIR/vhdl/float/fp_dec.vhd
 $SYNTAX $DIR/vhdl/float/fp_exe.vhd
 $ANALYS $DIR/vhdl/float/fp_exe.vhd
-$SYNTAX $DIR/vhdl/float/fp_pipe.vhd
-$ANALYS $DIR/vhdl/float/fp_pipe.vhd
 $SYNTAX $DIR/vhdl/float/fpu.vhd
 $ANALYS $DIR/vhdl/float/fpu.vhd
 

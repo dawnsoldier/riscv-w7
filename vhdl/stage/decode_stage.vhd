@@ -25,8 +25,6 @@ entity decode_stage is
 		fp_dec_i      : out fp_dec_in_type;
 		fp_dec_o      : in  fp_dec_out_type;
 		csr_eo        : in  csr_exception_out_type;
-		fpu_dec_o     : in  fpu_dec_out_type;
-		fpu_dec_i     : out fpu_dec_in_type;
 		a             : in  decode_in_type;
 		d             : in  decode_in_type;
 		y             : out decode_out_type;
@@ -41,7 +39,7 @@ architecture behavior of decode_stage is
 
 begin
 
-	combinational : process(a, d, r, int_decode_o, comp_decode_o, fp_dec_o, csr_eo, fpu_dec_o)
+	combinational : process(a, d, r, int_decode_o, comp_decode_o, fp_dec_o, csr_eo)
 
 		variable v : decode_reg_type;
 
@@ -182,15 +180,6 @@ begin
 			v.fpu_store := '0';
 		end if;
 
-		fpu_dec_i.instr <= v.instr;
-		fpu_dec_i.rden1 <= v.fpu_rden1;
-		fpu_dec_i.rden2 <= v.fpu_rden2;
-		fpu_dec_i.rden3 <= v.fpu_rden3;
-		fpu_dec_i.wren <= v.fpu_wren;
-		fpu_dec_i.load <= v.fpu_load;
-		fpu_dec_i.op <= v.fpu_op;
-		fpu_dec_i.frm <= csr_eo.frm;
-
 		v.link_waddr := (v.waddr = "00001") or (v.waddr = "00101");
 		v.link_raddr1 := (v.raddr1 = "00001") or (v.raddr1 = "00101");
 		v.raddr1_eq_waddr := v.raddr1 = v.waddr;
@@ -278,18 +267,21 @@ begin
 			if (nor_reduce(d.d.waddr xor v.raddr2) and v.int_rden2) = '1' then
 				v.stall := '1';
 			end if;
+		elsif (d.d.fpu_load) = '1' then
+			if (nor_reduce(d.d.waddr xor v.raddr1) and v.fpu_rden1) = '1' then
+				v.stall := '1';
+			end if;
+			if (nor_reduce(d.d.waddr xor v.raddr2) and v.fpu_rden2) = '1' then
+				v.stall := '1';
+			end if;
+			if (nor_reduce(d.d.waddr xor v.raddr3) and v.fpu_rden3) = '1' then
+				v.stall := '1';
+			end if;
 		elsif (v.csr_rden) = '1' then
 			if (nor_reduce(v.caddr xor csr_fflags) and (d.d.fpu or d.e.fpu)) = '1' then
 				v.stall := '1';
 			end if;
 		elsif (d.d.int_op.mcycle) = '1' then
-			v.stall := '1';
-		end if;
-
-		fpu_dec_i.stall <= v.stall;
-		fpu_dec_i.clear <= v.clear;
-
-		if (fpu_dec_o.stall) = '1' then
 			v.stall := '1';
 		end if;
 
@@ -335,6 +327,9 @@ begin
 		y.imm <= v.imm;
 		y.int_rden1 <= v.int_rden1;
 		y.int_rden2 <= v.int_rden2;
+		y.fpu_rden1 <= v.fpu_rden1;
+		y.fpu_rden2 <= v.fpu_rden2;
+		y.fpu_rden3 <= v.fpu_rden3;
 		y.csr_rden <= v.csr_rden;
 		y.int_wren <= v.int_wren;
 		y.fpu_wren <= v.fpu_wren;
@@ -382,6 +377,9 @@ begin
 		q.imm <= r.imm;
 		q.int_rden1 <= r.int_rden1;
 		q.int_rden2 <= r.int_rden2;
+		q.fpu_rden1 <= r.fpu_rden1;
+		q.fpu_rden2 <= r.fpu_rden2;
+		q.fpu_rden3 <= r.fpu_rden3;
 		q.csr_rden <= r.csr_rden;
 		q.int_wren <= r.int_wren;
 		q.fpu_wren <= r.fpu_wren;

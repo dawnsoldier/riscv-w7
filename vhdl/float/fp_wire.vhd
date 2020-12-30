@@ -125,43 +125,6 @@ package fp_wire is
 		data3 : std_logic_vector(63 downto 0);
 	end record;
 
-	type fpu_dec_in_type is record
-		instr : std_logic_vector(31 downto 0);
-		rden1 : std_logic;
-		rden2 : std_logic;
-		rden3 : std_logic;
-		wren  : std_logic;
-		load  : std_logic;
-		op    : fp_operation_type;
-		frm   : std_logic_vector(2 downto 0);
-		clear : std_logic;
-		stall : std_logic;
-	end record;
-
-	type fpu_exe_in_type is record
-		idata : std_logic_vector(63 downto 0);
-		clear : std_logic;
-		stall : std_logic;
-	end record;
-
-	type fpu_mem_in_type is record
-		wdata : std_logic_vector(63 downto 0);
-		nbox  : std_logic;
-		clear : std_logic;
-		stall : std_logic;
-	end record;
-
-	type fpu_dec_out_type is record
-		stall   : std_logic;
-	end record;
-
-	type fpu_exe_out_type is record
-		wdata    : std_logic_vector(63 downto 0);
-		sdata    : std_logic_vector(63 downto 0);
-		flags    : std_logic_vector(4 downto 0);
-		stall   : std_logic;
-	end record;
-
 	type fp_rnd_in_type is record
 		sig  : std_logic;
 		expo : integer range -8191 to 8191;
@@ -746,106 +709,19 @@ package fp_wire is
 		ready   : std_logic;
 	end record;
 
-	type fp_decode_reg_type is record
-		instr  : std_logic_vector(31 downto 0);
-		fmt    : std_logic_vector(1 downto 0);
-		rm     : std_logic_vector(2 downto 0);
-		raddr1 : std_logic_vector(4 downto 0);
-		raddr2 : std_logic_vector(4 downto 0);
-		raddr3 : std_logic_vector(4 downto 0);
-		waddr  : std_logic_vector(4 downto 0);
-		rden1  : std_logic;
-		rden2  : std_logic;
-		rden3  : std_logic;
-		wren   : std_logic;
-		load   : std_logic;
-		op     : fp_operation_type;
-		stall  : std_logic;
+	type fpu_in_type is record
+		fp_dec_i  : fp_dec_in_type;
+		fp_exe_i  : fp_exe_in_type;
+		fp_reg_ri : fp_reg_read_in_type;
+		fp_reg_wi : fp_reg_write_in_type;
+		fp_for_i  : fp_for_in_type;
 	end record;
 
-	constant init_fp_decode_reg : fp_decode_reg_type := (
-		instr  => (others => '0'),
-		fmt    => (others => '0'),
-		rm     => (others => '0'),
-		raddr1 => (others => '0'),
-		raddr2 => (others => '0'),
-		raddr3 => (others => '0'),
-		waddr  => (others => '0'),
-		rden1  => '0',
-		rden2  => '0',
-		rden3  => '0',
-		wren   => '0',
-		load   => '0',
-		op     => init_fp_operation,
-		stall  => '0'
-	);
-
-	type fp_execute_reg_type is record
-		idata  : std_logic_vector(63 downto 0);
-		rdata1 : std_logic_vector(63 downto 0);
-		rdata2 : std_logic_vector(63 downto 0);
-		rdata3 : std_logic_vector(63 downto 0);
-		wdata  : std_logic_vector(63 downto 0);
-		sdata  : std_logic_vector(63 downto 0);
-		waddr  : std_logic_vector(4 downto 0);
-		fmt    : std_logic_vector(1 downto 0);
-		rm     : std_logic_vector(2 downto 0);
-		wren   : std_logic;
-		load   : std_logic;
-		op     : fp_operation_type;
-		flags  : std_logic_vector(4 downto 0);
-		enable : std_logic;
-		clear  : std_logic;
-		ready  : std_logic;
-		stall  : std_logic;
+	type fpu_out_type is record
+		fp_dec_o  : fp_dec_out_type;
+		fp_exe_o  : fp_exe_out_type;
+		fp_reg_o  : fp_reg_out_type;
+		fp_for_o  : fp_for_out_type;
 	end record;
-
-	constant init_fp_execute_reg : fp_execute_reg_type := (
-		idata  => (others => '0'),
-		rdata1 => (others => '0'),
-		rdata2 => (others => '0'),
-		rdata3 => (others => '0'),
-		wdata  => (others => '0'),
-		sdata  => (others => '0'),
-		waddr  => (others => '0'),
-		fmt    => (others => '0'),
-		rm     => (others => '0'),
-		wren   => '0',
-		load   => '0',
-		op     => init_fp_operation,
-		flags  => (others => '0'),
-		enable => '0',
-		clear  => '0',
-		ready  => '0',
-		stall  => '0'
-	);
-
-	type fp_memory_reg_type is record
-		wdata : std_logic_vector(63 downto 0);
-		waddr : std_logic_vector(4 downto 0);
-		wren  : std_logic;
-		load  : std_logic;
-		stall : std_logic;
-	end record;
-
-	constant init_fp_memory_reg : fp_memory_reg_type := (
-		wdata => (others => '0'),
-		waddr => (others => '0'),
-		wren  => '0',
-		load  => '0',
-		stall => '0'
-	);
-
-	type fp_writeback_reg_type is record
-		wdata : std_logic_vector(63 downto 0);
-		waddr : std_logic_vector(4 downto 0);
-		wren  : std_logic;
-	end record;
-
-	constant init_fp_writeback_reg : fp_writeback_reg_type := (
-		wdata => (others => '0'),
-		waddr => (others => '0'),
-		wren  => '0'
-	);
 
 end package;
