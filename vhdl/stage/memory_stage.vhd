@@ -109,9 +109,7 @@ begin
 		end if;
 
 		if v.fpu_load = '1' then
-			if v.load_op.mem_lw = '1' then
-				v.wdata(63 downto 32) := X"FFFFFFFF"; -- NaN Boxing
-			end if;
+			v.wdata := nan_boxing(v.wdata,v.load_op.mem_lw);
 		end if;
 
 		if (v.stall or v.clear) = '1' then

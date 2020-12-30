@@ -457,6 +457,8 @@ begin
 			ipmp_i    => ipmp_i,
 			dpmp_o    => dpmp_o,
 			dpmp_i    => dpmp_i,
+			fpu_o     => fpu_o,
+			fpu_i     => fpu_i,
 			time_irpt => timer_irpt,
 			ext_irpt  => '0'
 		);

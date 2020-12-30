@@ -137,7 +137,7 @@ begin
 
 		v.clear := csr_eo.exc or csr_eo.mret or d.e.jump or a.m.stall or d.w.clear;
 
-		v.enable := not(v.clear);
+		v.enable := not(d.e.stall or d.m.stall or d.w.stall or d.w.clear);
 
 		int_reg_ri.rden1 <= v.int_rden1;
 		int_reg_ri.rden2 <= v.int_rden2;
@@ -169,7 +169,7 @@ begin
 
 		fp_for_i.reg_en1 <= v.fpu_rden1;
 		fp_for_i.reg_en2 <= v.fpu_rden2;
-		fp_for_i.reg_en2 <= v.fpu_rden2;
+		fp_for_i.reg_en3 <= v.fpu_rden3;
 		fp_for_i.reg_addr1 <= v.raddr1;
 		fp_for_i.reg_addr2 <= v.raddr2;
 		fp_for_i.reg_addr3 <= v.raddr3;

@@ -54,6 +54,12 @@ package functions is
 	)
 	return std_logic;
 
+	function nan_boxing(
+		data   : in std_logic_vector(63 downto 0);
+		enable : in std_logic
+	)
+	return std_logic_vector;
+
 end functions;
 
 package body functions is
@@ -283,5 +289,18 @@ package body functions is
 		end if;
 		return ucond;
 	end function is_unconditional;
+
+	function nan_boxing(
+		data   : in std_logic_vector(63 downto 0);
+		enable : in std_logic
+	)
+	return std_logic_vector is
+	begin
+		if enable = '1' then
+			return X"FFFFFFFF" & data(31 downto 0);
+		else
+			return data;
+		end if;
+	end function nan_boxing;
 
 end functions;

@@ -172,6 +172,9 @@ begin
 			v.load_op := fp_dec_o.load_op;
 			v.store_op := fp_dec_o.store_op;
 			v.valid := fp_dec_o.valid;
+			if and_reduce(v.rm) = '1' then
+				v.rm := csr_eo.frm;
+			end if;
 		end if;
 
 		if csr_eo.fs = "00" then
@@ -282,6 +285,8 @@ begin
 				v.stall := '1';
 			end if;
 		elsif (d.d.int_op.mcycle) = '1' then
+			v.stall := '1';
+		elsif (d.d.fpu_op.fmcycle) = '1' then
 			v.stall := '1';
 		end if;
 
