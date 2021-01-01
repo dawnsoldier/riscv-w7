@@ -5,11 +5,15 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.std_logic_misc.all;
 
+use work.configure.all;
 use work.int_constants.all;
 use work.int_wire.all;
 use work.csr_constants.all;
 
 entity int_decode is
+	generic(
+		mul_performance : boolean := mul_performance
+	);
 	port(
 		int_decode_i : in  int_decode_in_type;
 		int_decode_o : out int_decode_out_type
@@ -190,7 +194,15 @@ begin
 							when funct_remu   => v.int_op.div_op.alu_remu := '1';
 							when others       => null;
 						end case;
-						v.int_op.mcycle := '1';
+						if v.int_op.mul = '1' then
+							if mul_performance then
+								v.int_op.mcycle := '0';
+							else
+								v.int_op.mcycle := '1';
+							end if;
+						else
+							v.int_op.mcycle := '1';
+						end if;
 					end if;
 				end if;
 				v.int := '1';
