@@ -139,16 +139,14 @@ begin
 
 		v.enable := not(v.stall or d.w.clear);
 
-		if r.enable = '1' then
-			if r.int_op.mcycle = '1' then
-				if r.ready = '0' then
-					v.enable := '0';
-				end if;
+		if r.int_op.mcycle = '1' then
+			if r.ready = '0' then
+				v.enable := '0';
 			end if;
-			if r.fpu_op.fmcycle = '1' then
-				if r.fready = '0' then
-					v.enable := '0';
-				end if;
+		end if;
+		if r.fpu_op.fmcycle = '1' then
+			if r.fready = '0' then
+				v.enable := '0';
 			end if;
 		end if;
 
