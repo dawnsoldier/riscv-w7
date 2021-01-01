@@ -137,18 +137,7 @@ begin
 
 		v.clear := csr_eo.exc or csr_eo.mret or d.e.jump or d.w.clear;
 
-		v.enable := not(v.stall or d.w.clear);
-
-		if r.int_op.mcycle = '1' then
-			if r.ready = '0' then
-				v.enable := '0';
-			end if;
-		end if;
-		if r.fpu_op.fmcycle = '1' then
-			if r.fready = '0' then
-				v.enable := '0';
-			end if;
-		end if;
+		v.enable := not(d.e.stall or d.m.stall or d.w.stall or d.w.clear);
 
 		int_reg_ri.rden1 <= v.int_rden1;
 		int_reg_ri.rden2 <= v.int_rden2;
