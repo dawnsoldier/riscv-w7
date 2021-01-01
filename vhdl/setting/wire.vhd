@@ -51,55 +51,78 @@ package wire is
 	);
 
 	type decode_out_type is record
-		pc          : std_logic_vector(63 downto 0);
-		npc         : std_logic_vector(63 downto 0);
-		funct3      : std_logic_vector(2 downto 0);
-		funct7      : std_logic_vector(6 downto 0);
-		fmt         : std_logic_vector(1 downto 0);
-		rm          : std_logic_vector(2 downto 0);
-		imm         : std_logic_vector(63 downto 0);
-		int_rden1   : std_logic;
-		int_rden2   : std_logic;
-		fpu_rden1   : std_logic;
-		fpu_rden2   : std_logic;
-		fpu_rden3   : std_logic;
-		csr_rden    : std_logic;
-		int_wren    : std_logic;
-		fpu_wren    : std_logic;
-		csr_wren    : std_logic;
-		raddr1      : std_logic_vector(4 downto 0);
-		raddr2      : std_logic_vector(4 downto 0);
-		raddr3      : std_logic_vector(4 downto 0);
-		waddr       : std_logic_vector(4 downto 0);
-		caddr       : std_logic_vector(11 downto 0);
-		load        : std_logic;
-		store       : std_logic;
-		fpu_load    : std_logic;
-		fpu_store   : std_logic;
-		int         : std_logic;
-		fpu         : std_logic;
-		csr         : std_logic;
-		comp        : std_logic;
-		load_op     : load_operation_type;
-		store_op    : store_operation_type;
-		int_op      : int_operation_type;
-		fpu_op      : fp_operation_type;
-		return_pop  : std_logic;
-		return_push : std_logic;
-		jump_uncond : std_logic;
-		jump_rest   : std_logic;
-		taken       : std_logic;
-		etval       : std_logic_vector(63 downto 0);
-		ecause      : std_logic_vector(3 downto 0);
-		exc         : std_logic;
-		ecall       : std_logic;
-		ebreak      : std_logic;
-		mret        : std_logic;
-		wfi         : std_logic;
-		fence       : std_logic;
-		valid       : std_logic;
-		stall       : std_logic;
-		clear       : std_logic;
+		pc            : std_logic_vector(63 downto 0);
+		npc           : std_logic_vector(63 downto 0);
+		funct3        : std_logic_vector(2 downto 0);
+		funct7        : std_logic_vector(6 downto 0);
+		fmt           : std_logic_vector(1 downto 0);
+		rm            : std_logic_vector(2 downto 0);
+		imm           : std_logic_vector(63 downto 0);
+		int_rden1     : std_logic;
+		int_rden2     : std_logic;
+		fpu_rden1     : std_logic;
+		fpu_rden2     : std_logic;
+		fpu_rden3     : std_logic;
+		csr_rden      : std_logic;
+		int_wren      : std_logic;
+		fpu_wren      : std_logic;
+		csr_wren      : std_logic;
+		int_wren_n    : std_logic;
+		fpu_wren_n    : std_logic;
+		csr_wren_n    : std_logic;
+		raddr1        : std_logic_vector(4 downto 0);
+		raddr2        : std_logic_vector(4 downto 0);
+		raddr3        : std_logic_vector(4 downto 0);
+		waddr         : std_logic_vector(4 downto 0);
+		caddr         : std_logic_vector(11 downto 0);
+		load          : std_logic;
+		store         : std_logic;
+		load_n        : std_logic;
+		store_n       : std_logic;
+		fpu_load      : std_logic;
+		fpu_store     : std_logic;
+		fpu_load_n    : std_logic;
+		fpu_store_n   : std_logic;
+		int           : std_logic;
+		fpu           : std_logic;
+		csr           : std_logic;
+		comp          : std_logic;
+		int_n         : std_logic;
+		fpu_n         : std_logic;
+		csr_n         : std_logic;
+		comp_n        : std_logic;
+		load_op       : load_operation_type;
+		store_op      : store_operation_type;
+		int_op        : int_operation_type;
+		fpu_op        : fp_operation_type;
+		return_pop    : std_logic;
+		return_push   : std_logic;
+		jump_uncond   : std_logic;
+		jump_rest     : std_logic;
+		taken         : std_logic;
+		return_pop_n  : std_logic;
+		return_push_n : std_logic;
+		jump_uncond_n : std_logic;
+		jump_rest_n   : std_logic;
+		taken_n       : std_logic;
+		etval         : std_logic_vector(63 downto 0);
+		ecause        : std_logic_vector(3 downto 0);
+		exc           : std_logic;
+		ecall         : std_logic;
+		ebreak        : std_logic;
+		exc_n         : std_logic;
+		ecall_n       : std_logic;
+		ebreak_n      : std_logic;
+		mret          : std_logic;
+		wfi           : std_logic;
+		fence         : std_logic;
+		valid         : std_logic;
+		mret_n        : std_logic;
+		wfi_n         : std_logic;
+		fence_n       : std_logic;
+		valid_n       : std_logic;
+		stall         : std_logic;
+		clear         : std_logic;
 	end record;
 
 	type decode_reg_type is record
@@ -121,6 +144,9 @@ package wire is
 		int_wren        : std_logic;
 		fpu_wren        : std_logic;
 		csr_wren        : std_logic;
+		int_wren_n      : std_logic;
+		fpu_wren_n      : std_logic;
+		csr_wren_n      : std_logic;
 		raddr1          : std_logic_vector(4 downto 0);
 		raddr2          : std_logic_vector(4 downto 0);
 		raddr3          : std_logic_vector(4 downto 0);
@@ -128,12 +154,20 @@ package wire is
 		caddr           : std_logic_vector(11 downto 0);
 		load            : std_logic;
 		store           : std_logic;
+		load_n          : std_logic;
+		store_n         : std_logic;
 		fpu_load        : std_logic;
 		fpu_store       : std_logic;
+		fpu_load_n      : std_logic;
+		fpu_store_n     : std_logic;
 		int             : std_logic;
 		fpu             : std_logic;
 		csr             : std_logic;
 		comp            : std_logic;
+		int_n           : std_logic;
+		fpu_n           : std_logic;
+		csr_n           : std_logic;
+		comp_n          : std_logic;
 		csr_mode        : std_logic_vector(1 downto 0);
 		load_op         : load_operation_type;
 		store_op        : store_operation_type;
@@ -143,12 +177,17 @@ package wire is
 		return_push     : std_logic;
 		jump_uncond     : std_logic;
 		jump_rest       : std_logic;
+		taken           : std_logic;
+		return_pop_n    : std_logic;
+		return_push_n   : std_logic;
+		jump_uncond_n   : std_logic;
+		jump_rest_n     : std_logic;
+		taken_n         : std_logic;
 		link_waddr      : boolean;
 		link_raddr1     : boolean;
 		raddr1_eq_waddr : boolean;
 		zero_waddr      : boolean;
 		inc             : unsigned(2 downto 0);
-		taken           : std_logic;
 		etval           : std_logic_vector(63 downto 0);
 		ecause          : std_logic_vector(3 downto 0);
 		exc             : std_logic;
@@ -158,6 +197,13 @@ package wire is
 		wfi             : std_logic;
 		fence           : std_logic;
 		valid           : std_logic;
+		exc_n           : std_logic;
+		ecall_n         : std_logic;
+		ebreak_n        : std_logic;
+		mret_n          : std_logic;
+		wfi_n           : std_logic;
+		fence_n         : std_logic;
+		valid_n         : std_logic;
 		clear           : std_logic;
 		stall           : std_logic;
 	end record;
@@ -181,6 +227,9 @@ package wire is
 		int_wren        => '0',
 		fpu_wren        => '0',
 		csr_wren        => '0',
+		int_wren_n      => '0',
+		fpu_wren_n      => '0',
+		csr_wren_n      => '0',
 		raddr1          => (others => '0'),
 		raddr2          => (others => '0'),
 		raddr3          => (others => '0'),
@@ -188,12 +237,20 @@ package wire is
 		caddr           => (others => '0'),
 		load            => '0',
 		store           => '0',
+		load_n          => '0',
+		store_n         => '0',
 		fpu_load        => '0',
 		fpu_store       => '0',
+		fpu_load_n      => '0',
+		fpu_store_n     => '0',
 		int             => '0',
 		fpu             => '0',
 		csr             => '0',
 		comp            => '0',
+		int_n           => '0',
+		fpu_n           => '0',
+		csr_n           => '0',
+		comp_n          => '0',
 		csr_mode        => (others => '0'),
 		load_op         => init_load_operation,
 		store_op        => init_store_operation,
@@ -203,12 +260,17 @@ package wire is
 		return_push     => '0',
 		jump_uncond     => '0',
 		jump_rest       => '0',
+		taken           => '0',
+		return_pop_n    => '0',
+		return_push_n   => '0',
+		jump_uncond_n   => '0',
+		jump_rest_n     => '0',
+		taken_n         => '0',
 		link_waddr      => false,
 		link_raddr1     => false,
 		raddr1_eq_waddr => false,
 		zero_waddr      => false,
 		inc             => (others => '0'),
-		taken           => '0',
 		etval           => (others => '0'),
 		ecause          => (others => '0'),
 		exc             => '0',
@@ -218,52 +280,81 @@ package wire is
 		wfi             => '0',
 		fence           => '0',
 		valid           => '0',
+		exc_n           => '0',
+		ecall_n         => '0',
+		ebreak_n        => '0',
+		mret_n          => '0',
+		wfi_n           => '0',
+		fence_n         => '0',
+		valid_n         => '0',
 		clear           => '0',
 		stall           => '0'
 	);
 
 	type execute_out_type is record
-		pc          : std_logic_vector(63 downto 0);
-		npc         : std_logic_vector(63 downto 0);
-		funct3      : std_logic_vector(2 downto 0);
-		int_wren    : std_logic;
-		fpu_wren    : std_logic;
-		csr_wren    : std_logic;
-		waddr       : std_logic_vector(4 downto 0);
-		caddr       : std_logic_vector(11 downto 0);
-		wdata       : std_logic_vector(63 downto 0);
-		cdata       : std_logic_vector(63 downto 0);
-		sdata       : std_logic_vector(63 downto 0);
-		flags       : std_logic_vector(4 downto 0);
-		load        : std_logic;
-		store       : std_logic;
-		fpu_load    : std_logic;
-		fpu_store   : std_logic;
-		int         : std_logic;
-		fpu         : std_logic;
-		csr         : std_logic;
-		load_op     : load_operation_type;
-		store_op    : store_operation_type;
-		int_op      : int_operation_type;
-		fpu_op      : fp_operation_type;
-		return_pop  : std_logic;
-		return_push : std_logic;
-		jump_uncond : std_logic;
-		jump_rest   : std_logic;
-		taken       : std_logic;
-		jump        : std_logic;
-		address     : std_logic_vector(63 downto 0);
-		byteenable  : std_logic_vector(7 downto 0);
-		strobe      : std_logic_vector(7 downto 0);
-		etval       : std_logic_vector(63 downto 0);
-		ecause      : std_logic_vector(3 downto 0);
-		exc         : std_logic;
-		ecall       : std_logic;
-		ebreak      : std_logic;
-		mret        : std_logic;
-		valid       : std_logic;
-		stall       : std_logic;
-		clear       : std_logic;
+		pc            : std_logic_vector(63 downto 0);
+		npc           : std_logic_vector(63 downto 0);
+		funct3        : std_logic_vector(2 downto 0);
+		int_wren      : std_logic;
+		fpu_wren      : std_logic;
+		csr_wren      : std_logic;
+		int_wren_n    : std_logic;
+		fpu_wren_n    : std_logic;
+		csr_wren_n    : std_logic;
+		waddr         : std_logic_vector(4 downto 0);
+		caddr         : std_logic_vector(11 downto 0);
+		wdata         : std_logic_vector(63 downto 0);
+		cdata         : std_logic_vector(63 downto 0);
+		sdata         : std_logic_vector(63 downto 0);
+		flags         : std_logic_vector(4 downto 0);
+		load          : std_logic;
+		store         : std_logic;
+		load_n        : std_logic;
+		store_n       : std_logic;
+		fpu_load      : std_logic;
+		fpu_store     : std_logic;
+		fpu_load_n    : std_logic;
+		fpu_store_n   : std_logic;
+		int           : std_logic;
+		fpu           : std_logic;
+		csr           : std_logic;
+		comp          : std_logic;
+		int_n         : std_logic;
+		fpu_n         : std_logic;
+		csr_n         : std_logic;
+		comp_n        : std_logic;
+		load_op       : load_operation_type;
+		store_op      : store_operation_type;
+		int_op        : int_operation_type;
+		fpu_op        : fp_operation_type;
+		return_pop    : std_logic;
+		return_push   : std_logic;
+		jump_uncond   : std_logic;
+		jump_rest     : std_logic;
+		taken         : std_logic;
+		return_pop_n  : std_logic;
+		return_push_n : std_logic;
+		jump_uncond_n : std_logic;
+		jump_rest_n   : std_logic;
+		taken_n       : std_logic;
+		jump          : std_logic;
+		address       : std_logic_vector(63 downto 0);
+		byteenable    : std_logic_vector(7 downto 0);
+		strobe        : std_logic_vector(7 downto 0);
+		etval         : std_logic_vector(63 downto 0);
+		ecause        : std_logic_vector(3 downto 0);
+		exc           : std_logic;
+		ecall         : std_logic;
+		ebreak        : std_logic;
+		mret          : std_logic;
+		valid         : std_logic;
+		exc_n         : std_logic;
+		ecall_n       : std_logic;
+		ebreak_n      : std_logic;
+		mret_n        : std_logic;
+		valid_n       : std_logic;
+		stall         : std_logic;
+		clear         : std_logic;
 	end record;
 
 	type execute_reg_type is record
@@ -344,12 +435,12 @@ package wire is
 		exc           : std_logic;
 		ecall         : std_logic;
 		ebreak        : std_logic;
+		mret          : std_logic;
+		valid         : std_logic;
 		exc_n         : std_logic;
 		ecall_n       : std_logic;
 		ebreak_n      : std_logic;
-		mret          : std_logic;
 		mret_n        : std_logic;
-		valid         : std_logic;
 		valid_n       : std_logic;
 		clear         : std_logic;
 		stall         : std_logic;
@@ -433,12 +524,12 @@ package wire is
 		exc           => '0',
 		ecall         => '0',
 		ebreak        => '0',
+		mret          => '0',
+		valid         => '0',
 		exc_n         => '0',
 		ecall_n       => '0',
 		ebreak_n      => '0',
-		mret          => '0',
 		mret_n        => '0',
-		valid         => '0',
 		valid_n       => '0',
 		clear         => '0',
 		stall         => '0'
@@ -461,11 +552,11 @@ package wire is
 		int        : std_logic;
 		fpu        : std_logic;
 		csr        : std_logic;
+		comp       : std_logic;
 		load_op    : load_operation_type;
 		store_op   : store_operation_type;
 		int_op     : int_operation_type;
 		fpu_op     : fp_operation_type;
-		byteenable : std_logic_vector(7 downto 0);
 		etval      : std_logic_vector(63 downto 0);
 		ecause     : std_logic_vector(3 downto 0);
 		exc        : std_logic;
@@ -495,6 +586,7 @@ package wire is
 		int        : std_logic;
 		fpu        : std_logic;
 		csr        : std_logic;
+		comp       : std_logic;
 		load_op    : load_operation_type;
 		store_op   : store_operation_type;
 		int_op     : int_operation_type;
@@ -531,6 +623,7 @@ package wire is
 		int        => '0',
 		fpu        => '0',
 		csr        => '0',
+		comp       => '0',
 		load_op    => init_load_operation,
 		store_op   => init_store_operation,
 		int_op     => init_int_operation,
@@ -577,11 +670,11 @@ package wire is
 		int        : std_logic;
 		fpu        : std_logic;
 		csr        : std_logic;
+		comp       : std_logic;
 		load_op    : load_operation_type;
 		store_op   : store_operation_type;
 		int_op     : int_operation_type;
 		fpu_op     : fp_operation_type;
-		byteenable : std_logic_vector(7 downto 0);
 		etval      : std_logic_vector(63 downto 0);
 		ecause     : std_logic_vector(3 downto 0);
 		exc        : std_logic;
@@ -610,11 +703,11 @@ package wire is
 		int        => '0',
 		fpu        => '0',
 		csr        => '0',
+		comp       => '0',
 		load_op    => init_load_operation,
 		store_op   => init_store_operation,
 		int_op     => init_int_operation,
 		fpu_op     => init_fp_operation,
-		byteenable => (others => '0'),
 		etval      => (others => '0'),
 		ecause     => (others => '0'),
 		exc        => '0',

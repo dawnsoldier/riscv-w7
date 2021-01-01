@@ -533,10 +533,10 @@ begin
 			da_mem_i.mem_wstrb <= (others => '0');
 		end if;
 
-		if post_dmem_access = CACHE_ACCESS then
+		if dcache_enable = true and post_dmem_access = CACHE_ACCESS then
 			dmem_o.mem_rdata <= dcache_o.mem_rdata;
 			dmem_o.mem_ready <= dcache_o.mem_ready;
-		elsif post_dmem_access = IO_MEM_ACCESS then
+		elsif dcache_enable = true and post_dmem_access = IO_MEM_ACCESS then
 			dmem_o.mem_rdata <= da_mem_o.mem_rdata;
 			dmem_o.mem_ready <= da_mem_o.mem_ready;
 		elsif dcache_enable = false then

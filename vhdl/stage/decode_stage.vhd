@@ -57,7 +57,7 @@ begin
 		v.etval := d.f.etval;
 		v.ecause := d.f.ecause;
 
-		if (d.d.stall or d.e.stall or d.m.stall or d.w.stall) = '1' then
+		if r.stall = '1' then
 			v := r;
 		end if;
 
@@ -72,9 +72,9 @@ begin
 
 		v.npc := std_logic_vector(unsigned(v.pc) + v.inc);
 
-		v.stall := '0';
+		v.stall := a.e.stall or a.m.stall or a.w.stall;
 
-		v.clear := csr_eo.exc or csr_eo.mret or a.m.stall or d.w.clear;
+		v.clear := csr_eo.exc or csr_eo.mret or d.w.clear;
 
 		if d.e.jump = '1' and d.f.taken = '0' then
 			v.clear := '1';
@@ -261,34 +261,58 @@ begin
 			when others => null;
 		end case;
 
-		if (d.d.csr_wren or d.e.csr_wren) = '1' then
+		if (a.e.csr_wren_n or d.e.csr_wren_n) = '1' then
 			v.stall := '1';
-		elsif (d.d.load) = '1' then
-			if (nor_reduce(d.d.waddr xor v.raddr1) and v.int_rden1) = '1' then
+		elsif (a.e.load_n) = '1' then
+			if (nor_reduce(a.e.waddr xor v.raddr1) and v.int_rden1) = '1' then
 				v.stall := '1';
 			end if;
-			if (nor_reduce(d.d.waddr xor v.raddr2) and v.int_rden2) = '1' then
+			if (nor_reduce(a.e.waddr xor v.raddr2) and v.int_rden2) = '1' then
 				v.stall := '1';
 			end if;
-		elsif (d.d.fpu_load) = '1' then
-			if (nor_reduce(d.d.waddr xor v.raddr1) and v.fpu_rden1) = '1' then
+		elsif (a.e.fpu_load_n) = '1' then
+			if (nor_reduce(a.e.waddr xor v.raddr1) and v.fpu_rden1) = '1' then
 				v.stall := '1';
 			end if;
-			if (nor_reduce(d.d.waddr xor v.raddr2) and v.fpu_rden2) = '1' then
+			if (nor_reduce(a.e.waddr xor v.raddr2) and v.fpu_rden2) = '1' then
 				v.stall := '1';
 			end if;
-			if (nor_reduce(d.d.waddr xor v.raddr3) and v.fpu_rden3) = '1' then
+			if (nor_reduce(a.e.waddr xor v.raddr3) and v.fpu_rden3) = '1' then
 				v.stall := '1';
 			end if;
 		elsif (v.csr_rden) = '1' then
-			if (nor_reduce(v.caddr xor csr_fflags) and (d.d.fpu or d.e.fpu)) = '1' then
+			if (nor_reduce(v.caddr xor csr_fflags) and (a.e.fpu_n or d.e.fpu_n)) = '1' then
 				v.stall := '1';
 			end if;
-		elsif (d.d.int_op.mcycle) = '1' then
+		elsif (a.e.int_op.mcycle) = '1' then
 			v.stall := '1';
-		elsif (d.d.fpu_op.fmcycle) = '1' then
+		elsif (a.e.fpu_op.fmcycle) = '1' then
 			v.stall := '1';
 		end if;
+
+		v.int_wren_n := v.int_wren;
+		v.fpu_wren_n := v.fpu_wren;
+		v.csr_wren_n := v.csr_wren;
+		v.int_n := v.int;
+		v.fpu_n := v.fpu;
+		v.csr_n := v.csr;
+		v.comp_n := v.comp;
+		v.load_n := v.load;
+		v.store_n := v.store;
+		v.fpu_load_n := v.fpu_load;
+		v.fpu_store_n := v.fpu_store;
+		v.return_pop_n := v.return_pop;
+		v.return_push_n := v.return_push;
+		v.jump_uncond_n := v.jump_uncond;
+		v.jump_rest_n := v.jump_rest;
+		v.taken_n := v.taken;
+		v.exc_n := v.exc;
+		v.ecall_n := v.ecall;
+		v.ebreak_n := v.ebreak;
+		v.mret_n := v.mret;
+		v.wfi_n := v.wfi;
+		v.fence_n := v.fence;
+		v.valid_n := v.valid;
 
 		if (v.stall or v.clear) = '1' then
 			v.int_wren := '0';
@@ -300,19 +324,20 @@ begin
 			v.comp := '0';
 			v.int_op := init_int_operation;
 			v.fpu_op := init_fp_operation;
-			v.return_pop := '0';
-			v.return_push := '0';
-			v.jump_uncond := '0';
-			v.jump_rest := '0';
 			v.load := '0';
 			v.store := '0';
 			v.fpu_load := '0';
 			v.fpu_store := '0';
+			v.return_pop := '0';
+			v.return_push := '0';
+			v.jump_uncond := '0';
+			v.jump_rest := '0';
 			v.taken := '0';
 			v.exc := '0';
 			v.ecall := '0';
 			v.ebreak := '0';
 			v.mret := '0';
+			v.wfi := '0';
 			v.fence := '0';
 			v.valid := '0';
 		end if;
@@ -373,6 +398,30 @@ begin
 		y.stall <= v.stall;
 		y.clear <= v.clear;
 
+		y.int_wren_n <= v.int_wren_n;
+		y.fpu_wren_n <= v.fpu_wren_n;
+		y.csr_wren_n <= v.csr_wren_n;
+		y.int_n <= v.int_n;
+		y.fpu_n <= v.fpu_n;
+		y.csr_n <= v.csr_n;
+		y.comp_n <= v.comp_n;
+		y.load_n <= v.load_n;
+		y.store_n <= v.store_n;
+		y.fpu_load_n <= v.fpu_load_n;
+		y.fpu_store_n <= v.fpu_store_n;
+		y.return_pop_n <= v.return_pop_n;
+		y.return_push_n <= v.return_push_n;
+		y.jump_uncond_n <= v.jump_uncond_n;
+		y.jump_rest_n <= v.jump_rest_n;
+		y.taken_n <= v.taken_n;
+		y.exc_n <= v.exc_n;
+		y.ecall_n <= v.ecall_n;
+		y.ebreak_n <= v.ebreak_n;
+		y.mret_n <= v.mret_n;
+		y.wfi_n <= v.wfi_n;
+		y.fence_n <= v.fence_n;
+		y.valid_n <= v.valid_n;
+
 		q.pc <= r.pc;
 		q.npc <= r.npc;
 		q.funct3 <= r.funct3;
@@ -422,6 +471,30 @@ begin
 		q.valid <= r.valid;
 		q.stall <= r.stall;
 		q.clear <= r.clear;
+
+		q.int_wren_n <= r.int_wren_n;
+		q.fpu_wren_n <= r.fpu_wren_n;
+		q.csr_wren_n <= r.csr_wren_n;
+		q.int_n <= r.int_n;
+		q.fpu_n <= r.fpu_n;
+		q.csr_n <= r.csr_n;
+		q.comp_n <= r.comp_n;
+		q.load_n <= r.load_n;
+		q.store_n <= r.store_n;
+		q.fpu_load_n <= r.fpu_load_n;
+		q.fpu_store_n <= r.fpu_store_n;
+		q.return_pop_n <= r.return_pop_n;
+		q.return_push_n <= r.return_push_n;
+		q.jump_uncond_n <= r.jump_uncond_n;
+		q.jump_rest_n <= r.jump_rest_n;
+		q.taken_n <= r.taken_n;
+		q.exc_n <= r.exc_n;
+		q.ecall_n <= r.ecall_n;
+		q.ebreak_n <= r.ebreak_n;
+		q.mret_n <= r.mret_n;
+		q.wfi_n <= r.wfi_n;
+		q.fence_n <= r.fence_n;
+		q.valid_n <= r.valid_n;
 
 	end process;
 

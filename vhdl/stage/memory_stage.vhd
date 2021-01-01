@@ -58,6 +58,7 @@ begin
 		v.int := d.e.int;
 		v.fpu := d.e.fpu;
 		v.csr := d.e.csr;
+		v.comp := d.e.comp;
 		v.load_op := d.e.load_op;
 		v.store_op := d.e.store_op;
 		v.int_op := d.e.int_op;
@@ -71,11 +72,11 @@ begin
 		v.valid := d.e.valid;
 		v.byteenable := d.e.byteenable;
 
-		if (d.m.stall or d.w.stall) = '1' then
+		if r.stall = '1' then
 			v := r;
 		end if;
 
-		v.stall := '0';
+		v.stall := a.w.stall;
 
 		v.clear := d.w.clear;
 
@@ -119,6 +120,7 @@ begin
 			v.int := '0';
 			v.fpu := '0';
 			v.csr := '0';
+			v.comp := '0';
 			v.exc := '0';
 			v.ecall := '0';
 			v.ebreak := '0';
@@ -148,11 +150,11 @@ begin
 		y.int <= v.int;
 		y.fpu <= v.fpu;
 		y.csr <= v.csr;
+		y.comp <= v.comp;
 		y.load_op <= v.load_op;
 		y.store_op <= v.store_op;
 		y.int_op <= v.int_op;
 		y.fpu_op <= v.fpu_op;
-		y.byteenable <= v.byteenable;
 		y.etval <= v.etval;
 		y.ecause <= v.ecause;
 		y.exc <= v.exc;
@@ -179,11 +181,11 @@ begin
 		q.int <= r.int;
 		q.fpu <= r.fpu;
 		q.csr <= r.csr;
+		q.comp <= r.comp;
 		q.load_op <= r.load_op;
 		q.store_op <= r.store_op;
 		q.int_op <= r.int_op;
 		q.fpu_op <= r.fpu_op;
-		q.byteenable <= r.byteenable;
 		q.etval <= r.etval;
 		q.ecause <= r.ecause;
 		q.exc <= r.exc;

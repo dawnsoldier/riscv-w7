@@ -74,6 +74,7 @@ package csr_wire is
 		int       : std_logic;
 		fpu       : std_logic;
 		csr       : std_logic;
+		comp      : std_logic;
 		load      : std_logic;
 		store     : std_logic;
 	end record;

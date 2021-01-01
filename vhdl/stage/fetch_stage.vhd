@@ -49,8 +49,8 @@ begin
 		v := r;
 
 		v.valid := not d.w.clear;
-		-- v.stall := not(imem_o.mem_ready) or d.d.stall or d.e.stall or d.m.stall or d.w.stall or d.w.clear;
-		v.stall := pfetch_o.stall or d.d.stall or d.e.stall or d.m.stall or d.w.stall or d.w.clear;
+		-- v.stall := not(imem_o.mem_ready) or a.d.stall or a.e.stall or a.m.stall or a.w.stall or d.w.clear;
+		v.stall := pfetch_o.stall or a.d.stall or a.e.stall or a.m.stall or a.w.stall or d.w.clear;
 		v.clear := csr_eo.exc or csr_eo.mret or d.w.clear;
 
 		-- v.instr := nop;

@@ -58,6 +58,7 @@ begin
 		v.int := d.m.int;
 		v.fpu := d.m.fpu;
 		v.csr := d.m.csr;
+		v.comp := d.m.comp;
 		v.load_op := d.m.load_op;
 		v.store_op := d.m.store_op;
 		v.int_op := d.m.int_op;
@@ -68,11 +69,10 @@ begin
 		v.ecall := d.m.ecall;
 		v.ebreak := d.m.ebreak;
 		v.mret := d.m.mret;
-		v.byteenable := d.m.byteenable;
 		v.flags := d.m.flags;
 		v.valid := d.m.valid;
 
-		if d.w.stall = '1' then
+		if r.stall = '1' then
 			v := r;
 		end if;
 
@@ -82,10 +82,14 @@ begin
 
 		if (v.stall or v.clear) = '1' then
 			v.int_wren := '0';
+			v.fpu_wren := '0';
 			v.csr_wren := '0';
 			v.int := '0';
 			v.fpu := '0';
 			v.csr := '0';
+			v.comp := '0';
+			v.fpu_load := '0';
+			v.fpu_store := '0';
 			v.load := '0';
 			v.store := '0';
 			v.exc := '0';
@@ -116,6 +120,7 @@ begin
 		csr_ci.int <= v.int;
 		csr_ci.fpu <= v.fpu;
 		csr_ci.csr <= v.csr;
+		csr_ci.comp <= v.comp;
 		csr_ci.int_op <= v.int_op;
 		csr_ci.fpu_op <= v.fpu_op;
 		csr_ci.flags <= v.flags;
