@@ -536,110 +536,154 @@ package wire is
 	);
 
 	type memory_out_type is record
-		pc         : std_logic_vector(63 downto 0);
-		int_wren   : std_logic;
-		fpu_wren   : std_logic;
-		csr_wren   : std_logic;
-		waddr      : std_logic_vector(4 downto 0);
-		caddr      : std_logic_vector(11 downto 0);
-		wdata      : std_logic_vector(63 downto 0);
-		cdata      : std_logic_vector(63 downto 0);
-		flags      : std_logic_vector(4 downto 0);
-		load       : std_logic;
-		store      : std_logic;
-		fpu_load   : std_logic;
-		fpu_store  : std_logic;
-		int        : std_logic;
-		fpu        : std_logic;
-		csr        : std_logic;
-		comp       : std_logic;
-		load_op    : load_operation_type;
-		store_op   : store_operation_type;
-		int_op     : int_operation_type;
-		fpu_op     : fp_operation_type;
-		etval      : std_logic_vector(63 downto 0);
-		ecause     : std_logic_vector(3 downto 0);
-		exc        : std_logic;
-		ecall      : std_logic;
-		ebreak     : std_logic;
-		mret       : std_logic;
-		valid      : std_logic;
-		stall      : std_logic;
-		clear      : std_logic;
+		pc          : std_logic_vector(63 downto 0);
+		int_wren    : std_logic;
+		fpu_wren    : std_logic;
+		csr_wren    : std_logic;
+		int_wren_n  : std_logic;
+		fpu_wren_n  : std_logic;
+		csr_wren_n  : std_logic;
+		waddr       : std_logic_vector(4 downto 0);
+		caddr       : std_logic_vector(11 downto 0);
+		wdata       : std_logic_vector(63 downto 0);
+		cdata       : std_logic_vector(63 downto 0);
+		flags       : std_logic_vector(4 downto 0);
+		load        : std_logic;
+		store       : std_logic;
+		load_n      : std_logic;
+		store_n     : std_logic;
+		fpu_load    : std_logic;
+		fpu_store   : std_logic;
+		fpu_load_n  : std_logic;
+		fpu_store_n : std_logic;
+		int         : std_logic;
+		fpu         : std_logic;
+		csr         : std_logic;
+		comp        : std_logic;
+		int_n       : std_logic;
+		fpu_n       : std_logic;
+		csr_n       : std_logic;
+		comp_n      : std_logic;
+		load_op     : load_operation_type;
+		store_op    : store_operation_type;
+		int_op      : int_operation_type;
+		fpu_op      : fp_operation_type;
+		etval       : std_logic_vector(63 downto 0);
+		ecause      : std_logic_vector(3 downto 0);
+		exc         : std_logic;
+		ecall       : std_logic;
+		ebreak      : std_logic;
+		mret        : std_logic;
+		valid       : std_logic;
+		exc_n       : std_logic;
+		ecall_n     : std_logic;
+		ebreak_n    : std_logic;
+		mret_n      : std_logic;
+		valid_n     : std_logic;
+		stall       : std_logic;
+		clear       : std_logic;
 	end record;
 
 	type memory_reg_type is record
-		pc         : std_logic_vector(63 downto 0);
-		funct3     : std_logic_vector(2 downto 0);
-		int_wren   : std_logic;
-		fpu_wren   : std_logic;
-		csr_wren   : std_logic;
-		waddr      : std_logic_vector(4 downto 0);
-		caddr      : std_logic_vector(11 downto 0);
-		wdata      : std_logic_vector(63 downto 0);
-		cdata      : std_logic_vector(63 downto 0);
-		flags      : std_logic_vector(4 downto 0);
-		load       : std_logic;
-		store      : std_logic;
-		fpu_load   : std_logic;
-		fpu_store  : std_logic;
-		int        : std_logic;
-		fpu        : std_logic;
-		csr        : std_logic;
-		comp       : std_logic;
-		load_op    : load_operation_type;
-		store_op   : store_operation_type;
-		int_op     : int_operation_type;
-		fpu_op     : fp_operation_type;
-		byteenable : std_logic_vector(7 downto 0);
-		etval      : std_logic_vector(63 downto 0);
-		ecause     : std_logic_vector(3 downto 0);
-		exc        : std_logic;
-		ecall      : std_logic;
-		ebreak     : std_logic;
-		mret       : std_logic;
-		valid      : std_logic;
-		clear      : std_logic;
-		fstall     : std_logic;
-		istall     : std_logic;
-		stall      : std_logic;
+		pc          : std_logic_vector(63 downto 0);
+		funct3      : std_logic_vector(2 downto 0);
+		int_wren    : std_logic;
+		fpu_wren    : std_logic;
+		csr_wren    : std_logic;
+		int_wren_n  : std_logic;
+		fpu_wren_n  : std_logic;
+		csr_wren_n  : std_logic;
+		waddr       : std_logic_vector(4 downto 0);
+		caddr       : std_logic_vector(11 downto 0);
+		wdata       : std_logic_vector(63 downto 0);
+		cdata       : std_logic_vector(63 downto 0);
+		flags       : std_logic_vector(4 downto 0);
+		load        : std_logic;
+		store       : std_logic;
+		load_n      : std_logic;
+		store_n     : std_logic;
+		fpu_load    : std_logic;
+		fpu_store   : std_logic;
+		fpu_load_n  : std_logic;
+		fpu_store_n : std_logic;
+		int         : std_logic;
+		fpu         : std_logic;
+		csr         : std_logic;
+		comp        : std_logic;
+		int_n       : std_logic;
+		fpu_n       : std_logic;
+		csr_n       : std_logic;
+		comp_n      : std_logic;
+		load_op     : load_operation_type;
+		store_op    : store_operation_type;
+		int_op      : int_operation_type;
+		fpu_op      : fp_operation_type;
+		byteenable  : std_logic_vector(7 downto 0);
+		etval       : std_logic_vector(63 downto 0);
+		ecause      : std_logic_vector(3 downto 0);
+		exc         : std_logic;
+		ecall       : std_logic;
+		ebreak      : std_logic;
+		mret        : std_logic;
+		valid       : std_logic;
+		exc_n       : std_logic;
+		ecall_n     : std_logic;
+		ebreak_n    : std_logic;
+		mret_n      : std_logic;
+		valid_n     : std_logic;
+		clear       : std_logic;
+		stall       : std_logic;
 	end record;
 
 	constant init_memory_reg : memory_reg_type := (
-		pc         => (others => '0'),
-		funct3     => (others => '0'),
-		int_wren   => '0',
-		fpu_wren   => '0',
-		csr_wren   => '0',
-		waddr      => (others => '0'),
-		caddr      => (others => '0'),
-		wdata      => (others => '0'),
-		cdata      => (others => '0'),
-		flags      => (others => '0'),
-		load       => '0',
-		store      => '0',
-		fpu_load   => '0',
-		fpu_store  => '0',
-		int        => '0',
-		fpu        => '0',
-		csr        => '0',
-		comp       => '0',
-		load_op    => init_load_operation,
-		store_op   => init_store_operation,
-		int_op     => init_int_operation,
-		fpu_op     => init_fp_operation,
-		byteenable => (others => '0'),
-		etval      => (others => '0'),
-		ecause     => (others => '0'),
-		exc        => '0',
-		ecall      => '0',
-		ebreak     => '0',
-		mret       => '0',
-		valid      => '0',
-		clear      => '0',
-		fstall     => '0',
-		istall     => '0',
-		stall      => '0'
+		pc          => (others => '0'),
+		funct3      => (others => '0'),
+		int_wren    => '0',
+		fpu_wren    => '0',
+		csr_wren    => '0',
+		int_wren_n  => '0',
+		fpu_wren_n  => '0',
+		csr_wren_n  => '0',
+		waddr       => (others => '0'),
+		caddr       => (others => '0'),
+		wdata       => (others => '0'),
+		cdata       => (others => '0'),
+		flags       => (others => '0'),
+		load        => '0',
+		store       => '0',
+		load_n      => '0',
+		store_n     => '0',
+		fpu_load    => '0',
+		fpu_store   => '0',
+		fpu_load_n  => '0',
+		fpu_store_n => '0',
+		int         => '0',
+		fpu         => '0',
+		csr         => '0',
+		comp        => '0',
+		int_n       => '0',
+		fpu_n       => '0',
+		csr_n       => '0',
+		comp_n      => '0',
+		load_op     => init_load_operation,
+		store_op    => init_store_operation,
+		int_op      => init_int_operation,
+		fpu_op      => init_fp_operation,
+		byteenable  => (others => '0'),
+		etval       => (others => '0'),
+		ecause      => (others => '0'),
+		exc         => '0',
+		ecall       => '0',
+		ebreak      => '0',
+		mret        => '0',
+		valid       => '0',
+		exc_n       => '0',
+		ecall_n     => '0',
+		ebreak_n    => '0',
+		mret_n      => '0',
+		valid_n     => '0',
+		clear       => '0',
+		stall       => '0'
 	);
 
 	type writeback_out_type is record

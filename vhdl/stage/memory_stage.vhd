@@ -74,6 +74,22 @@ begin
 
 		if r.stall = '1' then
 			v := r;
+			v.int_wren := v.int_wren_n;
+			v.fpu_wren := v.fpu_wren_n;
+			v.csr_wren := v.csr_wren_n;
+			v.int := v.int_n;
+			v.fpu := v.fpu_n;
+			v.csr := v.csr_n;
+			v.comp := v.comp_n;
+			v.load := v.load_n;
+			v.store := v.store_n;
+			v.fpu_load := v.fpu_load_n;
+			v.fpu_store := v.fpu_store_n;
+			v.exc := v.exc_n;
+			v.ecall := v.ecall_n;
+			v.ebreak := v.ebreak_n;
+			v.mret := v.mret_n;
+			v.valid := v.valid_n;
 		end if;
 
 		v.stall := a.w.stall;
@@ -83,35 +99,30 @@ begin
 		if (v.load or v.fpu_load) = '1' then
 			v.wdata := load_data(dmem_o.mem_rdata, v.byteenable, v.load_op);
 			v.stall := not dmem_o.mem_ready;
-			if v.int = '1' then
-				v.istall := v.stall;
-			elsif v.fpu = '1' then
-				v.fstall := v.stall;
-			end if;
 		elsif (v.store or v.fpu_store) = '1' then
 			v.stall := not dmem_o.mem_ready;
-			if v.int = '1' then
-				v.istall := v.stall;
-			elsif v.fpu = '1' then
-				v.fstall := v.stall;
-			end if;
-		end if;
-
-		if dmem_o.mem_ready = '1' then
-			if v.istall = '1' then
-				v.istall := '0';
-				v.int := '1';
-				v.int_wren := v.load and or_reduce(v.waddr);
-			elsif v.fstall = '1' then
-				v.fstall := '0';
-				v.fpu := '1';
-				v.fpu_wren := v.fpu_load;
-			end if;
 		end if;
 
 		if v.fpu_load = '1' then
 			v.wdata := nan_boxing(v.wdata,v.load_op.mem_lw);
 		end if;
+
+		v.int_wren_n := v.int_wren;
+		v.fpu_wren_n := v.fpu_wren;
+		v.csr_wren_n := v.csr_wren;
+		v.int_n := v.int;
+		v.fpu_n := v.fpu;
+		v.csr_n := v.csr;
+		v.comp_n := v.comp;
+		v.load_n := v.load;
+		v.store_n := v.store;
+		v.fpu_load_n := v.fpu_load;
+		v.fpu_store_n := v.fpu_store;
+		v.exc_n := v.exc;
+		v.ecall_n := v.ecall;
+		v.ebreak_n := v.ebreak;
+		v.mret_n := v.mret;
+		v.valid_n := v.valid;
 
 		if (v.stall or v.clear) = '1' then
 			v.int_wren := '0';
@@ -121,6 +132,10 @@ begin
 			v.fpu := '0';
 			v.csr := '0';
 			v.comp := '0';
+			v.load := '0';
+			v.store := '0';
+			v.fpu_load := '0';
+			v.fpu_store := '0';
 			v.exc := '0';
 			v.ecall := '0';
 			v.ebreak := '0';
@@ -165,6 +180,23 @@ begin
 		y.stall <= v.stall;
 		y.clear <= v.clear;
 
+		y.int_wren_n <= v.int_wren_n;
+		y.fpu_wren_n <= v.fpu_wren_n;
+		y.csr_wren_n <= v.csr_wren_n;
+		y.int_n <= v.int_n;
+		y.fpu_n <= v.fpu_n;
+		y.csr_n <= v.csr_n;
+		y.comp_n <= v.comp_n;
+		y.load_n <= v.load_n;
+		y.store_n <= v.store_n;
+		y.fpu_load_n <= v.fpu_load_n;
+		y.fpu_store_n <= v.fpu_store_n;
+		y.exc_n <= v.exc_n;
+		y.ecall_n <= v.ecall_n;
+		y.ebreak_n <= v.ebreak_n;
+		y.mret_n <= v.mret_n;
+		y.valid_n <= v.valid_n;
+
 		q.pc <= r.pc;
 		q.int_wren <= r.int_wren;
 		q.fpu_wren <= r.fpu_wren;
@@ -195,6 +227,23 @@ begin
 		q.valid <= r.valid;
 		q.stall <= r.stall;
 		q.clear <= r.clear;
+
+		q.int_wren_n <= r.int_wren_n;
+		q.fpu_wren_n <= r.fpu_wren_n;
+		q.csr_wren_n <= r.csr_wren_n;
+		q.int_n <= r.int_n;
+		q.fpu_n <= r.fpu_n;
+		q.csr_n <= r.csr_n;
+		q.comp_n <= r.comp_n;
+		q.load_n <= r.load_n;
+		q.store_n <= r.store_n;
+		q.fpu_load_n <= r.fpu_load_n;
+		q.fpu_store_n <= r.fpu_store_n;
+		q.exc_n <= r.exc_n;
+		q.ecall_n <= r.ecall_n;
+		q.ebreak_n <= r.ebreak_n;
+		q.mret_n <= r.mret_n;
+		q.valid_n <= r.valid_n;
 
 	end process;
 

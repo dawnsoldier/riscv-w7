@@ -261,7 +261,7 @@ begin
 			when others => null;
 		end case;
 
-		if (a.e.csr_wren_n or d.e.csr_wren_n) = '1' then
+		if (a.e.csr_wren_n or a.m.csr_wren_n) = '1' then
 			v.stall := '1';
 		elsif (a.e.load_n) = '1' then
 			if (nor_reduce(a.e.waddr xor v.raddr1) and v.int_rden1) = '1' then
@@ -281,7 +281,7 @@ begin
 				v.stall := '1';
 			end if;
 		elsif (v.csr_rden) = '1' then
-			if (nor_reduce(v.caddr xor csr_fflags) and (a.e.fpu_n or d.e.fpu_n)) = '1' then
+			if (nor_reduce(v.caddr xor csr_fflags) and (a.e.fpu_n or a.m.fpu_n)) = '1' then
 				v.stall := '1';
 			end if;
 		elsif (a.e.int_op.mcycle) = '1' then
