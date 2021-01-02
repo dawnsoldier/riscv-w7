@@ -57,17 +57,9 @@ begin
 		v.etval := d.f.etval;
 		v.ecause := d.f.ecause;
 
-		if r.stall = '1' then
-			v := r;
-			if nor_reduce(v.instr xor nop) = '1' then
-				v.pc := d.f.pc;
-				v.instr := d.f.instr;
-				v.taken := d.f.taken;
-				v.exc := d.f.exc;
-				v.etval := d.f.etval;
-				v.ecause := d.f.ecause;
-			end if;
-		end if;
+		-- if r.stall = '1' then
+		-- 	v := r;
+		-- end if;
 
 		if d.f.exc = '1' then
 			v.instr := nop;
