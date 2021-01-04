@@ -164,6 +164,9 @@ architecture behavior of cpu is
 	signal dmem_i : mem_in_type;
 	signal dmem_o : mem_out_type;
 
+	signal imem_next_i : mem_in_type;
+	signal dmem_next_i : mem_in_type;
+
 	signal io_mem_i : mem_in_type;
 	signal io_mem_o : mem_out_type;
 	signal do_mem_i : mem_in_type;
@@ -281,7 +284,7 @@ begin
 
 	end process;
 
-	process(imem_i,io_mem_i,ia_mem_o,icache_i,icache_o,pre_imem_access,post_imem_access)
+	process(imem_i,imem_next_i,io_mem_i,ia_mem_o,icache_i,icache_o,pre_imem_access,post_imem_access)
 
 	begin
 
@@ -306,7 +309,7 @@ begin
 		icache_i.mem_wdata <= imem_i.mem_wdata;
 		icache_i.mem_wstrb <= imem_i.mem_wstrb;
 
-		if post_imem_access = CACHE_ACCESS then
+		if icache_enable = true and post_imem_access = CACHE_ACCESS then
 			ia_mem_i.mem_valid <= io_mem_i.mem_valid;
 			ia_mem_i.mem_instr <= io_mem_i.mem_instr;
 			ia_mem_i.mem_spec <= io_mem_i.mem_spec;
@@ -314,7 +317,15 @@ begin
 			ia_mem_i.mem_addr <= io_mem_i.mem_addr;
 			ia_mem_i.mem_wdata <= io_mem_i.mem_wdata;
 			ia_mem_i.mem_wstrb <= io_mem_i.mem_wstrb;
-		elsif pre_imem_access = IO_MEM_ACCESS then
+		elsif icache_enable = true and post_imem_access = IO_MEM_ACCESS then
+			ia_mem_i.mem_valid <= imem_next_i.mem_valid;
+			ia_mem_i.mem_instr <= imem_next_i.mem_instr;
+			ia_mem_i.mem_spec <= imem_next_i.mem_spec;
+			ia_mem_i.mem_invalid <= imem_next_i.mem_invalid;
+			ia_mem_i.mem_addr <= imem_next_i.mem_addr;
+			ia_mem_i.mem_wdata <= imem_next_i.mem_wdata;
+			ia_mem_i.mem_wstrb <= imem_next_i.mem_wstrb;
+		elsif icache_enable = false then
 			ia_mem_i.mem_valid <= imem_i.mem_valid;
 			ia_mem_i.mem_instr <= imem_i.mem_instr;
 			ia_mem_i.mem_spec <= imem_i.mem_spec;
@@ -332,18 +343,26 @@ begin
 			ia_mem_i.mem_wstrb <= (others => '0');
 		end if;
 
-		if post_imem_access = CACHE_ACCESS then
+		if icache_enable = true and post_imem_access = CACHE_ACCESS then
 			imem_o.mem_rdata <= icache_o.mem_rdata;
 			imem_o.mem_ready <= icache_o.mem_ready;
-		elsif post_imem_access = IO_MEM_ACCESS then
+			imem_o.mem_flush <= icache_o.mem_flush;
+		elsif icache_enable = true and post_imem_access = IO_MEM_ACCESS then
 			imem_o.mem_rdata <= ia_mem_o.mem_rdata;
 			imem_o.mem_ready <= ia_mem_o.mem_ready;
+			imem_o.mem_flush <= '0';
+		elsif icache_enable = false then
+			imem_o.mem_rdata <= ia_mem_o.mem_rdata;
+			imem_o.mem_ready <= ia_mem_o.mem_ready;
+			imem_o.mem_flush <= '0';
 		else
 			imem_o.mem_rdata <= (others => '0');
 			imem_o.mem_ready <= '0';
+			imem_o.mem_flush <= '0';
 		end if;
 		io_mem_o.mem_rdata <= ia_mem_o.mem_rdata;
 		io_mem_o.mem_ready <= ia_mem_o.mem_ready;
+		io_mem_o.mem_flush <= '0';
 
 	end process;
 
@@ -354,16 +373,30 @@ begin
 		if rising_edge(clock) then
 			if reset = '0' then
 				post_imem_access <= CACHE_ACCESS;
+				imem_next_i.mem_valid <= '0';
+				imem_next_i.mem_instr <= '0';
+				imem_next_i.mem_spec <= '0';
+				imem_next_i.mem_invalid <= '0';
+				imem_next_i.mem_addr <= (others => '0');
+				imem_next_i.mem_wdata <= (others => '0');
+				imem_next_i.mem_wstrb <= (others => '0');
 			else
 				if imem_i.mem_valid = '1' then
 					post_imem_access <= pre_imem_access;
 				end if;
+				imem_next_i.mem_valid <= imem_i.mem_valid;
+				imem_next_i.mem_instr <= imem_i.mem_instr;
+				imem_next_i.mem_spec <= imem_i.mem_spec;
+				imem_next_i.mem_invalid <= imem_i.mem_invalid;
+				imem_next_i.mem_addr <= imem_i.mem_addr;
+				imem_next_i.mem_wdata <= imem_i.mem_wdata;
+				imem_next_i.mem_wstrb <= imem_i.mem_wstrb;
 			end if;
 		end if;
 
 	end process;
 
-	process(dmem_i,do_mem_i,da_mem_o,dcache_i,dcache_o,pre_dmem_access,post_dmem_access)
+	process(dmem_i,dmem_next_i,do_mem_i,da_mem_o,dcache_i,dcache_o,pre_dmem_access,post_dmem_access)
 
 	begin
 
@@ -388,7 +421,7 @@ begin
 		dcache_i.mem_wdata <= dmem_i.mem_wdata;
 		dcache_i.mem_wstrb <= dmem_i.mem_wstrb;
 
-		if pre_dmem_access = CACHE_ACCESS then
+		if dcache_enable = true and post_dmem_access = CACHE_ACCESS then
 			da_mem_i.mem_valid <= do_mem_i.mem_valid;
 			da_mem_i.mem_instr <= do_mem_i.mem_instr;
 			da_mem_i.mem_spec <= do_mem_i.mem_spec;
@@ -396,7 +429,15 @@ begin
 			da_mem_i.mem_addr <= do_mem_i.mem_addr;
 			da_mem_i.mem_wdata <= do_mem_i.mem_wdata;
 			da_mem_i.mem_wstrb <= do_mem_i.mem_wstrb;
-		elsif pre_dmem_access = IO_MEM_ACCESS then
+		elsif dcache_enable = true and post_dmem_access = IO_MEM_ACCESS then
+			da_mem_i.mem_valid <= dmem_next_i.mem_valid;
+			da_mem_i.mem_instr <= dmem_next_i.mem_instr;
+			da_mem_i.mem_spec <= dmem_next_i.mem_spec;
+			da_mem_i.mem_invalid <= dmem_next_i.mem_invalid;
+			da_mem_i.mem_addr <= dmem_next_i.mem_addr;
+			da_mem_i.mem_wdata <= dmem_next_i.mem_wdata;
+			da_mem_i.mem_wstrb <= dmem_next_i.mem_wstrb;
+		elsif dcache_enable = false then
 			da_mem_i.mem_valid <= dmem_i.mem_valid;
 			da_mem_i.mem_instr <= dmem_i.mem_instr;
 			da_mem_i.mem_spec <= dmem_i.mem_spec;
@@ -414,18 +455,26 @@ begin
 			da_mem_i.mem_wstrb <= (others => '0');
 		end if;
 
-		if post_dmem_access = CACHE_ACCESS then
+		if dcache_enable = true and post_dmem_access = CACHE_ACCESS then
 			dmem_o.mem_rdata <= dcache_o.mem_rdata;
 			dmem_o.mem_ready <= dcache_o.mem_ready;
-		elsif post_dmem_access = IO_MEM_ACCESS then
+			dmem_o.mem_flush <= dcache_o.mem_flush;
+		elsif dcache_enable = true and post_dmem_access = IO_MEM_ACCESS then
 			dmem_o.mem_rdata <= da_mem_o.mem_rdata;
 			dmem_o.mem_ready <= da_mem_o.mem_ready;
+			dmem_o.mem_flush <= '0';
+		elsif dcache_enable = false then
+			dmem_o.mem_rdata <= da_mem_o.mem_rdata;
+			dmem_o.mem_ready <= da_mem_o.mem_ready;
+			dmem_o.mem_flush <= '0';
 		else
 			dmem_o.mem_rdata <= (others => '0');
 			dmem_o.mem_ready <= '0';
+			dmem_o.mem_flush <= '0';
 		end if;
 		do_mem_o.mem_rdata <= da_mem_o.mem_rdata;
 		do_mem_o.mem_ready <= da_mem_o.mem_ready;
+		do_mem_o.mem_flush <= '0';
 
 	end process;
 
@@ -436,10 +485,24 @@ begin
 		if rising_edge(clock) then
 			if reset = '0' then
 				post_dmem_access <= CACHE_ACCESS;
+				dmem_next_i.mem_valid <= '0';
+				dmem_next_i.mem_instr <= '0';
+				dmem_next_i.mem_spec <= '0';
+				dmem_next_i.mem_invalid <= '0';
+				dmem_next_i.mem_addr <= (others => '0');
+				dmem_next_i.mem_wdata <= (others => '0');
+				dmem_next_i.mem_wstrb <= (others => '0');
 			else
 				if dmem_i.mem_valid = '1' then
 					post_dmem_access <= pre_dmem_access;
 				end if;
+				dmem_next_i.mem_valid <= dmem_i.mem_valid;
+				dmem_next_i.mem_instr <= dmem_i.mem_instr;
+				dmem_next_i.mem_spec <= dmem_i.mem_spec;
+				dmem_next_i.mem_invalid <= dmem_i.mem_invalid;
+				dmem_next_i.mem_addr <= dmem_i.mem_addr;
+				dmem_next_i.mem_wdata <= dmem_i.mem_wdata;
+				dmem_next_i.mem_wstrb <= dmem_i.mem_wstrb;
 			end if;
 		end if;
 

@@ -347,11 +347,13 @@ package wire is
 		ecall         : std_logic;
 		ebreak        : std_logic;
 		mret          : std_logic;
+		fence         : std_logic;
 		valid         : std_logic;
 		exc_n         : std_logic;
 		ecall_n       : std_logic;
 		ebreak_n      : std_logic;
 		mret_n        : std_logic;
+		fence_n       : std_logic;
 		valid_n       : std_logic;
 		stall         : std_logic;
 		clear         : std_logic;
@@ -436,11 +438,13 @@ package wire is
 		ecall         : std_logic;
 		ebreak        : std_logic;
 		mret          : std_logic;
+		fence         : std_logic;
 		valid         : std_logic;
 		exc_n         : std_logic;
 		ecall_n       : std_logic;
 		ebreak_n      : std_logic;
 		mret_n        : std_logic;
+		fence_n       : std_logic;
 		valid_n       : std_logic;
 		clear         : std_logic;
 		stall         : std_logic;
@@ -525,11 +529,13 @@ package wire is
 		ecall         => '0',
 		ebreak        => '0',
 		mret          => '0',
+		fence         => '0',
 		valid         => '0',
 		exc_n         => '0',
 		ecall_n       => '0',
 		ebreak_n      => '0',
 		mret_n        => '0',
+		fence_n       => '0',
 		valid_n       => '0',
 		clear         => '0',
 		stall         => '0'
@@ -625,11 +631,13 @@ package wire is
 		ecall       : std_logic;
 		ebreak      : std_logic;
 		mret        : std_logic;
+		fence       : std_logic;
 		valid       : std_logic;
 		exc_n       : std_logic;
 		ecall_n     : std_logic;
 		ebreak_n    : std_logic;
 		mret_n      : std_logic;
+		fence_n     : std_logic;
 		valid_n     : std_logic;
 		clear       : std_logic;
 		stall       : std_logic;
@@ -676,11 +684,13 @@ package wire is
 		ecall       => '0',
 		ebreak      => '0',
 		mret        => '0',
+		fence       => '0',
 		valid       => '0',
 		exc_n       => '0',
 		ecall_n     => '0',
 		ebreak_n    => '0',
 		mret_n      => '0',
+		fence_n     => '0',
 		valid_n     => '0',
 		clear       => '0',
 		stall       => '0'
@@ -1037,6 +1047,7 @@ package wire is
 	end record;
 
 	type mem_out_type is record
+		mem_flush : std_logic;
 		mem_ready : std_logic;
 		mem_rdata : std_logic_vector(63 downto 0);
 	end record;

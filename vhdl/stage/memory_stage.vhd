@@ -69,6 +69,7 @@ begin
 		v.ecall := d.e.ecall;
 		v.ebreak := d.e.ebreak;
 		v.mret := d.e.mret;
+		v.fence := d.e.fence;
 		v.valid := d.e.valid;
 		v.byteenable := d.e.byteenable;
 
@@ -89,10 +90,11 @@ begin
 			v.ecall := v.ecall_n;
 			v.ebreak := v.ebreak_n;
 			v.mret := v.mret_n;
+			v.fence := v.fence_n;
 			v.valid := v.valid_n;
 		end if;
 
-		v.stall := a.w.stall;
+		v.stall := dmem_o.mem_flush or a.w.stall;
 
 		v.clear := d.w.clear;
 
@@ -122,6 +124,7 @@ begin
 		v.ecall_n := v.ecall;
 		v.ebreak_n := v.ebreak;
 		v.mret_n := v.mret;
+		v.fence_n := v.fence;
 		v.valid_n := v.valid;
 
 		if (v.stall or v.clear) = '1' then

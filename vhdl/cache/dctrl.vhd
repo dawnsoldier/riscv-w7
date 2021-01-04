@@ -28,7 +28,7 @@ end dctrl;
 
 architecture behavior of dctrl is
 
-	type state_type is (HIT,MISS,UPDATE,INVALIDATE);
+	type state_type is (HIT,MISS,UPDATE,INVALIDATE,WRITEBACK);
 
 	type ctrl_type is record
 		addr    : std_logic_vector(63 downto 0);
@@ -74,6 +74,7 @@ architecture behavior of dctrl is
 		count   : integer range 0 to 7;
 		wid     : integer range 0 to 7;
 		invalid : std_logic;
+		flush   : std_logic;
 		valid   : std_logic;
 		hit     : std_logic;
 		miss    : std_logic;
@@ -104,6 +105,7 @@ architecture behavior of dctrl is
 		wid     => 0,
 		count   => 0,
 		invalid => '0',
+		flush   => '0',
 		valid   => '0',
 		hit     => '0',
 		miss    => '0',
@@ -119,7 +121,7 @@ architecture behavior of dctrl is
 
 begin
 
-	process(cache_i,r)
+	process(cache_i,r,rin_next)
 
 	variable v : ctrl_type;
 
@@ -134,6 +136,7 @@ begin
 		if cache_i.mem_valid = '1' then
 			if cache_i.mem_invalid = '1' then
 				v.invalid := '1';
+				v.sid := 0;
 			else
 				v.rden := nor_reduce(cache_i.mem_wstrb);
 				v.wren := or_reduce(cache_i.mem_wstrb);
@@ -144,6 +147,10 @@ begin
 				v.sid := to_integer(unsigned(cache_i.mem_addr(cache_set_depth+4 downto 5)));
 				v.lid := to_integer(unsigned(cache_i.mem_addr(4 downto 3)));
 			end if;
+		end if;
+
+		if rin_next.invalid = '1' then
+			v.sid := rin_next.sid;
 		end if;
 
 		ctrl_o.data0_i.raddr <= v.sid;
@@ -197,11 +204,6 @@ begin
 			v.tag := r.tag;
 			v.sid := r.sid;
 			v.lid := r.lid;
-		end if;
-
-		if (r.invalid) = '1' then
-			v.sid := 0;
-			v.state := INVALIDATE;
 		end if;
 
 		ctrl_o.hit_i.tag <= v.tag;
@@ -261,6 +263,8 @@ begin
 					v.valid := '0';
 				end if;
 
+				v.flush := '0';
+
 			when MISS =>
 
 				if r_next.miss = '1' then
@@ -306,43 +310,28 @@ begin
 							v.cline(191 downto 128) := mem_o.mem_rdata;
 						when 3 =>
 							v.cline(255 downto 192) := mem_o.mem_rdata;
-							if v.dirty = '0' then
-								v.wen(v.wid) := '1';
-								v.wvec(v.wid) := '1';
-								v.valid := '0';
-								v.state := UPDATE;
-							elsif v.dirty = '1' then
-								v.addr := v.dtag & std_logic_vector(to_unsigned(v.sid,cache_set_depth)) & "00000";
-								v.wdata := v.dline(63 downto 0);
-								v.wstrb := X"FF";
-							end if;
-						when 4 =>
-							v.wdata := v.dline(127 downto 64);
-							v.wstrb := X"FF";
-						when 5 =>
-							v.wdata := v.dline(191 downto 128);
-							v.wstrb := X"FF";
-						when 6 =>
-							v.wdata := v.dline(255 downto 192);
-							v.wstrb := X"FF";
-						when 7 =>
-							v.wen(v.wid) := '1';
-							v.wvec(v.wid) := '1';
-							v.valid := '0';
-							v.state := UPDATE;
 						when others =>
 							null;
 					end case;
 
-					if v.count /= 3 then
+					if v.count = 3 then
+						if v.dirty = '0' then
+							v.wen(v.wid) := '1';
+							v.wvec(v.wid) := '1';
+							v.state := UPDATE;
+						else
+							v.addr := v.dtag & std_logic_vector(to_unsigned(v.sid,cache_set_depth)) & "00000";
+							v.state := WRITEBACK;
+						end if;
+						v.valid := '0';
+					else
 						v.addr(63 downto 3) := std_logic_vector(unsigned(v.addr(63 downto 3))+1);
-					end if;
-
-					if v.count /= 7 then
 						v.count := v.count + 1;
 					end if;
 
 				end if;
+
+				v.flush := '0';
 
 			when UPDATE =>
 
@@ -352,13 +341,95 @@ begin
 				v.valid := '0';
 				v.state := HIT;
 
+				v.flush := '0';
+
 			when INVALIDATE =>
 
+				v.dvec := ctrl_i.dirty_o.rdata;
+				v.wvec := ctrl_i.valid_o.rdata;
 				v.wen := (others => '0');
-				v.wvec := (others => '0');
-				v.dvec := (others => '0');
+
+				if v.wid = 0 then
+					v.dline := ctrl_i.data0_o.rdata;
+					v.dtag := ctrl_i.tag0_o.rdata;
+				elsif v.wid = 1 then
+					v.dline := ctrl_i.data1_o.rdata;
+					v.dtag := ctrl_i.tag1_o.rdata;
+				elsif v.wid = 2 then
+					v.dline := ctrl_i.data2_o.rdata;
+					v.dtag := ctrl_i.tag2_o.rdata;
+				elsif v.wid = 3 then
+					v.dline := ctrl_i.data3_o.rdata;
+					v.dtag := ctrl_i.tag3_o.rdata;
+				elsif v.wid = 4 then
+					v.dline := ctrl_i.data4_o.rdata;
+					v.dtag := ctrl_i.tag4_o.rdata;
+				elsif v.wid = 5 then
+					v.dline := ctrl_i.data5_o.rdata;
+					v.dtag := ctrl_i.tag5_o.rdata;
+				elsif v.wid = 6 then
+					v.dline := ctrl_i.data6_o.rdata;
+					v.dtag := ctrl_i.tag6_o.rdata;
+				elsif v.wid = 7 then
+					v.dline := ctrl_i.data7_o.rdata;
+					v.dtag := ctrl_i.tag7_o.rdata;
+				end if;
+
+				if (v.dvec(v.wid) and v.wvec(v.wid)) = '1' then
+					v.addr := v.dtag & std_logic_vector(to_unsigned(v.sid,cache_set_depth)) & "00000";
+					v.state := WRITEBACK;
+				else
+					if v.wid = 7 then
+						v.dvec := (others => '0');
+						v.wvec := (others => '0');
+						v.invalid := '1';
+					end if;
+				end if;
+
+				v.count := 0;
 				v.valid := '0';
-				v.invalid := '1';
+
+				v.flush := '1';
+
+			when WRITEBACK =>
+
+				if mem_o.mem_ready = '1' then
+					if v.count /= 3 then
+						v.addr(63 downto 3) := std_logic_vector(unsigned(v.addr(63 downto 3))+1);
+					else
+						if v.wid = 7 then
+							v.dvec := (others => '0');
+							v.wvec := (others => '0');
+							v.invalid := '1';
+						end if;
+						v.state := INVALIDATE;
+						v.valid := '0';
+					end if;
+					v.count := v.count + 1;
+				end if;
+
+				case v.count is
+					when 0 =>
+						v.wdata := v.dline(63 downto 0);
+						v.wstrb := X"FF";
+						v.valid := '1';
+					when 1 =>
+						v.wdata := v.dline(127 downto 64);
+						v.wstrb := X"FF";
+						v.valid := '1';
+					when 2 =>
+						v.wdata := v.dline(191 downto 128);
+						v.wstrb := X"FF";
+						v.valid := '1';
+					when 3 =>
+						v.wdata := v.dline(255 downto 192);
+						v.wstrb := X"FF";
+						v.valid := '1';
+					when others =>
+						null;
+				end case;
+
+				v.wen := (others => '0');
 
 			when others =>
 
@@ -443,12 +514,23 @@ begin
 		ctrl_o.valid_i.wen <= or_reduce(v.wen) or v.invalid;
 		ctrl_o.valid_i.wdata <= v.wvec;
 
-		if r_next.state = INVALIDATE then
-			if v.sid = 2**cache_set_depth-1 then
-				v.state := HIT;
+		if v.state = INVALIDATE then
+			if v.wid = 7 then
+				v.wid := 0;
+				if v.sid = 2**cache_set_depth-1 then
+					v.state := HIT;
+				else
+					v.sid := v.sid+1;
+				end if;
 			else
-				v.sid := v.sid+1;
+				v.wid := v.wid + 1;
 			end if;
+		end if;
+
+		if r.invalid = '1' then
+			v.sid := 0;
+			v.wid := 0;
+			v.state := INVALIDATE;
 		end if;
 
 		if v.lid = 0 then
@@ -479,6 +561,7 @@ begin
 
 		cache_o.mem_rdata <= v.rdata;
 		cache_o.mem_ready <= v.ready;
+		cache_o.mem_flush <= v.flush;
 
 		rin_next <= v;
 

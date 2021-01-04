@@ -106,6 +106,7 @@ begin
 		v.ecall := d.d.ecall;
 		v.ebreak := d.d.ebreak;
 		v.mret := d.d.mret;
+		v.fence := d.d.fence;
 		v.valid := d.d.valid;
 
 		if r.stall = '1' then
@@ -130,6 +131,7 @@ begin
 			v.ecall := v.ecall_n;
 			v.ebreak := v.ebreak_n;
 			v.mret := v.mret_n;
+			v.fence := v.fence_n;
 			v.valid := v.valid_n;
 		end if;
 
@@ -320,6 +322,7 @@ begin
 		v.ecall_n := v.ecall;
 		v.ebreak_n := v.ebreak;
 		v.mret_n := v.mret;
+		v.fence_n := v.fence;
 		v.valid_n := v.valid;
 
 		if (v.stall or v.clear) = '1' then
@@ -343,6 +346,7 @@ begin
 			v.ecall := '0';
 			v.ebreak := '0';
 			v.mret := '0';
+			v.fence := '0';
 			v.jump := '0';
 			v.valid := '0';
 		end if;
@@ -351,10 +355,10 @@ begin
 			v.stall := '0';
 		end if;
 
-		dmem_i.mem_valid <= v.load or v.fpu_load or v.store or v.fpu_store;
+		dmem_i.mem_valid <= v.load or v.fpu_load or v.store or v.fpu_store or v.fence;
 		dmem_i.mem_instr <= '0';
 		dmem_i.mem_spec <= '0';
-		dmem_i.mem_invalid <= '0';
+		dmem_i.mem_invalid <= v.fence;
 		dmem_i.mem_addr <= v.address;
 		dmem_i.mem_wdata <= store_data(v.sdata, v.store_op);
 		dmem_i.mem_wstrb <= v.strobe;
@@ -418,6 +422,7 @@ begin
 		y.ecall <= v.ecall;
 		y.ebreak <= v.ebreak;
 		y.mret <= v.mret;
+		y.fence <= v.fence;
 		y.valid <= v.valid;
 		y.jump <= v.jump;
 		y.stall <= v.stall;
@@ -443,6 +448,7 @@ begin
 		y.ecall_n <= v.ecall_n;
 		y.ebreak_n <= v.ebreak_n;
 		y.mret_n <= v.mret_n;
+		y.fence_n <= v.fence_n;
 		y.valid_n <= v.valid_n;
 
 		q.pc <= r.pc;
@@ -484,6 +490,7 @@ begin
 		q.ecall <= r.ecall;
 		q.ebreak <= r.ebreak;
 		q.mret <= r.mret;
+		q.fence <= r.fence;
 		q.valid <= r.valid;
 		q.jump <= r.jump;
 		q.stall <= r.stall;
@@ -509,6 +516,7 @@ begin
 		q.ecall_n <= r.ecall_n;
 		q.ebreak_n <= r.ebreak_n;
 		q.mret_n <= r.mret_n;
+		q.fence_n <= r.fence_n;
 		q.valid_n <= r.valid_n;
 
 	end process;

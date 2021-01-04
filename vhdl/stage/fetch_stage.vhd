@@ -49,18 +49,8 @@ begin
 		v := r;
 
 		v.valid := not d.w.clear;
-		-- v.stall := not(imem_o.mem_ready) or a.d.stall or a.e.stall or a.m.stall or a.w.stall or d.w.clear;
-		v.stall := pfetch_o.stall or a.d.stall or a.e.stall or a.m.stall or a.w.stall or d.w.clear;
+		v.stall := pfetch_o.stall or imem_o.mem_flush or a.d.stall or a.e.stall or a.m.stall or a.w.stall or d.w.clear;
 		v.clear := csr_eo.exc or csr_eo.mret or d.w.clear;
-
-		-- v.instr := nop;
-		-- if imem_o.mem_ready = '1' then
-		-- 	if v.pc(2) = '0' then
-		-- 		v.instr := imem_o.mem_rdata(31 downto 0);
-		-- 	elsif v.pc(2) = '1' then
-		-- 		v.instr := imem_o.mem_rdata(63 downto 32);
-		-- 	end if;
-		-- end if;
 
 		v.instr := pfetch_o.instr;
 
@@ -153,7 +143,6 @@ begin
 		imem_i.mem_instr <= '1';
 		imem_i.mem_spec <= v.spec;
 		imem_i.mem_invalid <= a.d.fence;
-		-- imem_i.mem_addr <= v.pc;
 		imem_i.mem_addr <= pfetch_o.fpc;
 		imem_i.mem_wdata <= (others => '0');
 		imem_i.mem_wstrb <= (others => '0');

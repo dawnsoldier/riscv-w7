@@ -8,8 +8,8 @@ use ieee.std_logic_misc.all;
 
 use work.configure.all;
 use work.constants.all;
-use work.wire.all;
 use work.fp_wire.all;
+use work.wire.all;
 
 library std;
 use std.textio.all;
@@ -429,18 +429,23 @@ begin
 		if icache_enable = true and post_imem_access = CACHE_ACCESS then
 			imem_o.mem_rdata <= icache_o.mem_rdata;
 			imem_o.mem_ready <= icache_o.mem_ready;
+			imem_o.mem_flush <= icache_o.mem_flush;
 		elsif icache_enable = true and post_imem_access = IO_MEM_ACCESS then
 			imem_o.mem_rdata <= ia_mem_o.mem_rdata;
 			imem_o.mem_ready <= ia_mem_o.mem_ready;
+			imem_o.mem_flush <= '0';
 		elsif icache_enable = false then
 			imem_o.mem_rdata <= ia_mem_o.mem_rdata;
 			imem_o.mem_ready <= ia_mem_o.mem_ready;
+			imem_o.mem_flush <= '0';
 		else
 			imem_o.mem_rdata <= (others => '0');
 			imem_o.mem_ready <= '0';
+			imem_o.mem_flush <= '0';
 		end if;
 		io_mem_o.mem_rdata <= ia_mem_o.mem_rdata;
 		io_mem_o.mem_ready <= ia_mem_o.mem_ready;
+		io_mem_o.mem_flush <= '0';
 
 	end process;
 
@@ -536,18 +541,23 @@ begin
 		if dcache_enable = true and post_dmem_access = CACHE_ACCESS then
 			dmem_o.mem_rdata <= dcache_o.mem_rdata;
 			dmem_o.mem_ready <= dcache_o.mem_ready;
+			dmem_o.mem_flush <= dcache_o.mem_flush;
 		elsif dcache_enable = true and post_dmem_access = IO_MEM_ACCESS then
 			dmem_o.mem_rdata <= da_mem_o.mem_rdata;
 			dmem_o.mem_ready <= da_mem_o.mem_ready;
+			dmem_o.mem_flush <= '0';
 		elsif dcache_enable = false then
 			dmem_o.mem_rdata <= da_mem_o.mem_rdata;
 			dmem_o.mem_ready <= da_mem_o.mem_ready;
+			dmem_o.mem_flush <= '0';
 		else
 			dmem_o.mem_rdata <= (others => '0');
 			dmem_o.mem_ready <= '0';
+			dmem_o.mem_flush <= '0';
 		end if;
 		do_mem_o.mem_rdata <= da_mem_o.mem_rdata;
 		do_mem_o.mem_ready <= da_mem_o.mem_ready;
+		do_mem_o.mem_flush <= '0';
 
 	end process;
 

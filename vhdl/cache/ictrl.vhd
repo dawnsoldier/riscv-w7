@@ -63,6 +63,7 @@ architecture behavior of ictrl is
 		count   : integer range 0 to 3;
 		wid     : integer range 0 to 7;
 		invalid : std_logic;
+		flush   : std_logic;
 		valid   : std_logic;
 		hit     : std_logic;
 		miss    : std_logic;
@@ -84,6 +85,7 @@ architecture behavior of ictrl is
 		wid     => 0,
 		count   => 0,
 		invalid => '0',
+		flush   => '0',
 		valid   => '0',
 		hit     => '0',
 		miss    => '0',
@@ -105,8 +107,8 @@ begin
 
 		v := r;
 
-		v.en := '0';
 		v.invalid := '0';
+		v.en := '0';
 		v.spec := '0';
 
 		if cache_i.mem_valid = '1' then
@@ -158,6 +160,7 @@ begin
 		v.hit := '0';
 		v.miss := '0';
 		v.invalid := '0';
+		v.flush := '0';
 
 		if r_next.state = HIT then
 			v.en := r.en;
@@ -165,11 +168,6 @@ begin
 			v.tag := r.tag;
 			v.sid := r.sid;
 			v.lid := r.lid;
-		end if;
-
-		if (r.invalid) = '1' then
-			v.sid := 0;
-			v.state := INVALIDATE;
 		end if;
 
 		ctrl_o.hit_i.tag <= v.tag;
@@ -360,10 +358,21 @@ begin
 
 		if r_next.state = HIT then
 			v.ready := v.en and v.hit;
+			v.flush := '0';
 		elsif r_next.state = UPDATE then
 			v.ready := not v.spec;
+			v.flush := '0';
+		elsif r_next.state = INVALIDATE then
+			v.ready := '0';
+			v.flush := '1';
 		else
 			v.ready := '0';
+			v.flush := '0';
+		end if;
+
+		if (r.invalid) = '1' then
+			v.sid := 0;
+			v.state := INVALIDATE;
 		end if;
 
 		mem_i.mem_valid <= v.valid;
@@ -376,6 +385,7 @@ begin
 
 		cache_o.mem_rdata <= v.rdata;
 		cache_o.mem_ready <= v.ready;
+		cache_o.mem_flush <= v.flush;
 
 		rin_next <= v;
 
