@@ -321,6 +321,7 @@ begin
 							v.state := UPDATE;
 						else
 							v.addr := v.dtag & std_logic_vector(to_unsigned(v.sid,cache_set_depth)) & "00000";
+							v.count := 0;
 							v.state := WRITEBACK;
 						end if;
 						v.valid := '0';
@@ -393,16 +394,24 @@ begin
 
 			when WRITEBACK =>
 
+				v.wen := (others => '0');
+
 				if mem_o.mem_ready = '1' then
 					if v.count /= 3 then
 						v.addr(63 downto 3) := std_logic_vector(unsigned(v.addr(63 downto 3))+1);
 					else
-						if v.wid = 7 then
-							v.dvec := (others => '0');
-							v.wvec := (others => '0');
-							v.invalid := '1';
+						if v.dirty = '1' then
+							v.wen(v.wid) := '1';
+							v.wvec(v.wid) := '1';
+							v.state := UPDATE;
+						else
+							if v.wid = 7 then
+								v.dvec := (others => '0');
+								v.wvec := (others => '0');
+								v.invalid := '1';
+							end if;
+							v.state := INVALIDATE;
 						end if;
-						v.state := INVALIDATE;
 						v.valid := '0';
 					end if;
 					v.count := v.count + 1;
@@ -428,8 +437,6 @@ begin
 					when others =>
 						null;
 				end case;
-
-				v.wen := (others => '0');
 
 			when others =>
 
@@ -544,7 +551,7 @@ begin
 		end if;
 
 		if r_next.state = HIT then
-			v.ready := (v.rden or v.wren) and v.hit;
+			v.ready := v.rden and v.hit;
 		elsif r_next.state = UPDATE then
 			v.ready := '1';
 		else
