@@ -73,7 +73,7 @@ begin
 		v.valid := d.e.valid;
 		v.byteenable := d.e.byteenable;
 
-		if r.stall = '1' then
+		if (d.m.stall or d.w.stall) = '1' then
 			v := r;
 			v.int_wren := v.int_wren_n;
 			v.fpu_wren := v.fpu_wren_n;
@@ -94,7 +94,7 @@ begin
 			v.valid := v.valid_n;
 		end if;
 
-		v.stall := dmem_o.mem_flush or a.w.stall;
+		v.stall := dmem_o.mem_flush;
 
 		v.clear := d.w.clear;
 
@@ -127,7 +127,7 @@ begin
 		v.fence_n := v.fence;
 		v.valid_n := v.valid;
 
-		if (v.stall or v.clear) = '1' then
+		if (v.stall or a.w.stall or v.clear) = '1' then
 			v.int_wren := '0';
 			v.fpu_wren := '0';
 			v.csr_wren := '0';

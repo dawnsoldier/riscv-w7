@@ -109,7 +109,7 @@ begin
 		v.fence := d.d.fence;
 		v.valid := d.d.valid;
 
-		if r.stall = '1' then
+		if (d.e.stall or d.m.stall or d.w.stall) = '1' then
 			v := r;
 			v.int_wren := v.int_wren_n;
 			v.fpu_wren := v.fpu_wren_n;
@@ -135,11 +135,11 @@ begin
 			v.valid := v.valid_n;
 		end if;
 
-		v.stall := a.m.stall or a.w.stall;
+		v.stall := '0';
 
 		v.clear := csr_eo.exc or csr_eo.mret or d.e.jump or d.w.clear;
 
-		v.enable := not(d.e.stall or d.m.stall or d.w.stall or d.w.clear);
+		v.enable := not(d.e.stall or a.m.stall or a.w.stall or d.w.clear);
 
 		int_reg_ri.rden1 <= v.int_rden1;
 		int_reg_ri.rden2 <= v.int_rden2;
@@ -325,7 +325,7 @@ begin
 		v.fence_n := v.fence;
 		v.valid_n := v.valid;
 
-		if (v.stall or v.clear) = '1' then
+		if (v.stall or a.m.stall or a.w.stall or v.clear) = '1' then
 			v.int_wren := '0';
 			v.fpu_wren := '0';
 			v.csr_wren := '0';

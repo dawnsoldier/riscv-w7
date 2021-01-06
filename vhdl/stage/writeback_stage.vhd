@@ -72,7 +72,7 @@ begin
 		v.flags := d.m.flags;
 		v.valid := d.m.valid;
 
-		if r.stall = '1' then
+		if d.w.stall = '1' then
 			v := r;
 		end if;
 

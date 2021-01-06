@@ -57,7 +57,7 @@ begin
 		v.etval := d.f.etval;
 		v.ecause := d.f.ecause;
 
-		-- if r.stall = '1' then
+		-- if (d.d.stall or d.e.stall or d.m.stall or d.w.stall) = '1' then
 		-- 	v := r;
 		-- end if;
 
@@ -72,7 +72,7 @@ begin
 
 		v.npc := std_logic_vector(unsigned(v.pc) + v.inc);
 
-		v.stall := a.e.stall or a.m.stall or a.w.stall;
+		v.stall := '0';
 
 		v.clear := csr_eo.exc or csr_eo.mret or d.w.clear;
 
@@ -314,7 +314,7 @@ begin
 		v.fence_n := v.fence;
 		v.valid_n := v.valid;
 
-		if (v.stall or v.clear) = '1' then
+		if (v.stall or a.e.stall or a.m.stall or a.w.stall or v.clear) = '1' then
 			v.int_wren := '0';
 			v.fpu_wren := '0';
 			v.csr_wren := '0';
