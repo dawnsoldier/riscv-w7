@@ -1,7 +1,9 @@
 #!/bin/bash
 
 RISCV_PATH=/opt/riscv
-FLAG="rv32i-ilp32--;rv32im-ilp32--;rv32imc-ilp32--;rv64imfd-lp64d--;rv64imfdc-lp64d--"
+FLAG="rv32i-ilp32--;rv32im-ilp32--;rv32imc-ilp32--"
+FLAG="${FLAG};rv64i-lp64--;rv64im-lp64--;rv64imc-lp64--"
+FLAG="${FLAG};rv64imfd-lp64d--;rv64imfdc-lp64d--"
 
 if [ -d "$RISCV_PATH" ]
 then
