@@ -125,6 +125,8 @@ $SYNTAX $DIR/vhdl/cache/hit.vhd
 $ANALYS $DIR/vhdl/cache/hit.vhd
 $SYNTAX $DIR/vhdl/cache/lru.vhd
 $ANALYS $DIR/vhdl/cache/lru.vhd
+$SYNTAX $DIR/vhdl/cache/lru_ctrl.vhd
+$ANALYS $DIR/vhdl/cache/lru_ctrl.vhd
 $SYNTAX $DIR/vhdl/cache/ictrl.vhd
 $ANALYS $DIR/vhdl/cache/ictrl.vhd
 $SYNTAX $DIR/vhdl/cache/dctrl.vhd

@@ -79,16 +79,16 @@ architecture behavior of cache is
 		);
 	end component;
 
-	component lru
+	component lru_ctrl
 		generic(
 			cache_type      : integer;
 			cache_set_depth : integer
 		);
 		port(
-			reset : in  std_logic;
-			clock : in  std_logic;
-			lru_i : in  lru_in_type;
-			lru_o : out lru_out_type
+			reset      : in  std_logic;
+			clock      : in  std_logic;
+			lru_ctrl_i : in  lru_ctrl_in_type;
+			lru_ctrl_o : out lru_ctrl_out_type
 		);
 	end component;
 
@@ -170,7 +170,7 @@ begin
 
 		hit_comp : hit generic map (cache_type => cache_type, cache_set_depth => cache_set_depth) port map(reset => reset, clock => clock, hit_i => ctrl_o.hit_i, hit_o => ctrl_i.hit_o);
 
-		lru_comp : lru generic map (cache_type => cache_type, cache_set_depth => cache_set_depth) port map(reset => reset, clock => clock, lru_i => ctrl_o.lru_i, lru_o => ctrl_i.lru_o);
+		lru_ctrl_comp : lru_ctrl generic map (cache_type => cache_type, cache_set_depth => cache_set_depth) port map(reset => reset, clock => clock, lru_ctrl_i => ctrl_o.lru_i, lru_ctrl_o => ctrl_i.lru_o);
 
 		ICACHE : if cache_type = 0 generate
 
