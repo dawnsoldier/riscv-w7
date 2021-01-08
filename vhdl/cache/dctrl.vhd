@@ -217,6 +217,34 @@ begin
 		ctrl_o.hit_i.tag7 <= ctrl_i.tag7_o.rdata;
 		ctrl_o.hit_i.valid <= ctrl_i.valid_o.rdata;
 
+		if (r_next.state = MISS and r_next.miss = '1') or r_next.state = INVALIDATE then
+			if v.wid = 0 then
+				v.dline := ctrl_i.data0_o.rdata;
+				v.dtag := ctrl_i.tag0_o.rdata;
+			elsif v.wid = 1 then
+				v.dline := ctrl_i.data1_o.rdata;
+				v.dtag := ctrl_i.tag1_o.rdata;
+			elsif v.wid = 2 then
+				v.dline := ctrl_i.data2_o.rdata;
+				v.dtag := ctrl_i.tag2_o.rdata;
+			elsif v.wid = 3 then
+				v.dline := ctrl_i.data3_o.rdata;
+				v.dtag := ctrl_i.tag3_o.rdata;
+			elsif v.wid = 4 then
+				v.dline := ctrl_i.data4_o.rdata;
+				v.dtag := ctrl_i.tag4_o.rdata;
+			elsif v.wid = 5 then
+				v.dline := ctrl_i.data5_o.rdata;
+				v.dtag := ctrl_i.tag5_o.rdata;
+			elsif v.wid = 6 then
+				v.dline := ctrl_i.data6_o.rdata;
+				v.dtag := ctrl_i.tag6_o.rdata;
+			elsif v.wid = 7 then
+				v.dline := ctrl_i.data7_o.rdata;
+				v.dtag := ctrl_i.tag7_o.rdata;
+			end if;
+		end if;
+
 		case r_next.state is
 
 			when HIT =>
@@ -272,31 +300,6 @@ begin
 					v.dirty := v.dvec(v.wid);
 					v.dvec(v.wid) := r_next.wren;
 					v.den := '1';
-					if v.wid = 0 then
-						v.dline := ctrl_i.data0_o.rdata;
-						v.dtag := ctrl_i.tag0_o.rdata;
-					elsif v.wid = 1 then
-						v.dline := ctrl_i.data1_o.rdata;
-						v.dtag := ctrl_i.tag1_o.rdata;
-					elsif v.wid = 2 then
-						v.dline := ctrl_i.data2_o.rdata;
-						v.dtag := ctrl_i.tag2_o.rdata;
-					elsif v.wid = 3 then
-						v.dline := ctrl_i.data3_o.rdata;
-						v.dtag := ctrl_i.tag3_o.rdata;
-					elsif v.wid = 4 then
-						v.dline := ctrl_i.data4_o.rdata;
-						v.dtag := ctrl_i.tag4_o.rdata;
-					elsif v.wid = 5 then
-						v.dline := ctrl_i.data5_o.rdata;
-						v.dtag := ctrl_i.tag5_o.rdata;
-					elsif v.wid = 6 then
-						v.dline := ctrl_i.data6_o.rdata;
-						v.dtag := ctrl_i.tag6_o.rdata;
-					elsif v.wid = 7 then
-						v.dline := ctrl_i.data7_o.rdata;
-						v.dtag := ctrl_i.tag7_o.rdata;
-					end if;
 				end if;
 
 				if mem_o.mem_ready = '1' then
@@ -349,32 +352,6 @@ begin
 				v.dvec := ctrl_i.dirty_o.rdata;
 				v.wvec := ctrl_i.valid_o.rdata;
 				v.wen := (others => '0');
-
-				if v.wid = 0 then
-					v.dline := ctrl_i.data0_o.rdata;
-					v.dtag := ctrl_i.tag0_o.rdata;
-				elsif v.wid = 1 then
-					v.dline := ctrl_i.data1_o.rdata;
-					v.dtag := ctrl_i.tag1_o.rdata;
-				elsif v.wid = 2 then
-					v.dline := ctrl_i.data2_o.rdata;
-					v.dtag := ctrl_i.tag2_o.rdata;
-				elsif v.wid = 3 then
-					v.dline := ctrl_i.data3_o.rdata;
-					v.dtag := ctrl_i.tag3_o.rdata;
-				elsif v.wid = 4 then
-					v.dline := ctrl_i.data4_o.rdata;
-					v.dtag := ctrl_i.tag4_o.rdata;
-				elsif v.wid = 5 then
-					v.dline := ctrl_i.data5_o.rdata;
-					v.dtag := ctrl_i.tag5_o.rdata;
-				elsif v.wid = 6 then
-					v.dline := ctrl_i.data6_o.rdata;
-					v.dtag := ctrl_i.tag6_o.rdata;
-				elsif v.wid = 7 then
-					v.dline := ctrl_i.data7_o.rdata;
-					v.dtag := ctrl_i.tag7_o.rdata;
-				end if;
 
 				if (v.dvec(v.wid) and v.wvec(v.wid)) = '1' then
 					v.addr := v.dtag & std_logic_vector(to_unsigned(v.sid,cache_set_depth)) & "00000";
