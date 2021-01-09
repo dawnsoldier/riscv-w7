@@ -972,7 +972,8 @@ package wire is
 	end record;
 
 	type lru_ctrl_in_type is record
-		sid   : integer range 0 to 2**icache_set_depth-1;
+		raddr : integer range 0 to 2**icache_set_depth-1;
+		waddr : integer range 0 to 2**icache_set_depth-1;
 		wid   : integer range 0 to 7;
 		hit   : std_logic;
 		miss  : std_logic;

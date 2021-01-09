@@ -108,7 +108,7 @@ architecture behavior of lru_ctrl is
 
 begin
 
-	lru_i.raddr <= lru_ctrl_i.sid;
+	lru_i.raddr <= lru_ctrl_i.raddr;
 
 	lru_rdata <= lru_o.rdata;
 
@@ -126,11 +126,11 @@ begin
 
 			if lru_ctrl_i.hit = '1' then
 				wen := '1';
-				waddr := lru_ctrl_i.sid;
+				waddr := lru_ctrl_i.waddr;
 				wdata := lru_access(lru_rdata,lru_ctrl_i.wid);
 			elsif lru_ctrl_i.miss = '1' then
 				wen := '1';
-				waddr := lru_ctrl_i.sid;
+				waddr := lru_ctrl_i.waddr;
 				wdata := lru_access(lru_rdata,lru_wid);
 			else
 				wen := '0';

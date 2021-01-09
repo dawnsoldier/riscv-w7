@@ -32,7 +32,7 @@ architecture behavior of lru is
 
 begin
 
-	lru_o.rdata <= lru_array(lru_i.raddr);
+	lru_o.rdata <= rdata;
 
 	process(clock)
 
@@ -43,6 +43,8 @@ begin
 			if lru_i.wen = '1' then
 				lru_array(lru_i.waddr) <= lru_i.wdata;
 			end if;
+
+			rdata <= lru_array(lru_i.raddr);
 
 		end if;
 

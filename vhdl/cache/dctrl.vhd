@@ -175,6 +175,8 @@ begin
 
 		ctrl_o.dirty_i.raddr <= v.sid;
 
+		ctrl_o.lru_i.raddr <= v.sid;
+
 		rin <= v;
 
 	end process;
@@ -485,7 +487,7 @@ begin
 		ctrl_o.tag6_i.wdata <= v.tag;
 		ctrl_o.tag7_i.wdata <= v.tag;
 
-		ctrl_o.lru_i.sid <= v.sid;
+		ctrl_o.lru_i.waddr <= v.sid;
 		ctrl_o.lru_i.wid <= v.wid;
 		ctrl_o.lru_i.hit <= v.hit;
 		ctrl_o.lru_i.miss <= v.miss;
