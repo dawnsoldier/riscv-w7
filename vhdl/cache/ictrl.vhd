@@ -11,8 +11,8 @@ use work.wire.all;
 
 entity ictrl is
 	generic(
-		cache_type      : integer;
-		cache_set_depth : integer
+		cache_type : integer;
+		cache_sets : integer
 	);
 	port(
 		reset   : in  std_logic;
@@ -32,8 +32,8 @@ architecture behavior of ictrl is
 
 	type ctrl_type is record
 		addr    : std_logic_vector(63 downto 0);
-		tag     : std_logic_vector(58-cache_set_depth downto 0);
-		sid     : integer range 0 to 2**cache_set_depth-1;
+		tag     : std_logic_vector(58-cache_sets downto 0);
+		sid     : integer range 0 to 2**cache_sets-1;
 		lid     : integer range 0 to 4;
 		invalid : std_logic;
 		spec    : std_logic;
@@ -54,11 +54,11 @@ architecture behavior of ictrl is
 		state   : state_type;
 		addr    : std_logic_vector(63 downto 0);
 		rdata   : std_logic_vector(63 downto 0);
-		tag     : std_logic_vector(58-cache_set_depth downto 0);
+		tag     : std_logic_vector(58-cache_sets downto 0);
 		cline   : std_logic_vector(255 downto 0);
 		wen     : std_logic_vector(7 downto 0);
 		wvec    : std_logic_vector(7 downto 0);
-		sid     : integer range 0 to 2**cache_set_depth-1;
+		sid     : integer range 0 to 2**cache_sets-1;
 		lid     : integer range 0 to 4;
 		count   : integer range 0 to 3;
 		wid     : integer range 0 to 7;
@@ -118,8 +118,8 @@ begin
 				v.spec := cache_i.mem_spec;
 				v.en := cache_i.mem_valid;
 				v.addr := cache_i.mem_addr(63 downto 5) & "00000";
-				v.tag := cache_i.mem_addr(63 downto cache_set_depth+5);
-				v.sid := to_integer(unsigned(cache_i.mem_addr(cache_set_depth+4 downto 5)));
+				v.tag := cache_i.mem_addr(63 downto cache_sets+5);
+				v.sid := to_integer(unsigned(cache_i.mem_addr(cache_sets+4 downto 5)));
 				v.lid := to_integer(unsigned(cache_i.mem_addr(4 downto 3)));
 			end if;
 		end if;
@@ -337,7 +337,7 @@ begin
 		ctrl_o.valid_i.wdata <= v.wvec;
 
 		if r_next.state = INVALIDATE then
-			if v.sid = 2**cache_set_depth-1 then
+			if v.sid = 2**cache_sets-1 then
 				v.state := HIT;
 			else
 				v.sid := v.sid+1;

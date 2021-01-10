@@ -11,8 +11,8 @@ use work.wire.all;
 
 entity tag is
 	generic(
-		cache_type      : integer;
-		cache_set_depth : integer
+		cache_type : integer;
+		cache_sets : integer
 	);
 	port(
 		reset : in  std_logic;
@@ -24,11 +24,11 @@ end tag;
 
 architecture behavior of tag is
 
-	type tag_type is array (0 to 2**cache_set_depth-1) of std_logic_vector(58-cache_set_depth downto 0);
+	type tag_type is array (0 to 2**cache_sets-1) of std_logic_vector(58-cache_sets downto 0);
 
 	signal tag_array : tag_type := (others => (others => '0'));
 
-	signal rdata : std_logic_vector(58-cache_set_depth downto 0) := (others => '0');
+	signal rdata : std_logic_vector(58-cache_sets downto 0) := (others => '0');
 
 begin
 

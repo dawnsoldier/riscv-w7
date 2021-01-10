@@ -10,11 +10,13 @@ package configure is
 
 	constant icache_enable    : boolean := true;
 	constant icache_type      : integer := 0;
-	constant icache_set_depth : integer := 6;
+	constant icache_sets      : integer := 6;
+	constant icache_ways      : integer := 8;
 
 	constant dcache_enable    : boolean := true;
 	constant dcache_type      : integer := 1;
-	constant dcache_set_depth : integer := 6;
+	constant dcache_sets      : integer := 6;
+	constant dcache_ways      : integer := 8;
 
 	constant bp_enable        : boolean := true;
 	constant btb_depth        : integer := 6;

@@ -11,8 +11,8 @@ use work.wire.all;
 
 entity lru_ctrl is
 	generic(
-		cache_type      : integer;
-		cache_set_depth : integer
+		cache_type : integer;
+		cache_sets : integer
 	);
 	port(
 		reset      : in  std_logic;
@@ -93,7 +93,7 @@ architecture behavior of lru_ctrl is
 	component lru
 		generic(
 			cache_type      : integer;
-			cache_set_depth : integer
+			cache_sets : integer
 		);
 		port(
 			reset : in  std_logic;
@@ -117,7 +117,7 @@ begin
 	process(clock)
 
 	variable wen : std_logic;
-	variable waddr : integer range 0 to 2**cache_set_depth-1;
+	variable waddr : integer range 0 to 2**cache_sets-1;
 	variable wdata : std_logic_vector(7 downto 0);
 
 	begin
@@ -151,7 +151,7 @@ begin
 	lru_comp : lru
 		generic map(
 			cache_type => cache_type,
-			cache_set_depth => cache_set_depth
+			cache_sets => cache_sets
 		)
 		port map(
 			reset => reset,

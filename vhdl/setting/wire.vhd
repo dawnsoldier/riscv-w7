@@ -917,9 +917,9 @@ package wire is
 	end record;
 
 	type data_in_type is record
-		raddr : integer range 0 to 2**icache_set_depth-1;
+		raddr : integer range 0 to 2**icache_sets-1;
 		wen   : std_logic;
-		waddr : integer range 0 to 2**icache_set_depth-1;
+		waddr : integer range 0 to 2**icache_sets-1;
 		wdata : std_logic_vector(255 downto 0);
 	end record;
 
@@ -928,20 +928,20 @@ package wire is
 	end record;
 
 	type tag_in_type is record
-		raddr : integer range 0 to 2**icache_set_depth-1;
+		raddr : integer range 0 to 2**icache_sets-1;
 		wen   : std_logic;
-		waddr : integer range 0 to 2**icache_set_depth-1;
-		wdata : std_logic_vector(58-icache_set_depth downto 0);
+		waddr : integer range 0 to 2**icache_sets-1;
+		wdata : std_logic_vector(58-icache_sets downto 0);
 	end record;
 
 	type tag_out_type is record
-		rdata :  std_logic_vector(58-icache_set_depth downto 0);
+		rdata :  std_logic_vector(58-icache_sets downto 0);
 	end record;
 
 	type valid_in_type is record
-		raddr : integer range 0 to 2**icache_set_depth-1;
+		raddr : integer range 0 to 2**icache_sets-1;
 		wen   : std_logic;
-		waddr : integer range 0 to 2**icache_set_depth-1;
+		waddr : integer range 0 to 2**icache_sets-1;
 		wdata : std_logic_vector(7 downto 0);
 	end record;
 
@@ -950,9 +950,9 @@ package wire is
 	end record;
 
 	type dirty_in_type is record
-		raddr : integer range 0 to 2**icache_set_depth-1;
+		raddr : integer range 0 to 2**icache_sets-1;
 		wen   : std_logic;
-		waddr : integer range 0 to 2**icache_set_depth-1;
+		waddr : integer range 0 to 2**icache_sets-1;
 		wdata : std_logic_vector(7 downto 0);
 	end record;
 
@@ -961,9 +961,9 @@ package wire is
 	end record;
 
 	type lru_in_type is record
-		raddr : integer range 0 to 2**icache_set_depth-1;
+		raddr : integer range 0 to 2**icache_sets-1;
 		wen   : std_logic;
-		waddr : integer range 0 to 2**icache_set_depth-1;
+		waddr : integer range 0 to 2**icache_sets-1;
 		wdata : std_logic_vector(7 downto 0);
 	end record;
 
@@ -972,8 +972,8 @@ package wire is
 	end record;
 
 	type lru_ctrl_in_type is record
-		raddr : integer range 0 to 2**icache_set_depth-1;
-		waddr : integer range 0 to 2**icache_set_depth-1;
+		raddr : integer range 0 to 2**icache_sets-1;
+		waddr : integer range 0 to 2**icache_sets-1;
 		wid   : integer range 0 to 7;
 		hit   : std_logic;
 		miss  : std_logic;
@@ -984,15 +984,15 @@ package wire is
 	end record;
 
 	type hit_in_type is record
-		tag   : std_logic_vector(58-icache_set_depth downto 0);
-		tag0  : std_logic_vector(58-icache_set_depth downto 0);
-		tag1  : std_logic_vector(58-icache_set_depth downto 0);
-		tag2  : std_logic_vector(58-icache_set_depth downto 0);
-		tag3  : std_logic_vector(58-icache_set_depth downto 0);
-		tag4  : std_logic_vector(58-icache_set_depth downto 0);
-		tag5  : std_logic_vector(58-icache_set_depth downto 0);
-		tag6  : std_logic_vector(58-icache_set_depth downto 0);
-		tag7  : std_logic_vector(58-icache_set_depth downto 0);
+		tag   : std_logic_vector(58-icache_sets downto 0);
+		tag0  : std_logic_vector(58-icache_sets downto 0);
+		tag1  : std_logic_vector(58-icache_sets downto 0);
+		tag2  : std_logic_vector(58-icache_sets downto 0);
+		tag3  : std_logic_vector(58-icache_sets downto 0);
+		tag4  : std_logic_vector(58-icache_sets downto 0);
+		tag5  : std_logic_vector(58-icache_sets downto 0);
+		tag6  : std_logic_vector(58-icache_sets downto 0);
+		tag7  : std_logic_vector(58-icache_sets downto 0);
 		valid : std_logic_vector(7 downto 0);
 	end record;
 

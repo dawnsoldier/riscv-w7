@@ -47,9 +47,10 @@ architecture behavior of cpu is
 
 	component cache
 		generic(
-			cache_enable    : boolean;
-			cache_type      : integer;
-			cache_set_depth : integer
+			cache_enable : boolean;
+			cache_type   : integer;
+			cache_sets   : integer;
+			cache_ways   : integer
 		);
 		port(
 			reset   : in  std_logic;
@@ -528,9 +529,10 @@ begin
 
 	icache_comp : cache
 		generic map (
-			cache_enable    => icache_enable,
-			cache_type      => icache_type,
-			cache_set_depth => icache_set_depth
+			cache_enable => icache_enable,
+			cache_type   => icache_type,
+			cache_sets   => icache_sets,
+			cache_ways   => icache_ways
 		)
 		port map(
 			reset   => reset,
@@ -543,9 +545,10 @@ begin
 
 	dcache_comp : cache
 		generic map (
-			cache_enable    => dcache_enable,
-			cache_type      => dcache_type,
-			cache_set_depth => dcache_set_depth
+			cache_enable => dcache_enable,
+			cache_type   => dcache_type,
+			cache_sets   => dcache_sets,
+			cache_ways   => dcache_ways
 		)
 		port map(
 			reset   => reset,

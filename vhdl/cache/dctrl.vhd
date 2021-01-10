@@ -11,8 +11,8 @@ use work.wire.all;
 
 entity dctrl is
 	generic(
-		cache_type      : integer;
-		cache_set_depth : integer
+		cache_type : integer;
+		cache_sets : integer
 	);
 	port(
 		reset   : in  std_logic;
@@ -34,8 +34,8 @@ architecture behavior of dctrl is
 		addr    : std_logic_vector(63 downto 0);
 		data    : std_logic_vector(63 downto 0);
 		strb    : std_logic_vector(7 downto 0);
-		tag     : std_logic_vector(58-cache_set_depth downto 0);
-		sid     : integer range 0 to 2**cache_set_depth-1;
+		tag     : std_logic_vector(58-cache_sets downto 0);
+		sid     : integer range 0 to 2**cache_sets-1;
 		lid     : integer range 0 to 4;
 		invalid : std_logic;
 		rden    : std_logic;
@@ -62,14 +62,14 @@ architecture behavior of dctrl is
 		rdata   : std_logic_vector(63 downto 0);
 		wdata   : std_logic_vector(63 downto 0);
 		wstrb   : std_logic_vector(7 downto 0);
-		tag     : std_logic_vector(58-cache_set_depth downto 0);
-		dtag    : std_logic_vector(58-cache_set_depth downto 0);
+		tag     : std_logic_vector(58-cache_sets downto 0);
+		dtag    : std_logic_vector(58-cache_sets downto 0);
 		cline   : std_logic_vector(255 downto 0);
 		dline   : std_logic_vector(255 downto 0);
 		wen     : std_logic_vector(7 downto 0);
 		wvec    : std_logic_vector(7 downto 0);
 		dvec    : std_logic_vector(7 downto 0);
-		sid     : integer range 0 to 2**cache_set_depth-1;
+		sid     : integer range 0 to 2**cache_sets-1;
 		lid     : integer range 0 to 4;
 		count   : integer range 0 to 7;
 		wid     : integer range 0 to 7;
@@ -143,8 +143,8 @@ begin
 				v.data := cache_i.mem_wdata;
 				v.strb := cache_i.mem_wstrb;
 				v.addr := cache_i.mem_addr(63 downto 5) & "00000";
-				v.tag := cache_i.mem_addr(63 downto cache_set_depth+5);
-				v.sid := to_integer(unsigned(cache_i.mem_addr(cache_set_depth+4 downto 5)));
+				v.tag := cache_i.mem_addr(63 downto cache_sets+5);
+				v.sid := to_integer(unsigned(cache_i.mem_addr(cache_sets+4 downto 5)));
 				v.lid := to_integer(unsigned(cache_i.mem_addr(4 downto 3)));
 			end if;
 		end if;
@@ -325,7 +325,7 @@ begin
 							v.wvec(v.wid) := '1';
 							v.state := UPDATE;
 						else
-							v.addr := v.dtag & std_logic_vector(to_unsigned(v.sid,cache_set_depth)) & "00000";
+							v.addr := v.dtag & std_logic_vector(to_unsigned(v.sid,cache_sets)) & "00000";
 							v.count := 0;
 							v.state := WRITEBACK;
 						end if;
@@ -356,7 +356,7 @@ begin
 				v.wen := (others => '0');
 
 				if (v.dvec(v.wid) and v.wvec(v.wid)) = '1' then
-					v.addr := v.dtag & std_logic_vector(to_unsigned(v.sid,cache_set_depth)) & "00000";
+					v.addr := v.dtag & std_logic_vector(to_unsigned(v.sid,cache_sets)) & "00000";
 					v.state := WRITEBACK;
 				else
 					if v.wid = 7 then
@@ -503,7 +503,7 @@ begin
 		if v.state = INVALIDATE then
 			if v.wid = 7 then
 				v.wid := 0;
-				if v.sid = 2**cache_set_depth-1 then
+				if v.sid = 2**cache_sets-1 then
 					v.state := HIT;
 				else
 					v.sid := v.sid+1;

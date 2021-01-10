@@ -11,8 +11,8 @@ use work.wire.all;
 
 entity hit is
 	generic(
-		cache_type      : integer;
-		cache_set_depth : integer
+		cache_type : integer;
+		cache_sets : integer
 	);
 	port(
 		reset : in  std_logic;

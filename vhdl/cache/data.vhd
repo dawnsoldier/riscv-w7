@@ -11,8 +11,8 @@ use work.wire.all;
 
 entity data is
 	generic(
-		cache_type      : integer;
-		cache_set_depth : integer
+		cache_type : integer;
+		cache_sets : integer
 	);
 	port(
 		reset  : in  std_logic;
@@ -24,7 +24,7 @@ end data;
 
 architecture behavior of data is
 
-	type data_type is array (0 to 2**cache_set_depth-1) of std_logic_vector(255 downto 0);
+	type data_type is array (0 to 2**cache_sets-1) of std_logic_vector(255 downto 0);
 
 	signal data_array : data_type := (others => (others => '0'));
 

@@ -11,9 +11,10 @@ use work.wire.all;
 
 entity cache is
 	generic(
-		cache_enable    : boolean;
-		cache_type      : integer;
-		cache_set_depth : integer
+		cache_enable : boolean;
+		cache_type   : integer;
+		cache_sets   : integer;
+		cache_ways   : integer
 	);
 	port(
 		reset   : in  std_logic;
@@ -30,7 +31,7 @@ architecture behavior of cache is
 	component data
 		generic(
 			cache_type      : integer;
-			cache_set_depth : integer
+			cache_sets : integer
 		);
 		port(
 			reset  : in  std_logic;
@@ -43,7 +44,7 @@ architecture behavior of cache is
 	component tag
 		generic(
 			cache_type      : integer;
-			cache_set_depth : integer
+			cache_sets : integer
 		);
 		port(
 			reset : in  std_logic;
@@ -56,7 +57,7 @@ architecture behavior of cache is
 	component valid
 		generic(
 			cache_type      : integer;
-			cache_set_depth : integer
+			cache_sets : integer
 		);
 		port(
 			reset   : in  std_logic;
@@ -69,7 +70,7 @@ architecture behavior of cache is
 	component dirty
 		generic(
 			cache_type      : integer;
-			cache_set_depth : integer
+			cache_sets : integer
 		);
 		port(
 			reset   : in  std_logic;
@@ -82,7 +83,7 @@ architecture behavior of cache is
 	component lru_ctrl
 		generic(
 			cache_type      : integer;
-			cache_set_depth : integer
+			cache_sets : integer
 		);
 		port(
 			reset      : in  std_logic;
@@ -95,7 +96,7 @@ architecture behavior of cache is
 	component hit
 		generic(
 			cache_type      : integer;
-			cache_set_depth : integer
+			cache_sets : integer
 		);
 		port(
 			reset : in  std_logic;
@@ -108,7 +109,7 @@ architecture behavior of cache is
 	component ictrl
 		generic(
 			cache_type      : integer;
-			cache_set_depth : integer
+			cache_sets : integer
 		);
 		port(
 			reset   : in  std_logic;
@@ -125,7 +126,7 @@ architecture behavior of cache is
 	component dctrl
 		generic(
 			cache_type      : integer;
-			cache_set_depth : integer
+			cache_sets : integer
 		);
 		port(
 			reset   : in  std_logic;
@@ -146,41 +147,41 @@ begin
 
 	CACHE_ENABLED : if cache_enable = true generate
 
-		data0_comp : data generic map (cache_type => cache_type, cache_set_depth => cache_set_depth) port map(reset => reset, clock => clock, data_i => ctrl_o.data0_i, data_o => ctrl_i.data0_o);
-		data1_comp : data generic map (cache_type => cache_type, cache_set_depth => cache_set_depth) port map(reset => reset, clock => clock, data_i => ctrl_o.data1_i, data_o => ctrl_i.data1_o);
-		data2_comp : data generic map (cache_type => cache_type, cache_set_depth => cache_set_depth) port map(reset => reset, clock => clock, data_i => ctrl_o.data2_i, data_o => ctrl_i.data2_o);
-		data3_comp : data generic map (cache_type => cache_type, cache_set_depth => cache_set_depth) port map(reset => reset, clock => clock, data_i => ctrl_o.data3_i, data_o => ctrl_i.data3_o);
-		data4_comp : data generic map (cache_type => cache_type, cache_set_depth => cache_set_depth) port map(reset => reset, clock => clock, data_i => ctrl_o.data4_i, data_o => ctrl_i.data4_o);
-		data5_comp : data generic map (cache_type => cache_type, cache_set_depth => cache_set_depth) port map(reset => reset, clock => clock, data_i => ctrl_o.data5_i, data_o => ctrl_i.data5_o);
-		data6_comp : data generic map (cache_type => cache_type, cache_set_depth => cache_set_depth) port map(reset => reset, clock => clock, data_i => ctrl_o.data6_i, data_o => ctrl_i.data6_o);
-		data7_comp : data generic map (cache_type => cache_type, cache_set_depth => cache_set_depth) port map(reset => reset, clock => clock, data_i => ctrl_o.data7_i, data_o => ctrl_i.data7_o);
+		data0_comp : data generic map (cache_type => cache_type, cache_sets => cache_sets) port map(reset => reset, clock => clock, data_i => ctrl_o.data0_i, data_o => ctrl_i.data0_o);
+		data1_comp : data generic map (cache_type => cache_type, cache_sets => cache_sets) port map(reset => reset, clock => clock, data_i => ctrl_o.data1_i, data_o => ctrl_i.data1_o);
+		data2_comp : data generic map (cache_type => cache_type, cache_sets => cache_sets) port map(reset => reset, clock => clock, data_i => ctrl_o.data2_i, data_o => ctrl_i.data2_o);
+		data3_comp : data generic map (cache_type => cache_type, cache_sets => cache_sets) port map(reset => reset, clock => clock, data_i => ctrl_o.data3_i, data_o => ctrl_i.data3_o);
+		data4_comp : data generic map (cache_type => cache_type, cache_sets => cache_sets) port map(reset => reset, clock => clock, data_i => ctrl_o.data4_i, data_o => ctrl_i.data4_o);
+		data5_comp : data generic map (cache_type => cache_type, cache_sets => cache_sets) port map(reset => reset, clock => clock, data_i => ctrl_o.data5_i, data_o => ctrl_i.data5_o);
+		data6_comp : data generic map (cache_type => cache_type, cache_sets => cache_sets) port map(reset => reset, clock => clock, data_i => ctrl_o.data6_i, data_o => ctrl_i.data6_o);
+		data7_comp : data generic map (cache_type => cache_type, cache_sets => cache_sets) port map(reset => reset, clock => clock, data_i => ctrl_o.data7_i, data_o => ctrl_i.data7_o);
 
-		tag0_comp : tag generic map (cache_type => cache_type, cache_set_depth => cache_set_depth) port map(reset => reset, clock => clock, tag_i => ctrl_o.tag0_i, tag_o => ctrl_i.tag0_o);
-		tag1_comp : tag generic map (cache_type => cache_type, cache_set_depth => cache_set_depth) port map(reset => reset, clock => clock, tag_i => ctrl_o.tag1_i, tag_o => ctrl_i.tag1_o);
-		tag2_comp : tag generic map (cache_type => cache_type, cache_set_depth => cache_set_depth) port map(reset => reset, clock => clock, tag_i => ctrl_o.tag2_i, tag_o => ctrl_i.tag2_o);
-		tag3_comp : tag generic map (cache_type => cache_type, cache_set_depth => cache_set_depth) port map(reset => reset, clock => clock, tag_i => ctrl_o.tag3_i, tag_o => ctrl_i.tag3_o);
-		tag4_comp : tag generic map (cache_type => cache_type, cache_set_depth => cache_set_depth) port map(reset => reset, clock => clock, tag_i => ctrl_o.tag4_i, tag_o => ctrl_i.tag4_o);
-		tag5_comp : tag generic map (cache_type => cache_type, cache_set_depth => cache_set_depth) port map(reset => reset, clock => clock, tag_i => ctrl_o.tag5_i, tag_o => ctrl_i.tag5_o);
-		tag6_comp : tag generic map (cache_type => cache_type, cache_set_depth => cache_set_depth) port map(reset => reset, clock => clock, tag_i => ctrl_o.tag6_i, tag_o => ctrl_i.tag6_o);
-		tag7_comp : tag generic map (cache_type => cache_type, cache_set_depth => cache_set_depth) port map(reset => reset, clock => clock, tag_i => ctrl_o.tag7_i, tag_o => ctrl_i.tag7_o);
+		tag0_comp : tag generic map (cache_type => cache_type, cache_sets => cache_sets) port map(reset => reset, clock => clock, tag_i => ctrl_o.tag0_i, tag_o => ctrl_i.tag0_o);
+		tag1_comp : tag generic map (cache_type => cache_type, cache_sets => cache_sets) port map(reset => reset, clock => clock, tag_i => ctrl_o.tag1_i, tag_o => ctrl_i.tag1_o);
+		tag2_comp : tag generic map (cache_type => cache_type, cache_sets => cache_sets) port map(reset => reset, clock => clock, tag_i => ctrl_o.tag2_i, tag_o => ctrl_i.tag2_o);
+		tag3_comp : tag generic map (cache_type => cache_type, cache_sets => cache_sets) port map(reset => reset, clock => clock, tag_i => ctrl_o.tag3_i, tag_o => ctrl_i.tag3_o);
+		tag4_comp : tag generic map (cache_type => cache_type, cache_sets => cache_sets) port map(reset => reset, clock => clock, tag_i => ctrl_o.tag4_i, tag_o => ctrl_i.tag4_o);
+		tag5_comp : tag generic map (cache_type => cache_type, cache_sets => cache_sets) port map(reset => reset, clock => clock, tag_i => ctrl_o.tag5_i, tag_o => ctrl_i.tag5_o);
+		tag6_comp : tag generic map (cache_type => cache_type, cache_sets => cache_sets) port map(reset => reset, clock => clock, tag_i => ctrl_o.tag6_i, tag_o => ctrl_i.tag6_o);
+		tag7_comp : tag generic map (cache_type => cache_type, cache_sets => cache_sets) port map(reset => reset, clock => clock, tag_i => ctrl_o.tag7_i, tag_o => ctrl_i.tag7_o);
 
-		valid_comp : valid generic map (cache_type => cache_type, cache_set_depth => cache_set_depth) port map(reset => reset, clock => clock, valid_i => ctrl_o.valid_i, valid_o => ctrl_i.valid_o);
+		valid_comp : valid generic map (cache_type => cache_type, cache_sets => cache_sets) port map(reset => reset, clock => clock, valid_i => ctrl_o.valid_i, valid_o => ctrl_i.valid_o);
 
-		dirty_comp : dirty generic map (cache_type => cache_type, cache_set_depth => cache_set_depth) port map(reset => reset, clock => clock, dirty_i => ctrl_o.dirty_i, dirty_o => ctrl_i.dirty_o);
+		dirty_comp : dirty generic map (cache_type => cache_type, cache_sets => cache_sets) port map(reset => reset, clock => clock, dirty_i => ctrl_o.dirty_i, dirty_o => ctrl_i.dirty_o);
 
-		hit_comp : hit generic map (cache_type => cache_type, cache_set_depth => cache_set_depth) port map(reset => reset, clock => clock, hit_i => ctrl_o.hit_i, hit_o => ctrl_i.hit_o);
+		hit_comp : hit generic map (cache_type => cache_type, cache_sets => cache_sets) port map(reset => reset, clock => clock, hit_i => ctrl_o.hit_i, hit_o => ctrl_i.hit_o);
 
-		lru_ctrl_comp : lru_ctrl generic map (cache_type => cache_type, cache_set_depth => cache_set_depth) port map(reset => reset, clock => clock, lru_ctrl_i => ctrl_o.lru_i, lru_ctrl_o => ctrl_i.lru_o);
+		lru_ctrl_comp : lru_ctrl generic map (cache_type => cache_type, cache_sets => cache_sets) port map(reset => reset, clock => clock, lru_ctrl_i => ctrl_o.lru_i, lru_ctrl_o => ctrl_i.lru_o);
 
 		ICACHE : if cache_type = 0 generate
 
-			ictrl_comp : ictrl generic map (cache_type => cache_type, cache_set_depth => cache_set_depth) port map (reset => reset, clock => clock, ctrl_i => ctrl_i, ctrl_o => ctrl_o, cache_i => cache_i, cache_o => cache_o, mem_o => mem_o, mem_i => mem_i);
+			ictrl_comp : ictrl generic map (cache_type => cache_type, cache_sets => cache_sets) port map (reset => reset, clock => clock, ctrl_i => ctrl_i, ctrl_o => ctrl_o, cache_i => cache_i, cache_o => cache_o, mem_o => mem_o, mem_i => mem_i);
 
 		end generate ICACHE;
 
 		DCACHE : if cache_type = 1 generate
 
-			dctrl_comp : dctrl generic map (cache_type => cache_type, cache_set_depth => cache_set_depth) port map (reset => reset, clock => clock, ctrl_i => ctrl_i, ctrl_o => ctrl_o, cache_i => cache_i, cache_o => cache_o, mem_o => mem_o, mem_i => mem_i);
+			dctrl_comp : dctrl generic map (cache_type => cache_type, cache_sets => cache_sets) port map (reset => reset, clock => clock, ctrl_i => ctrl_i, ctrl_o => ctrl_o, cache_i => cache_i, cache_o => cache_o, mem_o => mem_o, mem_i => mem_i);
 
 		end generate DCACHE;
 

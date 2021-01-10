@@ -11,8 +11,8 @@ use work.wire.all;
 
 entity lru is
 	generic(
-		cache_type      : integer;
-		cache_set_depth : integer
+		cache_type : integer;
+		cache_sets : integer
 	);
 	port(
 		reset   : in  std_logic;
@@ -24,7 +24,7 @@ end lru;
 
 architecture behavior of lru is
 
-	type lru_type is array (0 to 2**cache_set_depth-1) of std_logic_vector(7 downto 0);
+	type lru_type is array (0 to 2**cache_sets-1) of std_logic_vector(7 downto 0);
 
 	signal lru_array : lru_type := (others => (others => '0'));
 
