@@ -7,22 +7,23 @@ use ieee.std_logic_misc.all;
 
 use work.configure.all;
 use work.constants.all;
-use work.wire.all;
+use work.dwire.all;
 
-entity valid is
+entity dvalid is
 	generic(
-		cache_type : integer;
-		cache_sets : integer
+		cache_sets  : integer;
+		cache_ways  : integer;
+		cache_words : integer
 	);
 	port(
 		reset   : in  std_logic;
 		clock   : in  std_logic;
-		valid_i : in  valid_in_type;
-		valid_o : out valid_out_type
+		valid_i : in  dvalid_in_type;
+		valid_o : out dvalid_out_type
 	);
-end valid;
+end dvalid;
 
-architecture behavior of valid is
+architecture behavior of dvalid is
 
 	type valid_type is array (0 to 2**cache_sets-1) of std_logic_vector(7 downto 0);
 

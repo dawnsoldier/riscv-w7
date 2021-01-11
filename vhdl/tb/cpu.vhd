@@ -50,12 +50,29 @@ architecture behavior of cpu is
 		);
 	end component;
 
-	component cache
+	component icache
 		generic(
 			cache_enable : boolean;
-			cache_type   : integer;
 			cache_sets   : integer;
-			cache_ways   : integer
+			cache_ways   : integer;
+			cache_words  : integer
+		);
+		port(
+			reset   : in  std_logic;
+			clock   : in  std_logic;
+			cache_i : in  mem_in_type;
+			cache_o : out mem_out_type;
+			mem_o   : in  mem_out_type;
+			mem_i   : out mem_in_type
+		);
+	end component;
+
+	component dcache
+		generic(
+			cache_enable : boolean;
+			cache_sets   : integer;
+			cache_ways   : integer;
+			cache_words  : integer
 		);
 		port(
 			reset   : in  std_logic;
@@ -622,12 +639,12 @@ begin
 			ext_irpt  => '0'
 		);
 
-	icache_comp : cache
-		generic map (
+	icache_comp : icache
+		generic map(
 			cache_enable => icache_enable,
-			cache_type   => icache_type,
 			cache_sets   => icache_sets,
-			cache_ways   => icache_ways
+			cache_ways   => icache_ways,
+			cache_words  => icache_words
 		)
 		port map(
 			reset   => reset,
@@ -638,12 +655,12 @@ begin
 			mem_i   => io_mem_i
 		);
 
-	dcache_comp : cache
-		generic map (
+	dcache_comp : dcache
+		generic map(
 			cache_enable => dcache_enable,
-			cache_type   => dcache_type,
 			cache_sets   => dcache_sets,
-			cache_ways   => dcache_ways
+			cache_ways   => dcache_ways,
+			cache_words  => dcache_words
 		)
 		port map(
 			reset   => reset,

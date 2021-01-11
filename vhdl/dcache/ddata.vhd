@@ -7,22 +7,23 @@ use ieee.std_logic_misc.all;
 
 use work.configure.all;
 use work.constants.all;
-use work.wire.all;
+use work.dwire.all;
 
-entity data is
+entity ddata is
 	generic(
-		cache_type : integer;
-		cache_sets : integer
+		cache_sets  : integer;
+		cache_ways  : integer;
+		cache_words : integer
 	);
 	port(
 		reset  : in  std_logic;
 		clock  : in  std_logic;
-		data_i : in  data_in_type;
-		data_o : out data_out_type
+		data_i : in  ddata_in_type;
+		data_o : out ddata_out_type
 	);
-end data;
+end ddata;
 
-architecture behavior of data is
+architecture behavior of ddata is
 
 	type data_type is array (0 to 2**cache_sets-1) of std_logic_vector(255 downto 0);
 

@@ -7,12 +7,13 @@ use ieee.std_logic_misc.all;
 
 use work.configure.all;
 use work.constants.all;
-use work.wire.all;
+use work.dwire.all;
 
 entity dirty is
 	generic(
-		cache_type : integer;
-		cache_sets : integer
+		cache_sets  : integer;
+		cache_ways  : integer;
+		cache_words : integer
 	);
 	port(
 		reset   : in  std_logic;

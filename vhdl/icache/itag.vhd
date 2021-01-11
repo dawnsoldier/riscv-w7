@@ -7,22 +7,23 @@ use ieee.std_logic_misc.all;
 
 use work.configure.all;
 use work.constants.all;
-use work.wire.all;
+use work.iwire.all;
 
-entity tag is
+entity itag is
 	generic(
-		cache_type : integer;
-		cache_sets : integer
+		cache_sets  : integer;
+		cache_ways  : integer;
+		cache_words : integer
 	);
 	port(
 		reset : in  std_logic;
 		clock : in  std_logic;
-		tag_i : in  tag_in_type;
-		tag_o : out tag_out_type
+		tag_i : in  itag_in_type;
+		tag_o : out itag_out_type
 	);
-end tag;
+end itag;
 
-architecture behavior of tag is
+architecture behavior of itag is
 
 	type tag_type is array (0 to 2**cache_sets-1) of std_logic_vector(58-cache_sets downto 0);
 

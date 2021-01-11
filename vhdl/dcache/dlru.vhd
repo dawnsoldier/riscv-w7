@@ -7,22 +7,23 @@ use ieee.std_logic_misc.all;
 
 use work.configure.all;
 use work.constants.all;
-use work.wire.all;
+use work.dwire.all;
 
-entity lru is
+entity dlru is
 	generic(
-		cache_type : integer;
-		cache_sets : integer
+		cache_sets  : integer;
+		cache_ways  : integer;
+		cache_words : integer
 	);
 	port(
-		reset   : in  std_logic;
-		clock   : in  std_logic;
-		lru_i : in  lru_in_type;
-		lru_o : out lru_out_type
+		reset : in  std_logic;
+		clock : in  std_logic;
+		lru_i : in  dlru_in_type;
+		lru_o : out dlru_out_type
 	);
-end lru;
+end dlru;
 
-architecture behavior of lru is
+architecture behavior of dlru is
 
 	type lru_type is array (0 to 2**cache_sets-1) of std_logic_vector(7 downto 0);
 

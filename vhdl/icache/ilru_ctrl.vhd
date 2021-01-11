@@ -7,22 +7,23 @@ use ieee.std_logic_misc.all;
 
 use work.configure.all;
 use work.constants.all;
-use work.wire.all;
+use work.iwire.all;
 
-entity lru_ctrl is
+entity ilru_ctrl is
 	generic(
-		cache_type : integer;
-		cache_sets : integer
+		cache_sets  : integer;
+		cache_ways  : integer;
+		cache_words : integer
 	);
 	port(
 		reset      : in  std_logic;
 		clock      : in  std_logic;
-		lru_ctrl_i : in  lru_ctrl_in_type;
-		lru_ctrl_o : out lru_ctrl_out_type
+		lru_ctrl_i : in  ilru_ctrl_in_type;
+		lru_ctrl_o : out ilru_ctrl_out_type
 	);
-end lru_ctrl;
+end ilru_ctrl;
 
-architecture behavior of lru_ctrl is
+architecture behavior of ilru_ctrl is
 
 	constant LEFT  : std_logic := '0';
 	constant RIGHT : std_logic := '1';
@@ -90,21 +91,22 @@ architecture behavior of lru_ctrl is
 		return to_integer(blk);
 	end;
 
-	component lru
+	component ilru
 		generic(
-			cache_type      : integer;
-			cache_sets : integer
+			cache_sets  : integer;
+			cache_ways  : integer;
+			cache_words : integer
 		);
 		port(
 			reset : in  std_logic;
 			clock : in  std_logic;
-			lru_i : in  lru_in_type;
-			lru_o : out lru_out_type
+			lru_i : in  ilru_in_type;
+			lru_o : out ilru_out_type
 		);
 	end component;
 
-	signal lru_i : lru_in_type;
-	signal lru_o : lru_out_type;
+	signal lru_i : ilru_in_type;
+	signal lru_o : ilru_out_type;
 
 begin
 
@@ -148,10 +150,11 @@ begin
 
 	end process;
 
-	lru_comp : lru
+	lru_comp : ilru
 		generic map(
-			cache_type => cache_type,
-			cache_sets => cache_sets
+			cache_sets  => cache_sets,
+			cache_ways  => cache_ways,
+			cache_words => cache_words
 		)
 		port map(
 			reset => reset,

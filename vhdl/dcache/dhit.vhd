@@ -7,22 +7,23 @@ use ieee.std_logic_misc.all;
 
 use work.configure.all;
 use work.constants.all;
-use work.wire.all;
+use work.dwire.all;
 
-entity hit is
+entity dhit is
 	generic(
-		cache_type : integer;
-		cache_sets : integer
+		cache_sets  : integer;
+		cache_ways  : integer;
+		cache_words : integer
 	);
 	port(
 		reset : in  std_logic;
 		clock : in  std_logic;
-		hit_i : in  hit_in_type;
-		hit_o : out hit_out_type
+		hit_i : in  dhit_in_type;
+		hit_o : out dhit_out_type
 	);
-end hit;
+end dhit;
 
-architecture behavior of hit is
+architecture behavior of dhit is
 
 	signal valid : std_logic_vector(7 downto 0) := (others => '0');
 
