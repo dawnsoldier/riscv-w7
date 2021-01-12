@@ -138,25 +138,15 @@ begin
 
 	CACHE_ENABLED : if cache_enable = true generate
 
+		DATA : for i in 0 to 2**cache_ways-1 generate
+			data_comp : ddata generic map (cache_sets  => cache_sets, cache_ways  => cache_ways, cache_words => cache_words) port map(reset => reset, clock => clock, data_i => ctrl_o.data_i(i), data_o => ctrl_i.data_o(i));
+		end generate DATA;
+
+		TAG : for i in 0 to 2**cache_ways-1 generate
+			tag_comp : dtag generic map (cache_sets  => cache_sets, cache_ways  => cache_ways, cache_words => cache_words) port map(reset => reset, clock => clock, tag_i => ctrl_o.tag_i(i), tag_o => ctrl_i.tag_o(i));
+		end generate TAG;
+
 		dirty_comp : dirty generic map (cache_sets  => cache_sets, cache_ways  => cache_ways, cache_words => cache_words) port map(reset => reset, clock => clock, dirty_i => ctrl_o.dirty_i, dirty_o => ctrl_i.dirty_o);
-
-		data0_comp : ddata generic map (cache_sets  => cache_sets, cache_ways  => cache_ways, cache_words => cache_words) port map(reset => reset, clock => clock, data_i => ctrl_o.data0_i, data_o => ctrl_i.data0_o);
-		data1_comp : ddata generic map (cache_sets  => cache_sets, cache_ways  => cache_ways, cache_words => cache_words) port map(reset => reset, clock => clock, data_i => ctrl_o.data1_i, data_o => ctrl_i.data1_o);
-		data2_comp : ddata generic map (cache_sets  => cache_sets, cache_ways  => cache_ways, cache_words => cache_words) port map(reset => reset, clock => clock, data_i => ctrl_o.data2_i, data_o => ctrl_i.data2_o);
-		data3_comp : ddata generic map (cache_sets  => cache_sets, cache_ways  => cache_ways, cache_words => cache_words) port map(reset => reset, clock => clock, data_i => ctrl_o.data3_i, data_o => ctrl_i.data3_o);
-		data4_comp : ddata generic map (cache_sets  => cache_sets, cache_ways  => cache_ways, cache_words => cache_words) port map(reset => reset, clock => clock, data_i => ctrl_o.data4_i, data_o => ctrl_i.data4_o);
-		data5_comp : ddata generic map (cache_sets  => cache_sets, cache_ways  => cache_ways, cache_words => cache_words) port map(reset => reset, clock => clock, data_i => ctrl_o.data5_i, data_o => ctrl_i.data5_o);
-		data6_comp : ddata generic map (cache_sets  => cache_sets, cache_ways  => cache_ways, cache_words => cache_words) port map(reset => reset, clock => clock, data_i => ctrl_o.data6_i, data_o => ctrl_i.data6_o);
-		data7_comp : ddata generic map (cache_sets  => cache_sets, cache_ways  => cache_ways, cache_words => cache_words) port map(reset => reset, clock => clock, data_i => ctrl_o.data7_i, data_o => ctrl_i.data7_o);
-
-		tag0_comp : dtag generic map (cache_sets  => cache_sets, cache_ways  => cache_ways, cache_words => cache_words) port map(reset => reset, clock => clock, tag_i => ctrl_o.tag0_i, tag_o => ctrl_i.tag0_o);
-		tag1_comp : dtag generic map (cache_sets  => cache_sets, cache_ways  => cache_ways, cache_words => cache_words) port map(reset => reset, clock => clock, tag_i => ctrl_o.tag1_i, tag_o => ctrl_i.tag1_o);
-		tag2_comp : dtag generic map (cache_sets  => cache_sets, cache_ways  => cache_ways, cache_words => cache_words) port map(reset => reset, clock => clock, tag_i => ctrl_o.tag2_i, tag_o => ctrl_i.tag2_o);
-		tag3_comp : dtag generic map (cache_sets  => cache_sets, cache_ways  => cache_ways, cache_words => cache_words) port map(reset => reset, clock => clock, tag_i => ctrl_o.tag3_i, tag_o => ctrl_i.tag3_o);
-		tag4_comp : dtag generic map (cache_sets  => cache_sets, cache_ways  => cache_ways, cache_words => cache_words) port map(reset => reset, clock => clock, tag_i => ctrl_o.tag4_i, tag_o => ctrl_i.tag4_o);
-		tag5_comp : dtag generic map (cache_sets  => cache_sets, cache_ways  => cache_ways, cache_words => cache_words) port map(reset => reset, clock => clock, tag_i => ctrl_o.tag5_i, tag_o => ctrl_i.tag5_o);
-		tag6_comp : dtag generic map (cache_sets  => cache_sets, cache_ways  => cache_ways, cache_words => cache_words) port map(reset => reset, clock => clock, tag_i => ctrl_o.tag6_i, tag_o => ctrl_i.tag6_o);
-		tag7_comp : dtag generic map (cache_sets  => cache_sets, cache_ways  => cache_ways, cache_words => cache_words) port map(reset => reset, clock => clock, tag_i => ctrl_o.tag7_i, tag_o => ctrl_i.tag7_o);
 
 		valid_comp : dvalid generic map (cache_sets  => cache_sets, cache_ways  => cache_ways, cache_words => cache_words) port map(reset => reset, clock => clock, valid_i => ctrl_o.valid_i, valid_o => ctrl_i.valid_o);
 

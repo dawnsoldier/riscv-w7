@@ -25,11 +25,11 @@ end idata;
 
 architecture behavior of idata is
 
-	type data_type is array (0 to 2**cache_sets-1) of std_logic_vector(255 downto 0);
+	type data_type is array (0 to 2**cache_sets-1) of std_logic_vector((2**cache_words)*64-1 downto 0);
 
 	signal data_array : data_type := (others => (others => '0'));
 
-	signal rdata : std_logic_vector(255 downto 0) := (others => '0');
+	signal rdata : std_logic_vector((2**cache_words)*64-1 downto 0) := (others => '0');
 
 begin
 

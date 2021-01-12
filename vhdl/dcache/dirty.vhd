@@ -25,11 +25,11 @@ end dirty;
 
 architecture behavior of dirty is
 
-	type dirty_type is array (0 to 2**cache_sets-1) of std_logic_vector(7 downto 0);
+	type dirty_type is array (0 to 2**cache_sets-1) of std_logic_vector(2**icache_ways-1 downto 0);
 
 	signal dirty_array : dirty_type := (others => (others => '0'));
 
-	signal rdata : std_logic_vector(7 downto 0) := (others => '0');
+	signal rdata : std_logic_vector(2**icache_ways-1 downto 0) := (others => '0');
 
 begin
 

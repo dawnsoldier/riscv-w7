@@ -25,18 +25,18 @@ end ihit;
 
 architecture behavior of ihit is
 
-	signal valid : std_logic_vector(7 downto 0) := (others => '0');
+	signal valid : std_logic_vector(2**icache_ways-1 downto 0) := (others => '0');
 
 begin
 
-	valid(0) <= hit_i.valid(0) and and_reduce(hit_i.tag xnor hit_i.tag0);
-	valid(1) <= hit_i.valid(1) and and_reduce(hit_i.tag xnor hit_i.tag1);
-	valid(2) <= hit_i.valid(2) and and_reduce(hit_i.tag xnor hit_i.tag2);
-	valid(3) <= hit_i.valid(3) and and_reduce(hit_i.tag xnor hit_i.tag3);
-	valid(4) <= hit_i.valid(4) and and_reduce(hit_i.tag xnor hit_i.tag4);
-	valid(5) <= hit_i.valid(5) and and_reduce(hit_i.tag xnor hit_i.tag5);
-	valid(6) <= hit_i.valid(6) and and_reduce(hit_i.tag xnor hit_i.tag6);
-	valid(7) <= hit_i.valid(7) and and_reduce(hit_i.tag xnor hit_i.tag7);
+	valid(0) <= hit_i.valid(0) and and_reduce(hit_i.tag xnor hit_i.tag_a(0));
+	valid(1) <= hit_i.valid(1) and and_reduce(hit_i.tag xnor hit_i.tag_a(1));
+	valid(2) <= hit_i.valid(2) and and_reduce(hit_i.tag xnor hit_i.tag_a(2));
+	valid(3) <= hit_i.valid(3) and and_reduce(hit_i.tag xnor hit_i.tag_a(3));
+	valid(4) <= hit_i.valid(4) and and_reduce(hit_i.tag xnor hit_i.tag_a(4));
+	valid(5) <= hit_i.valid(5) and and_reduce(hit_i.tag xnor hit_i.tag_a(5));
+	valid(6) <= hit_i.valid(6) and and_reduce(hit_i.tag xnor hit_i.tag_a(6));
+	valid(7) <= hit_i.valid(7) and and_reduce(hit_i.tag xnor hit_i.tag_a(7));
 
 	hit_o.hit <= or_reduce(valid);
 	hit_o.miss <= nor_reduce(valid);

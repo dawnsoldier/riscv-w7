@@ -156,35 +156,11 @@ begin
 			v.sid := rin_next.sid;
 		end if;
 
-		ctrl_o.data0_i.raddr <= v.sid;
-		ctrl_o.data1_i.raddr <= v.sid;
-		ctrl_o.data2_i.raddr <= v.sid;
-		ctrl_o.data3_i.raddr <= v.sid;
-		ctrl_o.data4_i.raddr <= v.sid;
-		ctrl_o.data5_i.raddr <= v.sid;
-		ctrl_o.data6_i.raddr <= v.sid;
-		ctrl_o.data7_i.raddr <= v.sid;
-
-		ctrl_o.tag0_i.raddr <= v.sid;
-		ctrl_o.tag1_i.raddr <= v.sid;
-		ctrl_o.tag2_i.raddr <= v.sid;
-		ctrl_o.tag3_i.raddr <= v.sid;
-		ctrl_o.tag4_i.raddr <= v.sid;
-		ctrl_o.tag5_i.raddr <= v.sid;
-		ctrl_o.tag6_i.raddr <= v.sid;
-		ctrl_o.tag7_i.raddr <= v.sid;
-
-		ctrl_o.valid_i.raddr <= v.sid;
-
-		ctrl_o.dirty_i.raddr <= v.sid;
-
-		ctrl_o.lru_i.raddr <= v.sid;
-
 		rin <= v;
 
 	end process;
 
-	process(ctrl_i,cache_i,mem_o,r,r_next)
+	process(ctrl_i,cache_i,mem_o,r,r_next,rin)
 
 	variable v : data_type;
 
@@ -212,42 +188,14 @@ begin
 		end if;
 
 		ctrl_o.hit_i.tag <= v.tag;
-		ctrl_o.hit_i.tag0 <= ctrl_i.tag0_o.rdata;
-		ctrl_o.hit_i.tag1 <= ctrl_i.tag1_o.rdata;
-		ctrl_o.hit_i.tag2 <= ctrl_i.tag2_o.rdata;
-		ctrl_o.hit_i.tag3 <= ctrl_i.tag3_o.rdata;
-		ctrl_o.hit_i.tag4 <= ctrl_i.tag4_o.rdata;
-		ctrl_o.hit_i.tag5 <= ctrl_i.tag5_o.rdata;
-		ctrl_o.hit_i.tag6 <= ctrl_i.tag6_o.rdata;
-		ctrl_o.hit_i.tag7 <= ctrl_i.tag7_o.rdata;
+		for i in 0 to 2**cache_ways-1 loop
+			ctrl_o.hit_i.tag_a(i) <= ctrl_i.tag_o(i).rdata;
+		end loop;
 		ctrl_o.hit_i.valid <= ctrl_i.valid_o.rdata;
 
 		if (r_next.state = MISS and r_next.miss = '1') or r_next.state = INVALIDATE then
-			if v.wid = 0 then
-				v.dline := ctrl_i.data0_o.rdata;
-				v.dtag := ctrl_i.tag0_o.rdata;
-			elsif v.wid = 1 then
-				v.dline := ctrl_i.data1_o.rdata;
-				v.dtag := ctrl_i.tag1_o.rdata;
-			elsif v.wid = 2 then
-				v.dline := ctrl_i.data2_o.rdata;
-				v.dtag := ctrl_i.tag2_o.rdata;
-			elsif v.wid = 3 then
-				v.dline := ctrl_i.data3_o.rdata;
-				v.dtag := ctrl_i.tag3_o.rdata;
-			elsif v.wid = 4 then
-				v.dline := ctrl_i.data4_o.rdata;
-				v.dtag := ctrl_i.tag4_o.rdata;
-			elsif v.wid = 5 then
-				v.dline := ctrl_i.data5_o.rdata;
-				v.dtag := ctrl_i.tag5_o.rdata;
-			elsif v.wid = 6 then
-				v.dline := ctrl_i.data6_o.rdata;
-				v.dtag := ctrl_i.tag6_o.rdata;
-			elsif v.wid = 7 then
-				v.dline := ctrl_i.data7_o.rdata;
-				v.dtag := ctrl_i.tag7_o.rdata;
-			end if;
+			v.dline := ctrl_i.data_o(v.wid).rdata;
+			v.dtag := ctrl_i.tag_o(v.wid).rdata;
 		end if;
 
 		case r_next.state is
@@ -271,23 +219,7 @@ begin
 					v.wvec(v.wid) := v.wren;
 					v.dvec(v.wid) := v.wren;
 					v.den := v.wren;
-					if v.wid = 0 then
-							v.cline := ctrl_i.data0_o.rdata;
-					elsif v.wid = 1 then
-							v.cline := ctrl_i.data1_o.rdata;
-					elsif v.wid = 2 then
-							v.cline := ctrl_i.data2_o.rdata;
-					elsif v.wid = 3 then
-							v.cline := ctrl_i.data3_o.rdata;
-					elsif v.wid = 4 then
-							v.cline := ctrl_i.data4_o.rdata;
-					elsif v.wid = 5 then
-							v.cline := ctrl_i.data5_o.rdata;
-					elsif v.wid = 6 then
-							v.cline := ctrl_i.data6_o.rdata;
-					elsif v.wid = 7 then
-							v.cline := ctrl_i.data7_o.rdata;
-					end if;
+					v.cline := ctrl_i.data_o(v.wid).rdata;
 					v.valid := '0';
 					if v.wren = '1' then
 						v.state := UPDATE;
@@ -436,59 +368,25 @@ begin
 			end if;
 		end loop;
 
-		ctrl_o.data0_i.waddr <= v.sid;
-		ctrl_o.data1_i.waddr <= v.sid;
-		ctrl_o.data2_i.waddr <= v.sid;
-		ctrl_o.data3_i.waddr <= v.sid;
-		ctrl_o.data4_i.waddr <= v.sid;
-		ctrl_o.data5_i.waddr <= v.sid;
-		ctrl_o.data6_i.waddr <= v.sid;
-		ctrl_o.data7_i.waddr <= v.sid;
+		for i in 0 to 2**cache_ways-1 loop
+			ctrl_o.data_i(i).raddr <= rin.sid;
+			ctrl_o.tag_i(i).raddr <= rin.sid;
+		end loop;
 
-		ctrl_o.data0_i.wen <= v.wen(0);
-		ctrl_o.data1_i.wen <= v.wen(1);
-		ctrl_o.data2_i.wen <= v.wen(2);
-		ctrl_o.data3_i.wen <= v.wen(3);
-		ctrl_o.data4_i.wen <= v.wen(4);
-		ctrl_o.data5_i.wen <= v.wen(5);
-		ctrl_o.data6_i.wen <= v.wen(6);
-		ctrl_o.data7_i.wen <= v.wen(7);
+		ctrl_o.valid_i.raddr <= rin.sid;
 
-		ctrl_o.data0_i.wdata <= v.cline;
-		ctrl_o.data1_i.wdata <= v.cline;
-		ctrl_o.data2_i.wdata <= v.cline;
-		ctrl_o.data3_i.wdata <= v.cline;
-		ctrl_o.data4_i.wdata <= v.cline;
-		ctrl_o.data5_i.wdata <= v.cline;
-		ctrl_o.data6_i.wdata <= v.cline;
-		ctrl_o.data7_i.wdata <= v.cline;
+		ctrl_o.dirty_i.raddr <= rin.sid;
 
-		ctrl_o.tag0_i.waddr <= v.sid;
-		ctrl_o.tag1_i.waddr <= v.sid;
-		ctrl_o.tag2_i.waddr <= v.sid;
-		ctrl_o.tag3_i.waddr <= v.sid;
-		ctrl_o.tag4_i.waddr <= v.sid;
-		ctrl_o.tag5_i.waddr <= v.sid;
-		ctrl_o.tag6_i.waddr <= v.sid;
-		ctrl_o.tag7_i.waddr <= v.sid;
+		ctrl_o.lru_i.raddr <= rin.sid;
 
-		ctrl_o.tag0_i.wen <= v.wen(0);
-		ctrl_o.tag1_i.wen <= v.wen(1);
-		ctrl_o.tag2_i.wen <= v.wen(2);
-		ctrl_o.tag3_i.wen <= v.wen(3);
-		ctrl_o.tag4_i.wen <= v.wen(4);
-		ctrl_o.tag5_i.wen <= v.wen(5);
-		ctrl_o.tag6_i.wen <= v.wen(6);
-		ctrl_o.tag7_i.wen <= v.wen(7);
-
-		ctrl_o.tag0_i.wdata <= v.tag;
-		ctrl_o.tag1_i.wdata <= v.tag;
-		ctrl_o.tag2_i.wdata <= v.tag;
-		ctrl_o.tag3_i.wdata <= v.tag;
-		ctrl_o.tag4_i.wdata <= v.tag;
-		ctrl_o.tag5_i.wdata <= v.tag;
-		ctrl_o.tag6_i.wdata <= v.tag;
-		ctrl_o.tag7_i.wdata <= v.tag;
+		for i in 0 to 2**cache_ways-1 loop
+			ctrl_o.data_i(i).waddr <= v.sid;
+			ctrl_o.data_i(i).wen <= v.wen(i);
+			ctrl_o.data_i(i).wdata <= v.cline;
+			ctrl_o.tag_i(i).waddr <= v.sid;
+			ctrl_o.tag_i(i).wen <= v.wen(i);
+			ctrl_o.tag_i(i).wdata <= v.tag;
+		end loop;
 
 		ctrl_o.lru_i.waddr <= v.sid;
 		ctrl_o.lru_i.wid <= v.wid;

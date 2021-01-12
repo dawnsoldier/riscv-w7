@@ -25,11 +25,11 @@ end dtag;
 
 architecture behavior of dtag is
 
-	type tag_type is array (0 to 2**cache_sets-1) of std_logic_vector(58-cache_sets downto 0);
+	type tag_type is array (0 to 2**cache_sets-1) of std_logic_vector(60-(cache_sets+cache_words) downto 0);
 
 	signal tag_array : tag_type := (others => (others => '0'));
 
-	signal rdata : std_logic_vector(58-cache_sets downto 0) := (others => '0');
+	signal rdata : std_logic_vector(60-(cache_sets+cache_words) downto 0) := (others => '0');
 
 begin
 
