@@ -73,7 +73,7 @@ architecture behavior of dctrl is
 		dvec    : std_logic_vector(2**cache_ways-1 downto 0);
 		sid     : integer range 0 to 2**cache_sets-1;
 		lid     : integer range 0 to 2**cache_words-1;
-		count   : integer range 0 to 2**cache_ways-1;
+		count   : integer range 0 to 2**cache_words-1;
 		wid     : integer range 0 to 2**cache_ways-1;
 		invalid : std_logic;
 		flush   : std_logic;
@@ -289,7 +289,7 @@ begin
 					v.addr(cache_words+2 downto 0) := (others => '0');
 					v.state := WRITEBACK;
 				else
-					if v.wid = 7 then
+					if v.wid = 2**cache_ways-1 then
 						v.dvec := (others => '0');
 						v.wvec := (others => '0');
 						v.invalid := '1';
@@ -308,13 +308,14 @@ begin
 				if mem_o.mem_ready = '1' then
 					if v.count /= 2**cache_words-1 then
 						v.addr(63 downto 3) := std_logic_vector(unsigned(v.addr(63 downto 3))+1);
+						v.count := v.count + 1;
 					else
 						if v.dirty = '1' then
 							v.wen(v.wid) := '1';
 							v.wvec(v.wid) := '1';
 							v.state := UPDATE;
 						else
-							if v.wid = 7 then
+							if v.wid = 2**cache_ways-1 then
 								v.dvec := (others => '0');
 								v.wvec := (others => '0');
 								v.invalid := '1';
@@ -323,7 +324,6 @@ begin
 						end if;
 						v.valid := '0';
 					end if;
-					v.count := v.count + 1;
 				end if;
 
 				for i in 0 to 2**cache_words-1 loop
@@ -379,7 +379,7 @@ begin
 		ctrl_o.valid_i.wdata <= v.wvec;
 
 		if v.state = INVALIDATE then
-			if v.wid = 7 then
+			if v.wid = 2**cache_ways-1 then
 				v.wid := 0;
 				if v.sid = 2**cache_sets-1 then
 					v.state := HIT;

@@ -63,7 +63,7 @@ package dwire is
 	end record;
 
 	type drandom_out_type is record
-		wid   : integer range 0 to 2**icache_ways-1;
+		wid   : integer range 0 to 2**dcache_ways-1;
 	end record;
 
 	type tag_array is array(0 to 2**dcache_ways-1) of std_logic_vector(60-(dcache_sets+dcache_words) downto 0);
