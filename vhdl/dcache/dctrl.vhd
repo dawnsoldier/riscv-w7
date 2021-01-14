@@ -253,7 +253,8 @@ begin
 							v.wvec(v.wid) := '1';
 							v.state := UPDATE;
 						else
-							v.addr := v.dtag & std_logic_vector(to_unsigned(v.sid,cache_sets)) & "00000";
+							v.addr(63 downto cache_words+3) := v.dtag & std_logic_vector(to_unsigned(v.sid,cache_sets));
+							v.addr(cache_words+2 downto 0) := (others => '0');
 							v.count := 0;
 							v.state := WRITEBACK;
 						end if;
@@ -284,7 +285,8 @@ begin
 				v.wen := (others => '0');
 
 				if (v.dvec(v.wid) and v.wvec(v.wid)) = '1' then
-					v.addr := v.dtag & std_logic_vector(to_unsigned(v.sid,cache_sets)) & "00000";
+					v.addr(63 downto cache_words+3) := v.dtag & std_logic_vector(to_unsigned(v.sid,cache_sets));
+					v.addr(cache_words+2 downto 0) := (others => '0');
 					v.state := WRITEBACK;
 				else
 					if v.wid = 7 then

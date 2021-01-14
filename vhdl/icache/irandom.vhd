@@ -27,7 +27,7 @@ architecture behavior of irandom is
 
 	signal count : std_logic_vector(2**cache_ways-1 downto 0) := (others => '0');
 
-	signal feedback : std_logic;
+	signal feedback : std_logic := '0';
 
 begin
 
