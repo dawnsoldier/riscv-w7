@@ -233,7 +233,7 @@ begin
 			when MISS =>
 
 				if r_next.miss = '1' then
-					v.wid := ctrl_i.lru_o.wid;
+					v.wid := ctrl_i.rand_o.wid;
 					v.dirty := v.dvec(v.wid);
 					v.dvec(v.wid) := r_next.wren;
 					v.den := '1';
@@ -359,8 +359,6 @@ begin
 
 		ctrl_o.dirty_i.raddr <= rin.sid;
 
-		ctrl_o.lru_i.raddr <= rin.sid;
-
 		for i in 0 to 2**cache_ways-1 loop
 			ctrl_o.data_i(i).waddr <= v.sid;
 			ctrl_o.data_i(i).wen <= v.wen(i);
@@ -370,10 +368,7 @@ begin
 			ctrl_o.tag_i(i).wdata <= v.tag;
 		end loop;
 
-		ctrl_o.lru_i.waddr <= v.sid;
-		ctrl_o.lru_i.wid <= v.wid;
-		ctrl_o.lru_i.hit <= v.hit;
-		ctrl_o.lru_i.miss <= v.miss;
+		ctrl_o.rand_i.miss <= v.miss;
 
 		ctrl_o.dirty_i.waddr <= v.sid;
 		ctrl_o.dirty_i.wen <= v.den or v.invalid;

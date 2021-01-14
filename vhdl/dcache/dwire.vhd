@@ -58,29 +58,6 @@ package dwire is
 		rdata :  std_logic_vector(2**dcache_ways-1 downto 0);
 	end record;
 
-	type dlru_in_type is record
-		raddr : integer range 0 to 2**dcache_sets-1;
-		wen   : std_logic;
-		waddr : integer range 0 to 2**dcache_sets-1;
-		wdata : std_logic_vector(2**dcache_ways-1 downto 0);
-	end record;
-
-	type dlru_out_type is record
-		rdata :  std_logic_vector(2**dcache_ways-1 downto 0);
-	end record;
-
-	type dlru_ctrl_in_type is record
-		raddr : integer range 0 to 2**dcache_sets-1;
-		waddr : integer range 0 to 2**dcache_sets-1;
-		wid   : integer range 0 to 2**dcache_ways-1;
-		hit   : std_logic;
-		miss  : std_logic;
-	end record;
-
-	type dlru_ctrl_out_type is record
-		wid   : integer range 0 to 2**dcache_ways-1;
-	end record;
-
 	type drandom_in_type is record
 		miss  : std_logic;
 	end record;
@@ -108,7 +85,7 @@ package dwire is
 		tag_o   : dtag_o;
 		valid_o : dvalid_out_type;
 		dirty_o : dirty_out_type;
-		lru_o   : dlru_ctrl_out_type;
+		rand_o  : drandom_out_type;
 		hit_o   : dhit_out_type;
 	end record;
 
@@ -117,7 +94,7 @@ package dwire is
 		tag_i   : dtag_i;
 		valid_i : dvalid_in_type;
 		dirty_i : dirty_in_type;
-		lru_i   : dlru_ctrl_in_type;
+		rand_i  : drandom_in_type;
 		hit_i   : dhit_in_type;
 	end record;
 

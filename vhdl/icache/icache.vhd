@@ -71,17 +71,17 @@ architecture behavior of icache is
 		);
 	end component;
 
-	component ilru_ctrl
+	component irandom
 		generic(
 			cache_sets  : integer;
 			cache_ways  : integer;
 			cache_words : integer
 		);
 		port(
-			reset      : in  std_logic;
-			clock      : in  std_logic;
-			lru_ctrl_i : in  ilru_ctrl_in_type;
-			lru_ctrl_o : out ilru_ctrl_out_type
+			reset    : in  std_logic;
+			clock    : in  std_logic;
+			random_i : in  irandom_in_type;
+			random_o : out irandom_out_type
 		);
 	end component;
 
@@ -136,7 +136,7 @@ begin
 
 		hit_comp : ihit generic map (cache_sets  => cache_sets, cache_ways  => cache_ways, cache_words => cache_words) port map(reset => reset, clock => clock, hit_i => ctrl_o.hit_i, hit_o => ctrl_i.hit_o);
 
-		lru_ctrl_comp : ilru_ctrl generic map (cache_sets  => cache_sets, cache_ways  => cache_ways, cache_words => cache_words) port map(reset => reset, clock => clock, lru_ctrl_i => ctrl_o.lru_i, lru_ctrl_o => ctrl_i.lru_o);
+		random_comp : irandom generic map (cache_sets  => cache_sets, cache_ways  => cache_ways, cache_words => cache_words) port map(reset => reset, clock => clock, random_i => ctrl_o.rand_i, random_o => ctrl_i.rand_o);
 
 		ictrl_comp : ictrl generic map (cache_sets  => cache_sets, cache_ways  => cache_ways, cache_words => cache_words) port map (reset => reset, clock => clock, ctrl_i => ctrl_i, ctrl_o => ctrl_o, cache_i => cache_i, cache_o => cache_o, mem_o => mem_o, mem_i => mem_i);
 

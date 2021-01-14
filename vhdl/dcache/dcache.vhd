@@ -85,17 +85,17 @@ architecture behavior of dcache is
 		);
 	end component;
 
-	component dlru_ctrl
+	component drandom
 		generic(
 			cache_sets  : integer;
 			cache_ways  : integer;
 			cache_words : integer
 		);
 		port(
-			reset      : in  std_logic;
-			clock      : in  std_logic;
-			lru_ctrl_i : in  dlru_ctrl_in_type;
-			lru_ctrl_o : out dlru_ctrl_out_type
+			reset    : in  std_logic;
+			clock    : in  std_logic;
+			random_i : in  drandom_in_type;
+			random_o : out drandom_out_type
 		);
 	end component;
 
@@ -152,7 +152,7 @@ begin
 
 		hit_comp : dhit generic map (cache_sets  => cache_sets, cache_ways  => cache_ways, cache_words => cache_words) port map(reset => reset, clock => clock, hit_i => ctrl_o.hit_i, hit_o => ctrl_i.hit_o);
 
-		lru_ctrl_comp : dlru_ctrl generic map (cache_sets  => cache_sets, cache_ways  => cache_ways, cache_words => cache_words) port map(reset => reset, clock => clock, lru_ctrl_i => ctrl_o.lru_i, lru_ctrl_o => ctrl_i.lru_o);
+		random_comp : drandom generic map (cache_sets  => cache_sets, cache_ways  => cache_ways, cache_words => cache_words) port map(reset => reset, clock => clock, random_i => ctrl_o.rand_i, random_o => ctrl_i.rand_o);
 
 		dctrl_comp : dctrl generic map (cache_sets  => cache_sets, cache_ways  => cache_ways, cache_words => cache_words) port map (reset => reset, clock => clock, ctrl_i => ctrl_i, ctrl_o => ctrl_o, cache_i => cache_i, cache_o => cache_o, mem_o => mem_o, mem_i => mem_i);
 

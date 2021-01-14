@@ -47,29 +47,6 @@ package iwire is
 		rdata :  std_logic_vector(2**icache_ways-1 downto 0);
 	end record;
 
-	type ilru_in_type is record
-		raddr : integer range 0 to 2**icache_sets-1;
-		wen   : std_logic;
-		waddr : integer range 0 to 2**icache_sets-1;
-		wdata : std_logic_vector(2**icache_ways-1 downto 0);
-	end record;
-
-	type ilru_out_type is record
-		rdata :  std_logic_vector(2**icache_ways-1 downto 0);
-	end record;
-
-	type ilru_ctrl_in_type is record
-		raddr : integer range 0 to 2**icache_sets-1;
-		waddr : integer range 0 to 2**icache_sets-1;
-		wid   : integer range 0 to 2**icache_ways-1;
-		hit   : std_logic;
-		miss  : std_logic;
-	end record;
-
-	type ilru_ctrl_out_type is record
-		wid   : integer range 0 to 2**icache_ways-1;
-	end record;
-
 	type irandom_in_type is record
 		miss  : std_logic;
 	end record;
@@ -96,7 +73,7 @@ package iwire is
 		data_o  : idata_o;
 		tag_o   : itag_o;
 		valid_o : ivalid_out_type;
-		lru_o   : ilru_ctrl_out_type;
+		rand_o  : irandom_out_type;
 		hit_o   : ihit_out_type;
 	end record;
 
@@ -104,7 +81,7 @@ package iwire is
 		data_i  : idata_i;
 		tag_i   : itag_i;
 		valid_i : ivalid_in_type;
-		lru_i   : ilru_ctrl_in_type;
+		rand_i  : irandom_in_type;
 		hit_i   : ihit_in_type;
 	end record;
 

@@ -123,10 +123,6 @@ $SYNTAX $DIR/vhdl/icache/ivalid.vhd
 $ANALYS $DIR/vhdl/icache/ivalid.vhd
 $SYNTAX $DIR/vhdl/icache/ihit.vhd
 $ANALYS $DIR/vhdl/icache/ihit.vhd
-$SYNTAX $DIR/vhdl/icache/ilru.vhd
-$ANALYS $DIR/vhdl/icache/ilru.vhd
-$SYNTAX $DIR/vhdl/icache/ilru_ctrl.vhd
-$ANALYS $DIR/vhdl/icache/ilru_ctrl.vhd
 $SYNTAX $DIR/vhdl/icache/irandom.vhd
 $ANALYS $DIR/vhdl/icache/irandom.vhd
 $SYNTAX $DIR/vhdl/icache/ictrl.vhd
@@ -146,10 +142,6 @@ $SYNTAX $DIR/vhdl/dcache/dirty.vhd
 $ANALYS $DIR/vhdl/dcache/dirty.vhd
 $SYNTAX $DIR/vhdl/dcache/dhit.vhd
 $ANALYS $DIR/vhdl/dcache/dhit.vhd
-$SYNTAX $DIR/vhdl/dcache/dlru.vhd
-$ANALYS $DIR/vhdl/dcache/dlru.vhd
-$SYNTAX $DIR/vhdl/dcache/dlru_ctrl.vhd
-$ANALYS $DIR/vhdl/dcache/dlru_ctrl.vhd
 $SYNTAX $DIR/vhdl/dcache/drandom.vhd
 $ANALYS $DIR/vhdl/dcache/drandom.vhd
 $SYNTAX $DIR/vhdl/dcache/dctrl.vhd
