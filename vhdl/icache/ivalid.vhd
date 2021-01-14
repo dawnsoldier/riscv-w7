@@ -25,11 +25,11 @@ end ivalid;
 
 architecture behavior of ivalid is
 
-	type valid_type is array (0 to 2**cache_sets-1) of std_logic_vector(2**icache_ways-1 downto 0);
+	type valid_type is array (0 to 2**cache_sets-1) of std_logic_vector(2**cache_ways-1 downto 0);
 
 	signal valid_array : valid_type := (others => (others => '0'));
 
-	signal rdata : std_logic_vector(2**icache_ways-1 downto 0) := (others => '0');
+	signal rdata : std_logic_vector(2**cache_ways-1 downto 0) := (others => '0');
 
 begin
 

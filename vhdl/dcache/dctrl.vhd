@@ -241,20 +241,13 @@ begin
 
 				if mem_o.mem_ready = '1' then
 
-					case r_next.count is
-						when 0 =>
-							v.cline(63 downto 0) := mem_o.mem_rdata;
-						when 1 =>
-							v.cline(127 downto 64) := mem_o.mem_rdata;
-						when 2 =>
-							v.cline(191 downto 128) := mem_o.mem_rdata;
-						when 3 =>
-							v.cline(255 downto 192) := mem_o.mem_rdata;
-						when others =>
-							null;
-					end case;
+					for i in 0 to 2**cache_words-1 loop
+						if r_next.count = i then
+							v.cline(64*(i+1)-1 downto 64*i) := mem_o.mem_rdata;
+						end if;
+					end loop;
 
-					if v.count = 3 then
+					if v.count = 2**cache_words-1 then
 						if v.dirty = '0' then
 							v.wen(v.wid) := '1';
 							v.wvec(v.wid) := '1';
@@ -311,7 +304,7 @@ begin
 				v.wen := (others => '0');
 
 				if mem_o.mem_ready = '1' then
-					if v.count /= 3 then
+					if v.count /= 2**cache_words-1 then
 						v.addr(63 downto 3) := std_logic_vector(unsigned(v.addr(63 downto 3))+1);
 					else
 						if v.dirty = '1' then
@@ -331,26 +324,13 @@ begin
 					v.count := v.count + 1;
 				end if;
 
-				case v.count is
-					when 0 =>
-						v.wdata := v.dline(63 downto 0);
+				for i in 0 to 2**cache_words-1 loop
+					if v.count = i then
+						v.wdata := v.dline(64*(i+1)-1 downto 64*i);
 						v.wstrb := X"FF";
 						v.valid := '1';
-					when 1 =>
-						v.wdata := v.dline(127 downto 64);
-						v.wstrb := X"FF";
-						v.valid := '1';
-					when 2 =>
-						v.wdata := v.dline(191 downto 128);
-						v.wstrb := X"FF";
-						v.valid := '1';
-					when 3 =>
-						v.wdata := v.dline(255 downto 192);
-						v.wstrb := X"FF";
-						v.valid := '1';
-					when others =>
-						null;
-				end case;
+					end if;
+				end loop;
 
 			when others =>
 
@@ -358,7 +338,7 @@ begin
 
 		end case;
 
-		for i in 0 to 3 loop
+		for i in 0 to 2**cache_words-1 loop
 			if v.lid = i then
 				for j in 0 to 7 loop
 					if v.strb(j) = '1' then
@@ -420,15 +400,11 @@ begin
 			v.state := INVALIDATE;
 		end if;
 
-		if v.lid = 0 then
-			v.rdata := v.cline(63 downto 0);
-		elsif v.lid = 1 then
-			v.rdata := v.cline(127 downto 64);
-		elsif v.lid = 2 then
-			v.rdata := v.cline(191 downto 128);
-		elsif v.lid = 3 then
-			v.rdata := v.cline(255 downto 192);
-		end if;
+		for i in 0 to 2**cache_words-1 loop
+			if v.lid = i then
+				v.rdata := v.cline(64*(i+1)-1 downto 64*i);
+			end if;
+		end loop;
 
 		if r_next.state = HIT then
 			v.ready := v.rden and v.hit;

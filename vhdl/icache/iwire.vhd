@@ -70,6 +70,14 @@ package iwire is
 		wid   : integer range 0 to 2**icache_ways-1;
 	end record;
 
+	type irandom_in_type is record
+		miss  : std_logic;
+	end record;
+
+	type irandom_out_type is record
+		wid   : integer range 0 to 2**icache_ways-1;
+	end record;
+
 	type tag_array is array(0 to 2**icache_ways-1) of std_logic_vector(60-(icache_sets+icache_words) downto 0);
 
 	type ihit_in_type is record
