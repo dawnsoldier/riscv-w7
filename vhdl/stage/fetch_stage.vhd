@@ -48,7 +48,7 @@ begin
 
 		v := r;
 
-		v.valid := not d.w.clear;
+		v.valid := not(d.m.fence_n or d.w.clear);
 		v.stall := pfetch_o.stall or imem_o.mem_flush or a.d.stall or a.e.stall or a.m.stall or a.w.stall or d.w.clear;
 		v.clear := csr_eo.exc or csr_eo.mret or d.w.clear;
 

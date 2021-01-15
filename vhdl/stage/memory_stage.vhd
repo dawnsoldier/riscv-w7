@@ -143,6 +143,7 @@ begin
 			v.ecall := '0';
 			v.ebreak := '0';
 			v.mret := '0';
+			v.fence := '0';
 			v.valid := '0';
 		end if;
 
@@ -179,6 +180,7 @@ begin
 		y.ecall <= v.ecall;
 		y.ebreak <= v.ebreak;
 		y.mret <= v.mret;
+		y.fence <= v.fence;
 		y.valid <= v.valid;
 		y.stall <= v.stall;
 		y.clear <= v.clear;
@@ -198,6 +200,7 @@ begin
 		y.ecall_n <= v.ecall_n;
 		y.ebreak_n <= v.ebreak_n;
 		y.mret_n <= v.mret_n;
+		y.fence_n <= v.fence_n;
 		y.valid_n <= v.valid_n;
 
 		q.pc <= r.pc;
@@ -227,6 +230,7 @@ begin
 		q.ecall <= r.ecall;
 		q.ebreak <= r.ebreak;
 		q.mret <= r.mret;
+		q.fence <= r.fence;
 		q.valid <= r.valid;
 		q.stall <= r.stall;
 		q.clear <= r.clear;
@@ -246,6 +250,7 @@ begin
 		q.ecall_n <= r.ecall_n;
 		q.ebreak_n <= r.ebreak_n;
 		q.mret_n <= r.mret_n;
+		q.fence_n <= r.fence_n;
 		q.valid_n <= r.valid_n;
 
 	end process;

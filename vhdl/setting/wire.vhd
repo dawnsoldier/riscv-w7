@@ -580,11 +580,13 @@ package wire is
 		ecall       : std_logic;
 		ebreak      : std_logic;
 		mret        : std_logic;
+		fence       : std_logic;
 		valid       : std_logic;
 		exc_n       : std_logic;
 		ecall_n     : std_logic;
 		ebreak_n    : std_logic;
 		mret_n      : std_logic;
+		fence_n     : std_logic;
 		valid_n     : std_logic;
 		stall       : std_logic;
 		clear       : std_logic;
