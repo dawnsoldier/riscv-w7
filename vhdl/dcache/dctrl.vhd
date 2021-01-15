@@ -193,11 +193,6 @@ begin
 		end loop;
 		ctrl_o.hit_i.valid <= ctrl_i.valid_o.rdata;
 
-		if (r_next.state = MISS and r_next.miss = '1') or r_next.state = INVALIDATE then
-			v.dline := ctrl_i.data_o(v.wid).rdata;
-			v.dtag := ctrl_i.tag_o(v.wid).rdata;
-		end if;
-
 		case r_next.state is
 
 			when HIT =>
@@ -237,6 +232,8 @@ begin
 					v.dirty := v.dvec(v.wid);
 					v.dvec(v.wid) := r_next.wren;
 					v.den := '1';
+					v.dline := ctrl_i.data_o(v.wid).rdata;
+					v.dtag := ctrl_i.tag_o(v.wid).rdata;
 				end if;
 
 				if mem_o.mem_ready = '1' then
@@ -283,6 +280,9 @@ begin
 				v.dvec := ctrl_i.dirty_o.rdata;
 				v.wvec := ctrl_i.valid_o.rdata;
 				v.wen := (others => '0');
+
+				v.dline := ctrl_i.data_o(v.wid).rdata;
+				v.dtag := ctrl_i.tag_o(v.wid).rdata;
 
 				if (v.dvec(v.wid) and v.wvec(v.wid)) = '1' then
 					v.addr(63 downto cache_words+3) := v.dtag & std_logic_vector(to_unsigned(v.sid,cache_sets));
