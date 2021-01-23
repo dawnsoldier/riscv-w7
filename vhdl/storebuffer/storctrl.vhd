@@ -28,22 +28,25 @@ end storctrl;
 architecture behavior of storctrl is
 
 	type reg_type is record
+		laddr   : std_logic_vector(63 downto 0);
 		addr    : std_logic_vector(63 downto 0);
 		wdata   : std_logic_vector(63 downto 0);
 		wstrb   : std_logic_vector(7 downto 0);
-		wid     : integer range 0 to 2*storbuffer_depth-1;
-		rid     : integer range 0 to 2*storbuffer_depth-1;
+		wid     : integer range 0 to 2**storbuffer_depth-1;
+		rid     : integer range 0 to 2**storbuffer_depth-1;
 		wren    : std_logic;
 		rden    : std_logic;
 		oflow   : std_logic;
 		inv     : std_logic;
+		ld      : std_logic;
 		store   : std_logic;
 		load    : std_logic;
-		stall   : std_logic;
+		flush   : std_logic;
 		invalid : std_logic;
 	end record;
 
 	constant init_reg : reg_type := (
+		laddr   => (others => '0'),
 		addr    => (others => '0'),
 		wdata   => (others => '0'),
 		wstrb   => (others => '0'),
@@ -53,9 +56,10 @@ architecture behavior of storctrl is
 		rden    => '0',
 		oflow   => '0',
 		inv     => '0',
+		ld      => '0',
 		store   => '0',
 		load    => '0',
-		stall   => '0',
+		flush   => '0',
 		invalid => '0'
 	);
 
@@ -72,19 +76,23 @@ begin
 		v := r;
 
 		v.invalid := '0';
+		v.store := '0';
+		v.load := '0';
+
 
 		if storctrl_i.mem_valid = '1' then
-			v.stall := '0';
+			v.flush := '0';
 			v.inv := storctrl_i.mem_invalid;
 			v.store := or_reduce(storctrl_i.mem_wstrb);
-			v.load := not(v.store);
+			v.ld := not(v.store);
 			v.addr := storctrl_i.mem_addr;
 			v.wdata := storctrl_i.mem_wdata;
 			v.wstrb := storctrl_i.mem_wstrb;
 			if v.inv = '1' then
-				v.stall := '1';
-			elsif v.load = '1' then
-				v.stall := '1';
+				v.flush := '1';
+			elsif v.ld = '1' then
+				v.flush := '1';
+				v.laddr := storctrl_i.mem_addr;
 			end if;
 		end if;
 
@@ -134,18 +142,25 @@ begin
 			end if;
 		end if;
 
-		if v.rid = v.wid then
+		if (v.rden or v.wren) = '0' then
 			if v.inv = '1' then
 				v.invalid := '1';
+			elsif v.ld = '1' then
+				v.load := '1';
 			end if;
 			v.inv := '0';
-			v.stall := '0';
+			v.ld := '0';
+			v.flush := '0';
 		end if;
 
 		if v.rden = '1' then
 			v.addr := storram_o.rdata(135 downto 72);
 			v.wdata := storram_o.rdata(71 downto 8);
 			v.wstrb := storram_o.rdata(7 downto 0);
+		elsif v.load = '1' then
+			v.addr := v.laddr;
+			v.wdata := (others => '0');
+			v.wstrb := (others => '0');
 		end if;
 
 		dmem_i.mem_valid <= v.rden or v.load or v.invalid;
@@ -158,9 +173,8 @@ begin
 
 		rin <= v;
 
-		storctrl_o.mem_stall <= r.stall;
-		storctrl_o.mem_flush <= dmem_o.mem_flush;
-		storctrl_o.mem_ready <= dmem_o.mem_ready;
+		storctrl_o.mem_flush <= dmem_o.mem_flush or r.flush;
+		storctrl_o.mem_ready <= dmem_o.mem_ready or r.wren;
 		storctrl_o.mem_rdata <= dmem_o.mem_rdata;
 
 	end process;
