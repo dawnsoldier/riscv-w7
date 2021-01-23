@@ -35,7 +35,7 @@ entity execute_stage is
 		fp_for_i       : out fp_for_in_type;
 		fp_exe_o       : in  fp_exe_out_type;
 		fp_exe_i       : out fp_exe_in_type;
-		dmem_i         : out mem_in_type;
+		sbuffer_i      : out storbuffer_in_type;
 		dpmp_o         : in  pmp_out_type;
 		dpmp_i         : out pmp_in_type;
 		time_irpt      : in  std_logic;
@@ -355,13 +355,13 @@ begin
 			v.stall := '0';
 		end if;
 
-		dmem_i.mem_valid <= v.load or v.fpu_load or v.store or v.fpu_store or v.fence;
-		dmem_i.mem_instr <= '0';
-		dmem_i.mem_spec <= '0';
-		dmem_i.mem_invalid <= v.fence;
-		dmem_i.mem_addr <= v.address;
-		dmem_i.mem_wdata <= store_data(v.sdata, v.store_op);
-		dmem_i.mem_wstrb <= v.strobe;
+		sbuffer_i.mem_valid <= v.load or v.fpu_load or v.store or v.fpu_store or v.fence;
+		sbuffer_i.mem_instr <= '0';
+		sbuffer_i.mem_spec <= '0';
+		sbuffer_i.mem_invalid <= v.fence;
+		sbuffer_i.mem_addr <= v.address;
+		sbuffer_i.mem_wdata <= store_data(v.sdata, v.store_op);
+		sbuffer_i.mem_wstrb <= v.strobe;
 
 		csr_ei.d_epc <= v.pc;
 		csr_ei.e_epc <= d.e.pc;

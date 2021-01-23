@@ -18,7 +18,7 @@ entity memory_stage is
 		reset     : in  std_logic;
 		clock     : in  std_logic;
 		csr_eo    : in  csr_exception_out_type;
-		dmem_o    : in  mem_out_type;
+		sbuffer_o : in  storbuffer_out_type;
 		a         : in  memory_in_type;
 		d         : in  memory_in_type;
 		y         : out memory_out_type;
@@ -33,7 +33,7 @@ architecture behavior of memory_stage is
 
 begin
 
-	combinational : process(a, d, r, csr_eo, dmem_o)
+	combinational : process(a, d, r, csr_eo, sbuffer_o)
 
 		variable v : memory_reg_type;
 
@@ -94,15 +94,15 @@ begin
 			v.valid := v.valid_n;
 		end if;
 
-		v.stall := dmem_o.mem_flush;
+		v.stall := sbuffer_o.mem_flush;
 
 		v.clear := d.w.clear;
 
 		if (v.load or v.fpu_load) = '1' then
-			v.wdata := load_data(dmem_o.mem_rdata, v.byteenable, v.load_op);
-			v.stall := not dmem_o.mem_ready;
+			v.wdata := load_data(sbuffer_o.mem_rdata, v.byteenable, v.load_op);
+			v.stall := not sbuffer_o.mem_ready;
 		elsif (v.store or v.fpu_store) = '1' then
-			v.stall := not dmem_o.mem_ready;
+			v.stall := not sbuffer_o.mem_ready;
 		end if;
 
 		if v.fpu_load = '1' then

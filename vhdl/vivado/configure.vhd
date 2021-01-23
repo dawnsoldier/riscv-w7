@@ -24,6 +24,7 @@ package configure is
 	constant ras_depth        : integer := 2;
 
 	constant pfetch_depth     : integer := 4;
+	constant storbuffer_depth : integer := 4;
 
 	constant fpu_enable       : boolean := true;
 	constant fpu_performance  : boolean := true;

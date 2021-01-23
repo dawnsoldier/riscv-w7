@@ -156,6 +156,13 @@ $ANALYS $DIR/vhdl/prefetch/prectrl.vhd
 $SYNTAX $DIR/vhdl/prefetch/prebuffer.vhd
 $ANALYS $DIR/vhdl/prefetch/prebuffer.vhd
 
+$SYNTAX $DIR/vhdl/storebuffer/storbuffer.vhd
+$ANALYS $DIR/vhdl/storebuffer/storbuffer.vhd
+$SYNTAX $DIR/vhdl/storebuffer/storctrl.vhd
+$ANALYS $DIR/vhdl/storebuffer/storctrl.vhd
+$SYNTAX $DIR/vhdl/storebuffer/storram.vhd
+$ANALYS $DIR/vhdl/storebuffer/storram.vhd
+
 $SYNTAX $DIR/vhdl/bp/bht.vhd
 $ANALYS $DIR/vhdl/bp/bht.vhd
 $SYNTAX $DIR/vhdl/bp/btb.vhd
