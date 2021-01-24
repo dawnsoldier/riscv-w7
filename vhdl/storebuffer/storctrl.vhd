@@ -28,7 +28,9 @@ end storctrl;
 architecture behavior of storctrl is
 
 	type reg_type is record
-		laddr   : std_logic_vector(63 downto 0);
+		saddr   : std_logic_vector(63 downto 0);
+		sdata   : std_logic_vector(63 downto 0);
+		sstrb   : std_logic_vector(7 downto 0);
 		addr    : std_logic_vector(63 downto 0);
 		wdata   : std_logic_vector(63 downto 0);
 		wstrb   : std_logic_vector(7 downto 0);
@@ -38,15 +40,19 @@ architecture behavior of storctrl is
 		rden    : std_logic;
 		oflow   : std_logic;
 		inv     : std_logic;
+		st      : std_logic;
 		ld      : std_logic;
 		store   : std_logic;
 		load    : std_logic;
+		full    : std_logic;
 		flush   : std_logic;
 		invalid : std_logic;
 	end record;
 
 	constant init_reg : reg_type := (
-		laddr   => (others => '0'),
+		saddr   => (others => '0'),
+		sdata   => (others => '0'),
+		sstrb   => (others => '0'),
 		addr    => (others => '0'),
 		wdata   => (others => '0'),
 		wstrb   => (others => '0'),
@@ -56,9 +62,11 @@ architecture behavior of storctrl is
 		rden    => '0',
 		oflow   => '0',
 		inv     => '0',
+		st      => '0',
 		ld      => '0',
 		store   => '0',
 		load    => '0',
+		full    => '0',
 		flush   => '0',
 		invalid => '0'
 	);
@@ -71,41 +79,71 @@ begin
 
 	variable v : reg_type;
 
+	variable ready : std_logic;
+	variable rdata : std_logic_vector(63 downto 0);
+
 	begin
 
 		v := r;
 
-		v.invalid := '0';
-		v.store := '0';
-		v.load := '0';
+		if r.wren = '1' then
+			ready := '1';
+			rdata := (others => '0');
+		elsif r.load = '1' then
+			ready := dmem_o.mem_ready;
+			rdata := dmem_o.mem_rdata;
+		else
+			ready := '0';
+			rdata := (others => '0');
+		end if;
 
+		if r.invalid = '1' then
+			v.invalid := '0';
+			v.flush := '0';
+		elsif r.load = '1' then
+			if ready = '1' then
+				v.load := '0';
+				v.flush := '0';
+			end if;
+		end if;
+
+		storctrl_o.mem_flush <= dmem_o.mem_flush or r.flush;
+		storctrl_o.mem_ready <= ready;
+		storctrl_o.mem_rdata <= rdata;
+
+		v.store := '0';
 
 		if storctrl_i.mem_valid = '1' then
 			v.flush := '0';
 			v.inv := storctrl_i.mem_invalid;
-			v.store := or_reduce(storctrl_i.mem_wstrb);
-			v.ld := not(v.store);
-			v.addr := storctrl_i.mem_addr;
-			v.wdata := storctrl_i.mem_wdata;
-			v.wstrb := storctrl_i.mem_wstrb;
+			v.st := or_reduce(storctrl_i.mem_wstrb);
+			v.ld := nor_reduce(storctrl_i.mem_wstrb);
+			v.saddr := storctrl_i.mem_addr;
+			v.sdata := storctrl_i.mem_wdata;
+			v.sstrb := storctrl_i.mem_wstrb;
 			if v.inv = '1' then
 				v.flush := '1';
 			elsif v.ld = '1' then
 				v.flush := '1';
-				v.laddr := storctrl_i.mem_addr;
+			elsif v.st = '1' then
+				v.store := '1';
 			end if;
 		end if;
 
+		if r.full = '1' and r.store = '1' then
+			v.store := '1';
+		end if;
+
+		v.wren := '0';
+		v.full := '1';
 		if v.store = '1' then
 			if v.oflow = '1' and v.wid < v.rid then
 				v.wren := '1';
+				v.full := '0';
 			elsif v.oflow = '0' then
 				v.wren := '1';
-			else
-				v.wren := '0';
+				v.full := '0';
 			end if;
-		else
-			v.wren := '0';
 		end if;
 
 		if dmem_o.mem_ready = '1' then
@@ -119,17 +157,16 @@ begin
 			end if;
 		end if;
 
+		v.rden := '0';
 		if v.oflow = '0' and v.rid < v.wid then
 			v.rden := '1';
 		elsif v.oflow = '1' then
 			v.rden := '1';
-		else
-			v.rden := '0';
 		end if;
 
 		storram_i.wren <= v.wren;
 		storram_i.waddr <= v.wid;
-		storram_i.wdata <= v.addr & v.wdata & v.wstrb;
+		storram_i.wdata <= v.saddr & v.sdata & v.sstrb;
 
 		storram_i.raddr <= v.rid;
 
@@ -149,8 +186,6 @@ begin
 				v.load := '1';
 			end if;
 			v.inv := '0';
-			v.ld := '0';
-			v.flush := '0';
 		end if;
 
 		if v.rden = '1' then
@@ -158,7 +193,7 @@ begin
 			v.wdata := storram_o.rdata(71 downto 8);
 			v.wstrb := storram_o.rdata(7 downto 0);
 		elsif v.load = '1' then
-			v.addr := v.laddr;
+			v.addr := v.saddr;
 			v.wdata := (others => '0');
 			v.wstrb := (others => '0');
 		end if;
@@ -172,10 +207,6 @@ begin
 		dmem_i.mem_wstrb <= v.wstrb;
 
 		rin <= v;
-
-		storctrl_o.mem_flush <= dmem_o.mem_flush or r.flush;
-		storctrl_o.mem_ready <= dmem_o.mem_ready or r.wren;
-		storctrl_o.mem_rdata <= dmem_o.mem_rdata;
 
 	end process;
 
