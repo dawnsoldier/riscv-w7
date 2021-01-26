@@ -79,9 +79,7 @@ begin
 
 	variable v : reg_type;
 
-	variable store   : std_logic;
-	variable load    : std_logic;
-	variable invalid : std_logic;
+	variable valid : std_logic;
 
 	variable ready : std_logic;
 	variable rdata : std_logic_vector(63 downto 0);
@@ -202,28 +200,14 @@ begin
 			v.wstrb := (others => '0');
 		end if;
 
-		store := v.rden;
-		if r.rden = '1' then
+		valid := v.rden or v.load or v.invalid;
+		if (r.rden or r.load or r.invalid) = '1' then
 			if dmem_o.mem_ready = '0' then
-				store := '0';
+				valid := '0';
 			end if;
 		end if;
 
-		load := v.load;
-		if r.load = '1' then
-			if dmem_o.mem_ready = '0' then
-				load := '0';
-			end if;
-		end if;
-
-		invalid := v.invalid;
-		if r.invalid = '1' then
-			if dmem_o.mem_ready = '0' then
-				invalid := '0';
-			end if;
-		end if;
-
-		dmem_i.mem_valid <= store or load or invalid;
+		dmem_i.mem_valid <= valid;
 		dmem_i.mem_instr <= '0';
 		dmem_i.mem_spec <= '0';
 		dmem_i.mem_invalid <= v.invalid;
