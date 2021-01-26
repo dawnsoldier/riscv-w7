@@ -407,8 +407,10 @@ begin
 			v.ready := v.rden and v.hit;
 		elsif r_next.state = UPDATE then
 			v.ready := '1';
-		elsif r_next.state = INVALIDATE and v.state = HIT then
-			v.ready := '1';
+		elsif r_next.state = INVALIDATE then
+			if v.state = HIT then
+				v.ready := '1';
+			end if;
 		else
 			v.ready := '0';
 		end if;
