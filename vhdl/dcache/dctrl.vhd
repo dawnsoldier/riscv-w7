@@ -410,6 +410,8 @@ begin
 		elsif r_next.state = INVALIDATE then
 			if v.state = HIT then
 				v.ready := '1';
+			else
+				v.ready := '0';
 			end if;
 		else
 			v.ready := '0';
