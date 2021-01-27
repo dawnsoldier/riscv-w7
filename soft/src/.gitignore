@@ -1,4 +1,6 @@
 coremark
+riscv-compliance
+riscv-tests
 !common
 !coremark_portme
 !dhrystone

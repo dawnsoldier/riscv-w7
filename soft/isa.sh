@@ -26,6 +26,20 @@ mkdir ${BASEDIR}/build/isa/dat
 mkdir ${BASEDIR}/build/isa/mif
 mkdir ${BASEDIR}/build/isa/hex
 
+if [ -d "${BASEDIR}/soft/src/riscv-tests" ]; then
+  rm -rf ${BASEDIR}/soft/src/riscv-tests
+fi
+
+git clone https://github.com/riscv/riscv-tests.git ${BASEDIR}/soft/src/riscv-tests
+
+cp -r ${BASEDIR}/soft/src/riscv-tests/isa/rv64mi/*.S ${BASEDIR}/soft/src/isa/rv64mi/
+cp -r ${BASEDIR}/soft/src/riscv-tests/isa/rv64si/*.S ${BASEDIR}/soft/src/isa/rv64si/
+cp -r ${BASEDIR}/soft/src/riscv-tests/isa/rv64ui/*.S ${BASEDIR}/soft/src/isa/rv64ui/
+cp -r ${BASEDIR}/soft/src/riscv-tests/isa/rv64uc/*.S ${BASEDIR}/soft/src/isa/rv64uc/
+cp -r ${BASEDIR}/soft/src/riscv-tests/isa/rv64um/*.S ${BASEDIR}/soft/src/isa/rv64um/
+cp -r ${BASEDIR}/soft/src/riscv-tests/isa/rv64uf/*.S ${BASEDIR}/soft/src/isa/rv64uf/
+cp -r ${BASEDIR}/soft/src/riscv-tests/isa/rv64ud/*.S ${BASEDIR}/soft/src/isa/rv64ud/
+
 make -f ${BASEDIR}/soft/src/isa/Makefile || exit
 
 shopt -s nullglob
