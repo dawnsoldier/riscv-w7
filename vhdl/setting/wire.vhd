@@ -831,7 +831,7 @@ package wire is
 		etval  : std_logic_vector(63 downto 0);
 	end record;
 
-	type prefetch_in_type is record
+	type fetchbuffer_in_type is record
 		pc    : std_logic_vector(63 downto 0);
 		npc   : std_logic_vector(63 downto 0);
 		spec  : std_logic;
@@ -841,20 +841,20 @@ package wire is
 		ready : std_logic;
 	end record;
 
-	type prefetch_out_type is record
+	type fetchbuffer_out_type is record
 		fpc   : std_logic_vector(63 downto 0);
 		instr : std_logic_vector(31 downto 0);
 		stall : std_logic;
 	end record;
 
-	type prebuffer_in_type is record
+	type fetchram_in_type is record
 		raddr : integer range 0 to 2**fetchbuffer_depth-1;
 		wren  : std_logic;
 		waddr : integer range 0 to 2**fetchbuffer_depth-1;
 		wdata : std_logic_vector(63 downto 0);
 	end record;
 
-	type prebuffer_out_type is record
+	type fetchram_out_type is record
 		rdata : std_logic_vector(31 downto 0);
 	end record;
 

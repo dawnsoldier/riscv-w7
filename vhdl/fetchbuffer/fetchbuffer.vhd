@@ -9,61 +9,61 @@ use work.configure.all;
 use work.constants.all;
 use work.wire.all;
 
-entity prefetch is
+entity fetchbuffer is
 	generic(
 		fetchbuffer_depth : integer := fetchbuffer_depth
 	);
 	port(
 		reset     : in  std_logic;
 		clock     : in  std_logic;
-		pfetch_i  : in  prefetch_in_type;
-		pfetch_o  : out prefetch_out_type
+		fbuffer_i : in  fetchbuffer_in_type;
+		fbuffer_o : out fetchbuffer_out_type
 	);
-end prefetch;
+end fetchbuffer;
 
-architecture behavior of prefetch is
+architecture behavior of fetchbuffer is
 
-	component prebuffer
+	component fetchram
 		port(
-			reset     : in  std_logic;
-			clock     : in  std_logic;
-			pbuffer_i : in  prebuffer_in_type;
-			pbuffer_o : out prebuffer_out_type
+			reset      : in  std_logic;
+			clock      : in  std_logic;
+			fetchram_i : in  fetchram_in_type;
+			fetchram_o : out fetchram_out_type
 		);
 	end component;
 
-	component prectrl
+	component fetchctrl
 		port(
-			reset     : in  std_logic;
-			clock     : in  std_logic;
-			pctrl_i   : in  prefetch_in_type;
-			pctrl_o   : out prefetch_out_type;
-			pbuffer_i : out prebuffer_in_type;
-			pbuffer_o : in  prebuffer_out_type
+			reset       : in  std_logic;
+			clock       : in  std_logic;
+			fetchctrl_i : in  fetchbuffer_in_type;
+			fetchctrl_o : out fetchbuffer_out_type;
+			fetchram_i  : out fetchram_in_type;
+			fetchram_o  : in  fetchram_out_type
 		);
 	end component;
 
-	signal pbuffer_i : prebuffer_in_type;
-	signal pbuffer_o : prebuffer_out_type;
+	signal fetchram_i : fetchram_in_type;
+	signal fetchram_o : fetchram_out_type;
 
 begin
 
-	prebuffer_comp : prebuffer
+	fetchram_comp : fetchram
 		port map(
-			reset     => reset,
-			clock     => clock,
-			pbuffer_i => pbuffer_i,
-			pbuffer_o => pbuffer_o
+			reset      => reset,
+			clock      => clock,
+			fetchram_i => fetchram_i,
+			fetchram_o => fetchram_o
 		);
 
-	prectrl_comp : prectrl
+	fetchctrl_comp : fetchctrl
 		port map(
-			reset     => reset,
-			clock     => clock,
-			pctrl_i   => pfetch_i,
-			pctrl_o   => pfetch_o,
-			pbuffer_i => pbuffer_i,
-			pbuffer_o => pbuffer_o
+			reset       => reset,
+			clock       => clock,
+			fetchctrl_i => fbuffer_i,
+			fetchctrl_o => fbuffer_o,
+			fetchram_i  => fetchram_i,
+			fetchram_o  => fetchram_o
 		);
 
 end architecture;

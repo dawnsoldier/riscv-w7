@@ -9,21 +9,21 @@ use work.configure.all;
 use work.constants.all;
 use work.wire.all;
 
-entity prectrl is
+entity fetchctrl is
 	generic(
 		fetchbuffer_depth : integer := fetchbuffer_depth
 	);
 	port(
-		reset     : in  std_logic;
-		clock     : in  std_logic;
-		pctrl_i   : in  prefetch_in_type;
-		pctrl_o   : out prefetch_out_type;
-		pbuffer_i : out prebuffer_in_type;
-		pbuffer_o : in  prebuffer_out_type
+		reset       : in  std_logic;
+		clock       : in  std_logic;
+		fetchctrl_i : in  fetchbuffer_in_type;
+		fetchctrl_o : out fetchbuffer_out_type;
+		fetchram_i  : out fetchram_in_type;
+		fetchram_o  : in  fetchram_out_type
 	);
-end prectrl;
+end fetchctrl;
 
-architecture behavior of prectrl is
+architecture behavior of fetchctrl is
 
 	type reg_type is record
 		pc     : std_logic_vector(63 downto 0);
@@ -61,7 +61,7 @@ architecture behavior of prectrl is
 
 begin
 
-	process(r,pctrl_i,pbuffer_o)
+	process(r,fetchctrl_i,fetchram_o)
 
 	variable v : reg_type;
 
@@ -74,14 +74,14 @@ begin
 		v.wrdis := '0';
 		v.wrbuf := '0';
 
-		v.pc := pctrl_i.pc;
-		v.npc := pctrl_i.npc;
+		v.pc := fetchctrl_i.pc;
+		v.npc := fetchctrl_i.npc;
 
-		if pctrl_i.fence = '1' then
+		if fetchctrl_i.fence = '1' then
 			v.fpc := v.pc(63 downto 3) & "000";
 		end if;
 
-		if pctrl_i.valid = '1' then
+		if fetchctrl_i.valid = '1' then
 			v.wid := to_integer(unsigned(v.fpc(fetchbuffer_depth downto 1)));
 			v.rid := to_integer(unsigned(v.pc(fetchbuffer_depth downto 1)));
 		end if;
@@ -99,22 +99,22 @@ begin
 			v.rden := '1';
 		end if;
 
-		if pctrl_i.ready = '1' then
+		if fetchctrl_i.ready = '1' then
 			if v.wren = '1' then
 				v.wrbuf := '1';
 				v.fpc := std_logic_vector(unsigned(v.fpc) + 8);
 			end if;
-		elsif pctrl_i.ready = '0' then
+		elsif fetchctrl_i.ready = '0' then
 			if v.wren = '1' then
 				v.wrdis := '1';
 			end if;
 		end if;
 
-		if pctrl_i.spec = '1' then
+		if fetchctrl_i.spec = '1' then
 			v.fpc := v.npc(63 downto 3) & "000";
 		end if;
 
-		pbuffer_i.raddr <= v.rid;
+		fetchram_i.raddr <= v.rid;
 
 		if v.rden = '1' then
 			if v.rid = 2**fetchbuffer_depth-1 then
@@ -122,47 +122,47 @@ begin
 					if v.wrdis = '1' then
 						v.stall := '1';
 					else
-						v.instr := pctrl_i.rdata(15 downto 0) & pbuffer_o.rdata(15 downto 0);
+						v.instr := fetchctrl_i.rdata(15 downto 0) & fetchram_o.rdata(15 downto 0);
 					end if;
 				else
-					v.instr := pbuffer_o.rdata;
+					v.instr := fetchram_o.rdata;
 				end if;
 			else
 				if v.wid = (v.rid+1) then
 					if v.wrdis = '1' then
 						v.stall := '1';
 					else
-						v.instr := pctrl_i.rdata(15 downto 0) & pbuffer_o.rdata(15 downto 0);
+						v.instr := fetchctrl_i.rdata(15 downto 0) & fetchram_o.rdata(15 downto 0);
 					end if;
 				else
-					v.instr := pbuffer_o.rdata;
+					v.instr := fetchram_o.rdata;
 				end if;
 			end if;
-		elsif pctrl_i.ready = '1' then
+		elsif fetchctrl_i.ready = '1' then
 			if v.pc(2 downto 1) = "00" then
-				v.instr := pctrl_i.rdata(31 downto 0);
+				v.instr := fetchctrl_i.rdata(31 downto 0);
 			elsif v.pc(2 downto 1) = "01" then
-				v.instr := pctrl_i.rdata(47 downto 16);
+				v.instr := fetchctrl_i.rdata(47 downto 16);
 			elsif v.pc(2 downto 1) = "10" then
-				v.instr := pctrl_i.rdata(63 downto 32);
+				v.instr := fetchctrl_i.rdata(63 downto 32);
 			elsif v.pc(2 downto 1) = "11" then
-				if and_reduce(pctrl_i.rdata(49 downto 48)) = '0' then
-					v.instr := X"0000" & pctrl_i.rdata(63 downto 48);
+				if and_reduce(fetchctrl_i.rdata(49 downto 48)) = '0' then
+					v.instr := X"0000" & fetchctrl_i.rdata(63 downto 48);
 				else
 					v.stall := '1';
 				end if;
 			end if;
-		elsif pctrl_i.ready = '0' then
+		elsif fetchctrl_i.ready = '0' then
 			v.stall := '1';
 		end if;
 
-		pctrl_o.fpc <= v.fpc;
-		pctrl_o.instr <= v.instr;
-		pctrl_o.stall <= v.stall;
+		fetchctrl_o.fpc <= v.fpc;
+		fetchctrl_o.instr <= v.instr;
+		fetchctrl_o.stall <= v.stall;
 
-		pbuffer_i.wren <= v.wrbuf;
-		pbuffer_i.waddr <= v.wid;
-		pbuffer_i.wdata <= pctrl_i.rdata;
+		fetchram_i.wren <= v.wrbuf;
+		fetchram_i.waddr <= v.wid;
+		fetchram_i.wdata <= fetchctrl_i.rdata;
 
 		rin <= v;
 

@@ -34,21 +34,21 @@ architecture behavior of pipeline is
 
 	component fetch_stage
 		port(
-			reset    : in  std_logic;
-			clock    : in  std_logic;
-			csr_eo   : in  csr_exception_out_type;
-			bp_o     : in  bp_out_type;
-			bp_i     : out bp_in_type;
-			pfetch_o : in  prefetch_out_type;
-			pfetch_i : out prefetch_in_type;
-			imem_o   : in  mem_out_type;
-			imem_i   : out mem_in_type;
-			ipmp_o   : in  pmp_out_type;
-			ipmp_i   : out pmp_in_type;
-			a        : in  fetch_in_type;
-			d        : in  fetch_in_type;
-			y        : out fetch_out_type;
-			q        : out fetch_out_type
+			reset     : in  std_logic;
+			clock     : in  std_logic;
+			csr_eo    : in  csr_exception_out_type;
+			bp_o      : in  bp_out_type;
+			bp_i      : out bp_in_type;
+			fbuffer_o : in  fetchbuffer_out_type;
+			fbuffer_i : out fetchbuffer_in_type;
+			imem_o    : in  mem_out_type;
+			imem_i    : out mem_in_type;
+			ipmp_o    : in  pmp_out_type;
+			ipmp_i    : out pmp_in_type;
+			a         : in  fetch_in_type;
+			d         : in  fetch_in_type;
+			y         : out fetch_out_type;
+			q         : out fetch_out_type
 		);
 	end component;
 
@@ -200,12 +200,12 @@ architecture behavior of pipeline is
 		);
 	end component;
 
-	component prefetch
+	component fetchbuffer
 		port(
 			reset     : in  std_logic;
 			clock     : in  std_logic;
-			pfetch_i  : in  prefetch_in_type;
-			pfetch_o  : out prefetch_out_type
+			fbuffer_i : in  fetchbuffer_in_type;
+			fbuffer_o : out fetchbuffer_out_type
   	);
   end component;
 
@@ -253,11 +253,8 @@ architecture behavior of pipeline is
 	signal ras_i : ras_in_type;
 	signal ras_o : ras_out_type;
 
-	signal pfetch_i : prefetch_in_type;
-	signal pfetch_o : prefetch_out_type;
-
-	signal pbuffer_i : prebuffer_in_type;
-	signal pbuffer_o : prebuffer_out_type;
+	signal fbuffer_i : fetchbuffer_in_type;
+	signal fbuffer_o : fetchbuffer_out_type;
 
 	signal sbuffer_i : storebuffer_in_type;
 	signal sbuffer_o : storebuffer_out_type;
@@ -266,29 +263,29 @@ begin
 
 	fetch_stage_comp : fetch_stage
 		port map(
-			reset    => reset,
-			clock    => clock,
-			csr_eo   => csr_unit_o.csr_eo,
-			bp_o     => bp_o,
-			bp_i     => bp_i,
-			pfetch_o => pfetch_o,
-			pfetch_i => pfetch_i,
-			imem_o   => imem_o,
-			imem_i   => imem_i,
-			ipmp_o   => ipmp_o,
-			ipmp_i   => ipmp_i,
-			a.f      => fetch_y,
-			a.d      => decode_y,
-			a.e      => execute_y,
-			a.m      => memory_y,
-			a.w      => writeback_y,
-			d.f      => fetch_q,
-			d.d      => decode_q,
-			d.e      => execute_q,
-			d.m      => memory_q,
-			d.w      => writeback_q,
-			y        => fetch_y,
-			q        => fetch_q
+			reset     => reset,
+			clock     => clock,
+			csr_eo    => csr_unit_o.csr_eo,
+			bp_o      => bp_o,
+			bp_i      => bp_i,
+			fbuffer_o => fbuffer_o,
+			fbuffer_i => fbuffer_i,
+			imem_o    => imem_o,
+			imem_i    => imem_i,
+			ipmp_o    => ipmp_o,
+			ipmp_i    => ipmp_i,
+			a.f       => fetch_y,
+			a.d       => decode_y,
+			a.e       => execute_y,
+			a.m       => memory_y,
+			a.w       => writeback_y,
+			d.f       => fetch_q,
+			d.d       => decode_q,
+			d.e       => execute_q,
+			d.m       => memory_q,
+			d.w       => writeback_q,
+			y         => fetch_y,
+			q         => fetch_q
 		);
 
 	decode_stage_comp : decode_stage
@@ -460,12 +457,12 @@ begin
 			ras_o => ras_o
 		);
 
-	prefetch_comp : prefetch
+	fetchbuffer_comp : fetchbuffer
 		port map(
-			reset    => reset,
-			clock    => clock,
-			pfetch_i => pfetch_i,
-			pfetch_o => pfetch_o
+			reset     => reset,
+			clock     => clock,
+			fbuffer_i => fbuffer_i,
+			fbuffer_o => fbuffer_o
 		);
 
 	storebuffer_comp : storebuffer

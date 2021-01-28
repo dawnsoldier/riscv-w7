@@ -15,21 +15,21 @@ use work.fp_wire.all;
 
 entity fetch_stage is
 	port(
-		reset    : in  std_logic;
-		clock    : in  std_logic;
-		csr_eo   : in  csr_exception_out_type;
-		bp_o     : in  bp_out_type;
-		bp_i     : out bp_in_type;
-		pfetch_o : in  prefetch_out_type;
-		pfetch_i : out prefetch_in_type;
-		imem_o   : in  mem_out_type;
-		imem_i   : out mem_in_type;
-		ipmp_o   : in  pmp_out_type;
-		ipmp_i   : out pmp_in_type;
-		a        : in  fetch_in_type;
-		d        : in  fetch_in_type;
-		y        : out fetch_out_type;
-		q        : out fetch_out_type
+		reset     : in  std_logic;
+		clock     : in  std_logic;
+		csr_eo    : in  csr_exception_out_type;
+		bp_o      : in  bp_out_type;
+		bp_i      : out bp_in_type;
+		fbuffer_o : in  fetchbuffer_out_type;
+		fbuffer_i : out fetchbuffer_in_type;
+		imem_o    : in  mem_out_type;
+		imem_i    : out mem_in_type;
+		ipmp_o    : in  pmp_out_type;
+		ipmp_i    : out pmp_in_type;
+		a         : in  fetch_in_type;
+		d         : in  fetch_in_type;
+		y         : out fetch_out_type;
+		q         : out fetch_out_type
 	);
 end fetch_stage;
 
@@ -40,7 +40,7 @@ architecture behavior of fetch_stage is
 
 begin
 
-	combinational : process(a, d, r, csr_eo, bp_o, pfetch_o, imem_o, ipmp_o)
+	combinational : process(a, d, r, csr_eo, bp_o, fbuffer_o, imem_o, ipmp_o)
 
 		variable v : fetch_reg_type;
 
@@ -49,10 +49,10 @@ begin
 		v := r;
 
 		v.valid := not(d.m.fence_n or d.w.clear);
-		v.stall := pfetch_o.stall or imem_o.mem_flush or a.d.stall or a.e.stall or a.m.stall or a.w.stall or d.w.clear;
+		v.stall := fbuffer_o.stall or imem_o.mem_flush or a.d.stall or a.e.stall or a.m.stall or a.w.stall or d.w.clear;
 		v.clear := csr_eo.exc or csr_eo.mret or d.w.clear;
 
-		v.instr := pfetch_o.instr;
+		v.instr := fbuffer_o.instr;
 
 		if and_reduce(v.instr(1 downto 0)) = '0' then
 			v.inc := "010";
@@ -115,13 +115,13 @@ begin
 			v.spec := '0';
 		end if;
 
-		pfetch_i.pc <= r.pc;
-		pfetch_i.npc <= v.pc;
-		pfetch_i.spec <= v.spec;
-		pfetch_i.fence <= d.d.fence;
-		pfetch_i.valid <= v.valid;
-		pfetch_i.rdata <= imem_o.mem_rdata;
-		pfetch_i.ready <= imem_o.mem_ready;
+		fbuffer_i.pc <= r.pc;
+		fbuffer_i.npc <= v.pc;
+		fbuffer_i.spec <= v.spec;
+		fbuffer_i.fence <= d.d.fence;
+		fbuffer_i.valid <= v.valid;
+		fbuffer_i.rdata <= imem_o.mem_rdata;
+		fbuffer_i.ready <= imem_o.mem_ready;
 
 		ipmp_i.mem_valid <= v.valid;
 		ipmp_i.mem_instr <= '1';
@@ -143,7 +143,7 @@ begin
 		imem_i.mem_instr <= '1';
 		imem_i.mem_spec <= v.spec;
 		imem_i.mem_invalid <= a.d.fence;
-		imem_i.mem_addr <= pfetch_o.fpc;
+		imem_i.mem_addr <= fbuffer_o.fpc;
 		imem_i.mem_wdata <= (others => '0');
 		imem_i.mem_wstrb <= (others => '0');
 

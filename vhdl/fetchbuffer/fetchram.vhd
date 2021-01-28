@@ -9,34 +9,34 @@ use work.configure.all;
 use work.constants.all;
 use work.wire.all;
 
-entity prebuffer is
+entity fetchram is
 	generic(
 		fetchbuffer_depth : integer := fetchbuffer_depth
 	);
 	port(
-		reset     : in  std_logic;
-		clock     : in  std_logic;
-		pbuffer_i : in  prebuffer_in_type;
-		pbuffer_o : out prebuffer_out_type
+		reset      : in  std_logic;
+		clock      : in  std_logic;
+		fetchram_i : in  fetchram_in_type;
+		fetchram_o : out fetchram_out_type
 	);
-end prebuffer;
+end fetchram;
 
-architecture behavior of prebuffer is
+architecture behavior of fetchram is
 
-	type buffer_type is array (0 to 2**fetchbuffer_depth-1) of std_logic_vector(15 downto 0);
+	type ram_type is array (0 to 2**fetchbuffer_depth-1) of std_logic_vector(15 downto 0);
 
-	signal pbuffer : buffer_type := (others => (others => '0'));
+	signal fetch_ram : ram_type := (others => (others => '0'));
 
 begin
 
-  process(pbuffer_i,pbuffer)
+  process(fetchram_i,fetch_ram)
 
   begin
 
-    if pbuffer_i.raddr = 2**fetchbuffer_depth-1 then
-      pbuffer_o.rdata <= pbuffer(0) & pbuffer(pbuffer_i.raddr);
+    if fetchram_i.raddr = 2**fetchbuffer_depth-1 then
+      fetchram_o.rdata <= fetch_ram(0) & fetch_ram(fetchram_i.raddr);
     else
-      pbuffer_o.rdata <= pbuffer(pbuffer_i.raddr+1) & pbuffer(pbuffer_i.raddr);
+      fetchram_o.rdata <= fetch_ram(fetchram_i.raddr+1) & fetch_ram(fetchram_i.raddr);
     end if;
 
   end process;
@@ -47,11 +47,11 @@ begin
 
     if rising_edge(clock) then
 
-      if pbuffer_i.wren = '1' then
-        pbuffer(pbuffer_i.waddr) <= pbuffer_i.wdata(15 downto 0);
-        pbuffer(pbuffer_i.waddr+1) <= pbuffer_i.wdata(31 downto 16);
-        pbuffer(pbuffer_i.waddr+2) <= pbuffer_i.wdata(47 downto 32);
-        pbuffer(pbuffer_i.waddr+3) <= pbuffer_i.wdata(63 downto 48);
+      if fetchram_i.wren = '1' then
+        fetch_ram(fetchram_i.waddr) <= fetchram_i.wdata(15 downto 0);
+        fetch_ram(fetchram_i.waddr+1) <= fetchram_i.wdata(31 downto 16);
+        fetch_ram(fetchram_i.waddr+2) <= fetchram_i.wdata(47 downto 32);
+        fetch_ram(fetchram_i.waddr+3) <= fetchram_i.wdata(63 downto 48);
       end if;
 
     end if;
