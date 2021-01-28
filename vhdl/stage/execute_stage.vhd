@@ -35,7 +35,7 @@ entity execute_stage is
 		fp_for_i       : out fp_for_in_type;
 		fp_exe_o       : in  fp_exe_out_type;
 		fp_exe_i       : out fp_exe_in_type;
-		sbuffer_i      : out storbuffer_in_type;
+		sbuffer_i      : out storebuffer_in_type;
 		dpmp_o         : in  pmp_out_type;
 		dpmp_i         : out pmp_in_type;
 		time_irpt      : in  std_logic;

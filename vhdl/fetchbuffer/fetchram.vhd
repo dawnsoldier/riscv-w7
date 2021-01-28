@@ -11,7 +11,7 @@ use work.wire.all;
 
 entity prebuffer is
 	generic(
-		pfetch_depth : integer := pfetch_depth
+		fetchbuffer_depth : integer := fetchbuffer_depth
 	);
 	port(
 		reset     : in  std_logic;
@@ -23,7 +23,7 @@ end prebuffer;
 
 architecture behavior of prebuffer is
 
-	type buffer_type is array (0 to 2**pfetch_depth-1) of std_logic_vector(15 downto 0);
+	type buffer_type is array (0 to 2**fetchbuffer_depth-1) of std_logic_vector(15 downto 0);
 
 	signal pbuffer : buffer_type := (others => (others => '0'));
 
@@ -33,7 +33,7 @@ begin
 
   begin
 
-    if pbuffer_i.raddr = 2**pfetch_depth-1 then
+    if pbuffer_i.raddr = 2**fetchbuffer_depth-1 then
       pbuffer_o.rdata <= pbuffer(0) & pbuffer(pbuffer_i.raddr);
     else
       pbuffer_o.rdata <= pbuffer(pbuffer_i.raddr+1) & pbuffer(pbuffer_i.raddr);

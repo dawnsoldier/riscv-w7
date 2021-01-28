@@ -11,7 +11,7 @@ use work.wire.all;
 
 entity prefetch is
 	generic(
-		pfetch_depth : integer := pfetch_depth
+		fetchbuffer_depth : integer := fetchbuffer_depth
 	);
 	port(
 		reset     : in  std_logic;

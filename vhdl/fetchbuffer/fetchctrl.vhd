@@ -11,7 +11,7 @@ use work.wire.all;
 
 entity prectrl is
 	generic(
-		pfetch_depth : integer := pfetch_depth
+		fetchbuffer_depth : integer := fetchbuffer_depth
 	);
 	port(
 		reset     : in  std_logic;
@@ -36,8 +36,8 @@ architecture behavior of prectrl is
 		wrbuf  : std_logic;
 		equal  : std_logic;
 		full   : std_logic;
-		wid    : natural range 0 to 2**pfetch_depth-1;
-		rid    : natural range 0 to 2**pfetch_depth-1;
+		wid    : natural range 0 to 2**fetchbuffer_depth-1;
+		rid    : natural range 0 to 2**fetchbuffer_depth-1;
 		stall  : std_logic;
 	end record;
 
@@ -82,12 +82,12 @@ begin
 		end if;
 
 		if pctrl_i.valid = '1' then
-			v.wid := to_integer(unsigned(v.fpc(pfetch_depth downto 1)));
-			v.rid := to_integer(unsigned(v.pc(pfetch_depth downto 1)));
+			v.wid := to_integer(unsigned(v.fpc(fetchbuffer_depth downto 1)));
+			v.rid := to_integer(unsigned(v.pc(fetchbuffer_depth downto 1)));
 		end if;
 
 		v.equal := nor_reduce(v.fpc(63 downto 3) xor v.pc(63 downto 3));
-		v.full := nor_reduce(v.fpc(pfetch_depth downto 3) xor v.pc(pfetch_depth downto 3));
+		v.full := nor_reduce(v.fpc(fetchbuffer_depth downto 3) xor v.pc(fetchbuffer_depth downto 3));
 
 		if v.equal = '1' then
 			v.wren := '1';
@@ -117,7 +117,7 @@ begin
 		pbuffer_i.raddr <= v.rid;
 
 		if v.rden = '1' then
-			if v.rid = 2**pfetch_depth-1 then
+			if v.rid = 2**fetchbuffer_depth-1 then
 				if (v.wid = 0) then
 					if v.wrdis = '1' then
 						v.stall := '1';

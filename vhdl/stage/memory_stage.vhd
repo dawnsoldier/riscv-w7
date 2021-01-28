@@ -18,7 +18,7 @@ entity memory_stage is
 		reset     : in  std_logic;
 		clock     : in  std_logic;
 		csr_eo    : in  csr_exception_out_type;
-		sbuffer_o : in  storbuffer_out_type;
+		sbuffer_o : in  storebuffer_out_type;
 		a         : in  memory_in_type;
 		d         : in  memory_in_type;
 		y         : out memory_out_type;

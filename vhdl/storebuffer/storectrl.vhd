@@ -9,23 +9,23 @@ use work.configure.all;
 use work.constants.all;
 use work.wire.all;
 
-entity storctrl is
+entity storectrl is
 	generic(
-		storbuffer_depth : integer := storbuffer_depth
+		storebuffer_depth : integer := storebuffer_depth
 	);
 	port(
-		reset      : in  std_logic;
-		clock      : in  std_logic;
-		storctrl_i : in  storbuffer_in_type;
-		storctrl_o : out storbuffer_out_type;
-		storram_i  : out storram_in_type;
-		storram_o  : in  storram_out_type;
-		dmem_o     : in  mem_out_type;
-		dmem_i     : out mem_in_type
+		reset       : in  std_logic;
+		clock       : in  std_logic;
+		storectrl_i : in  storebuffer_in_type;
+		storectrl_o : out storebuffer_out_type;
+		storeram_i  : out storeram_in_type;
+		storeram_o  : in  storeram_out_type;
+		dmem_o      : in  mem_out_type;
+		dmem_i      : out mem_in_type
 	);
-end storctrl;
+end storectrl;
 
-architecture behavior of storctrl is
+architecture behavior of storectrl is
 
 	type reg_type is record
 		saddr   : std_logic_vector(63 downto 0);
@@ -34,8 +34,8 @@ architecture behavior of storctrl is
 		addr    : std_logic_vector(63 downto 0);
 		wdata   : std_logic_vector(63 downto 0);
 		wstrb   : std_logic_vector(7 downto 0);
-		wid     : integer range 0 to 2**storbuffer_depth-1;
-		rid     : integer range 0 to 2**storbuffer_depth-1;
+		wid     : integer range 0 to 2**storebuffer_depth-1;
+		rid     : integer range 0 to 2**storebuffer_depth-1;
 		wren    : std_logic;
 		rden    : std_logic;
 		oflow   : std_logic;
@@ -75,7 +75,7 @@ architecture behavior of storctrl is
 
 begin
 
-	process(r,storctrl_i,storram_o,dmem_o)
+	process(r,storectrl_i,storeram_o,dmem_o)
 
 	variable v : reg_type;
 
@@ -109,20 +109,20 @@ begin
 			end if;
 		end if;
 
-		storctrl_o.mem_flush <= dmem_o.mem_flush or r.flush;
-		storctrl_o.mem_ready <= ready;
-		storctrl_o.mem_rdata <= rdata;
+		storectrl_o.mem_flush <= dmem_o.mem_flush or r.flush;
+		storectrl_o.mem_ready <= ready;
+		storectrl_o.mem_rdata <= rdata;
 
 		v.store := '0';
 
-		if storctrl_i.mem_valid = '1' then
+		if storectrl_i.mem_valid = '1' then
 			v.flush := '0';
-			v.inv := storctrl_i.mem_invalid;
-			v.st := or_reduce(storctrl_i.mem_wstrb);
-			v.ld := nor_reduce(storctrl_i.mem_wstrb);
-			v.saddr := storctrl_i.mem_addr;
-			v.sdata := storctrl_i.mem_wdata;
-			v.sstrb := storctrl_i.mem_wstrb;
+			v.inv := storectrl_i.mem_invalid;
+			v.st := or_reduce(storectrl_i.mem_wstrb);
+			v.ld := nor_reduce(storectrl_i.mem_wstrb);
+			v.saddr := storectrl_i.mem_addr;
+			v.sdata := storectrl_i.mem_wdata;
+			v.sstrb := storectrl_i.mem_wstrb;
 			if v.inv = '1' then
 				v.flush := '1';
 			elsif v.ld = '1' then
@@ -150,7 +150,7 @@ begin
 
 		if dmem_o.mem_ready = '1' then
 			if v.rden = '1' then
-				if v.rid = 2**storbuffer_depth-1 then
+				if v.rid = 2**storebuffer_depth-1 then
 					v.oflow := '0';
 					v.rid := 0;
 				else
@@ -166,14 +166,14 @@ begin
 			v.rden := '1';
 		end if;
 
-		storram_i.wren <= v.wren;
-		storram_i.waddr <= v.wid;
-		storram_i.wdata <= v.saddr & v.sdata & v.sstrb;
+		storeram_i.wren <= v.wren;
+		storeram_i.waddr <= v.wid;
+		storeram_i.wdata <= v.saddr & v.sdata & v.sstrb;
 
-		storram_i.raddr <= v.rid;
+		storeram_i.raddr <= v.rid;
 
 		if v.wren = '1' then
-			if v.wid = 2**storbuffer_depth-1 then
+			if v.wid = 2**storebuffer_depth-1 then
 				v.oflow := '1';
 				v.wid := 0;
 			else
@@ -191,9 +191,9 @@ begin
 		end if;
 
 		if v.rden = '1' then
-			v.addr := storram_o.rdata(135 downto 72);
-			v.wdata := storram_o.rdata(71 downto 8);
-			v.wstrb := storram_o.rdata(7 downto 0);
+			v.addr := storeram_o.rdata(135 downto 72);
+			v.wdata := storeram_o.rdata(71 downto 8);
+			v.wstrb := storeram_o.rdata(7 downto 0);
 		elsif v.load = '1' then
 			v.addr := v.saddr;
 			v.wdata := (others => '0');

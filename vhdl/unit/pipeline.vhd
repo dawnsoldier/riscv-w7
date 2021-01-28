@@ -92,7 +92,7 @@ architecture behavior of pipeline is
 			fp_for_i       : out fp_for_in_type;
 			fp_exe_o       : in  fp_exe_out_type;
 			fp_exe_i       : out fp_exe_in_type;
-			sbuffer_i      : out storbuffer_in_type;
+			sbuffer_i      : out storebuffer_in_type;
 			dpmp_o         : in  pmp_out_type;
 			dpmp_i         : out pmp_in_type;
 			time_irpt      : in  std_logic;
@@ -109,7 +109,7 @@ architecture behavior of pipeline is
 			reset     : in  std_logic;
 			clock     : in  std_logic;
 			csr_eo    : in  csr_exception_out_type;
-			sbuffer_o : in  storbuffer_out_type;
+			sbuffer_o : in  storebuffer_out_type;
 			a         : in  memory_in_type;
 			d         : in  memory_in_type;
 			y         : out memory_out_type;
@@ -209,12 +209,12 @@ architecture behavior of pipeline is
   	);
   end component;
 
-	component storbuffer
+	component storebuffer
 		port(
 			reset     : in  std_logic;
 			clock     : in  std_logic;
-			sbuffer_i : in  storbuffer_in_type;
-			sbuffer_o : out storbuffer_out_type;
+			sbuffer_i : in  storebuffer_in_type;
+			sbuffer_o : out storebuffer_out_type;
 			dmem_o    : in  mem_out_type;
 			dmem_i    : out mem_in_type
 		);
@@ -259,8 +259,8 @@ architecture behavior of pipeline is
 	signal pbuffer_i : prebuffer_in_type;
 	signal pbuffer_o : prebuffer_out_type;
 
-	signal sbuffer_i : storbuffer_in_type;
-	signal sbuffer_o : storbuffer_out_type;
+	signal sbuffer_i : storebuffer_in_type;
+	signal sbuffer_o : storebuffer_out_type;
 
 begin
 
@@ -462,20 +462,20 @@ begin
 
 	prefetch_comp : prefetch
 		port map(
-			reset     => reset,
-			clock     => clock,
-			pfetch_i  => pfetch_i,
-			pfetch_o  => pfetch_o
+			reset    => reset,
+			clock    => clock,
+			pfetch_i => pfetch_i,
+			pfetch_o => pfetch_o
 		);
 
-	storbuffer_comp : storbuffer
+	storebuffer_comp : storebuffer
 		port map(
-			reset        => reset,
-			clock        => clock,
-			sbuffer_i    => sbuffer_i,
-			sbuffer_o    => sbuffer_o,
-			dmem_o       => dmem_o,
-			dmem_i       => dmem_i
+			reset     => reset,
+			clock     => clock,
+			sbuffer_i => sbuffer_i,
+			sbuffer_o => sbuffer_o,
+			dmem_o    => dmem_o,
+			dmem_i    => dmem_i
 		);
 
 end architecture;

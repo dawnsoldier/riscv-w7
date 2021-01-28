@@ -149,19 +149,19 @@ $ANALYS $DIR/vhdl/dcache/dctrl.vhd
 $SYNTAX $DIR/vhdl/dcache/dcache.vhd
 $ANALYS $DIR/vhdl/dcache/dcache.vhd
 
-$SYNTAX $DIR/vhdl/prefetch/prefetch.vhd
-$ANALYS $DIR/vhdl/prefetch/prefetch.vhd
-$SYNTAX $DIR/vhdl/prefetch/prectrl.vhd
-$ANALYS $DIR/vhdl/prefetch/prectrl.vhd
-$SYNTAX $DIR/vhdl/prefetch/prebuffer.vhd
-$ANALYS $DIR/vhdl/prefetch/prebuffer.vhd
+$SYNTAX $DIR/vhdl/fetchbuffer/fetchram.vhd
+$ANALYS $DIR/vhdl/fetchbuffer/fetchram.vhd
+$SYNTAX $DIR/vhdl/fetchbuffer/fetchctrl.vhd
+$ANALYS $DIR/vhdl/fetchbuffer/fetchctrl.vhd
+$SYNTAX $DIR/vhdl/fetchbuffer/fetchbuffer.vhd
+$ANALYS $DIR/vhdl/fetchbuffer/fetchbuffer.vhd
 
-$SYNTAX $DIR/vhdl/storebuffer/storbuffer.vhd
-$ANALYS $DIR/vhdl/storebuffer/storbuffer.vhd
-$SYNTAX $DIR/vhdl/storebuffer/storctrl.vhd
-$ANALYS $DIR/vhdl/storebuffer/storctrl.vhd
-$SYNTAX $DIR/vhdl/storebuffer/storram.vhd
-$ANALYS $DIR/vhdl/storebuffer/storram.vhd
+$SYNTAX $DIR/vhdl/storebuffer/storebuffer.vhd
+$ANALYS $DIR/vhdl/storebuffer/storebuffer.vhd
+$SYNTAX $DIR/vhdl/storebuffer/storectrl.vhd
+$ANALYS $DIR/vhdl/storebuffer/storectrl.vhd
+$SYNTAX $DIR/vhdl/storebuffer/storeram.vhd
+$ANALYS $DIR/vhdl/storebuffer/storeram.vhd
 
 $SYNTAX $DIR/vhdl/bp/bht.vhd
 $ANALYS $DIR/vhdl/bp/bht.vhd

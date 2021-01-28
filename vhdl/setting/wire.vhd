@@ -848,9 +848,9 @@ package wire is
 	end record;
 
 	type prebuffer_in_type is record
-		raddr : integer range 0 to 2**pfetch_depth-1;
+		raddr : integer range 0 to 2**fetchbuffer_depth-1;
 		wren  : std_logic;
-		waddr : integer range 0 to 2**pfetch_depth-1;
+		waddr : integer range 0 to 2**fetchbuffer_depth-1;
 		wdata : std_logic_vector(63 downto 0);
 	end record;
 
@@ -858,7 +858,7 @@ package wire is
 		rdata : std_logic_vector(31 downto 0);
 	end record;
 
-	type storbuffer_in_type is record
+	type storebuffer_in_type is record
 		mem_valid   : std_logic;
 		mem_instr   : std_logic;
 		mem_spec    : std_logic;
@@ -868,20 +868,20 @@ package wire is
 		mem_wstrb   : std_logic_vector(7 downto 0);
 	end record;
 
-	type storbuffer_out_type is record
+	type storebuffer_out_type is record
 		mem_flush : std_logic;
 		mem_ready : std_logic;
 		mem_rdata : std_logic_vector(63 downto 0);
 	end record;
 
-	type storram_in_type is record
-		raddr : integer range 0 to 2**storbuffer_depth-1;
+	type storeram_in_type is record
+		raddr : integer range 0 to 2**storebuffer_depth-1;
 		wren  : std_logic;
-		waddr : integer range 0 to 2**storbuffer_depth-1;
+		waddr : integer range 0 to 2**storebuffer_depth-1;
 		wdata : std_logic_vector(135 downto 0);
 	end record;
 
-	type storram_out_type is record
+	type storeram_out_type is record
 		rdata : std_logic_vector(135 downto 0);
 	end record;
 
