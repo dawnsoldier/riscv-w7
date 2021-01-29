@@ -41,8 +41,6 @@ architecture behavior of pipeline is
 			bp_i      : out bp_in_type;
 			fbuffer_o : in  fetchbuffer_out_type;
 			fbuffer_i : out fetchbuffer_in_type;
-			imem_o    : in  mem_out_type;
-			imem_i    : out mem_in_type;
 			ipmp_o    : in  pmp_out_type;
 			ipmp_i    : out pmp_in_type;
 			a         : in  fetch_in_type;
@@ -205,7 +203,9 @@ architecture behavior of pipeline is
 			reset     : in  std_logic;
 			clock     : in  std_logic;
 			fbuffer_i : in  fetchbuffer_in_type;
-			fbuffer_o : out fetchbuffer_out_type
+			fbuffer_o : out fetchbuffer_out_type;
+			imem_o    : in  mem_out_type;
+			imem_i    : out mem_in_type
   	);
   end component;
 
@@ -270,8 +270,6 @@ begin
 			bp_i      => bp_i,
 			fbuffer_o => fbuffer_o,
 			fbuffer_i => fbuffer_i,
-			imem_o    => imem_o,
-			imem_i    => imem_i,
 			ipmp_o    => ipmp_o,
 			ipmp_i    => ipmp_i,
 			a.f       => fetch_y,
@@ -462,7 +460,9 @@ begin
 			reset     => reset,
 			clock     => clock,
 			fbuffer_i => fbuffer_i,
-			fbuffer_o => fbuffer_o
+			fbuffer_o => fbuffer_o,
+			imem_o    => imem_o,
+			imem_i    => imem_i
 		);
 
 	storebuffer_comp : storebuffer

@@ -51,7 +51,7 @@ begin
 		v.fpu_op := init_fp_operation;
 
 		v.pc := d.f.pc;
-		v.instr := d.f.instr;
+		v.instr := a.f.instr;
 		v.taken := d.f.taken;
 		v.exc := d.f.exc;
 		v.etval := d.f.etval;

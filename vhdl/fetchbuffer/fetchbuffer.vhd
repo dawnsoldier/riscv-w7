@@ -17,7 +17,9 @@ entity fetchbuffer is
 		reset     : in  std_logic;
 		clock     : in  std_logic;
 		fbuffer_i : in  fetchbuffer_in_type;
-		fbuffer_o : out fetchbuffer_out_type
+		fbuffer_o : out fetchbuffer_out_type;
+		imem_o    : in  mem_out_type;
+		imem_i    : out mem_in_type
 	);
 end fetchbuffer;
 
@@ -39,7 +41,9 @@ architecture behavior of fetchbuffer is
 			fetchctrl_i : in  fetchbuffer_in_type;
 			fetchctrl_o : out fetchbuffer_out_type;
 			fetchram_i  : out fetchram_in_type;
-			fetchram_o  : in  fetchram_out_type
+			fetchram_o  : in  fetchram_out_type;
+			imem_o      : in  mem_out_type;
+			imem_i      : out mem_in_type
 		);
 	end component;
 
@@ -63,7 +67,9 @@ begin
 			fetchctrl_i => fbuffer_i,
 			fetchctrl_o => fbuffer_o,
 			fetchram_i  => fetchram_i,
-			fetchram_o  => fetchram_o
+			fetchram_o  => fetchram_o,
+			imem_o      => imem_o,
+			imem_i      => imem_i
 		);
 
 end architecture;

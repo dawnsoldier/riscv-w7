@@ -837,14 +837,13 @@ package wire is
 		spec  : std_logic;
 		fence : std_logic;
 		valid : std_logic;
-		rdata : std_logic_vector(63 downto 0);
-		ready : std_logic;
 	end record;
 
 	type fetchbuffer_out_type is record
 		fpc   : std_logic_vector(63 downto 0);
 		instr : std_logic_vector(31 downto 0);
 		stall : std_logic;
+		flush : std_logic;
 	end record;
 
 	type fetchram_in_type is record

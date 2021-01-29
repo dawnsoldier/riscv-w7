@@ -19,7 +19,9 @@ entity fetchctrl is
 		fetchctrl_i : in  fetchbuffer_in_type;
 		fetchctrl_o : out fetchbuffer_out_type;
 		fetchram_i  : out fetchram_in_type;
-		fetchram_o  : in  fetchram_out_type
+		fetchram_o  : in  fetchram_out_type;
+		imem_o      : in  mem_out_type;
+		imem_i      : out mem_in_type
 	);
 end fetchctrl;
 
@@ -61,7 +63,7 @@ architecture behavior of fetchctrl is
 
 begin
 
-	process(r,fetchctrl_i,fetchram_o)
+	process(r,fetchctrl_i,fetchram_o,imem_o)
 
 	variable v : reg_type;
 
@@ -99,12 +101,12 @@ begin
 			v.rden := '1';
 		end if;
 
-		if fetchctrl_i.ready = '1' then
+		if imem_o.mem_ready = '1' then
 			if v.wren = '1' then
 				v.wrbuf := '1';
 				v.fpc := std_logic_vector(unsigned(v.fpc) + 8);
 			end if;
-		elsif fetchctrl_i.ready = '0' then
+		elsif imem_o.mem_ready = '0' then
 			if v.wren = '1' then
 				v.wrdis := '1';
 			end if;
@@ -122,7 +124,7 @@ begin
 					if v.wrdis = '1' then
 						v.stall := '1';
 					else
-						v.instr := fetchctrl_i.rdata(15 downto 0) & fetchram_o.rdata(15 downto 0);
+						v.instr := imem_o.mem_rdata(15 downto 0) & fetchram_o.rdata(15 downto 0);
 					end if;
 				else
 					v.instr := fetchram_o.rdata;
@@ -132,37 +134,45 @@ begin
 					if v.wrdis = '1' then
 						v.stall := '1';
 					else
-						v.instr := fetchctrl_i.rdata(15 downto 0) & fetchram_o.rdata(15 downto 0);
+						v.instr := imem_o.mem_rdata(15 downto 0) & fetchram_o.rdata(15 downto 0);
 					end if;
 				else
 					v.instr := fetchram_o.rdata;
 				end if;
 			end if;
-		elsif fetchctrl_i.ready = '1' then
+		elsif imem_o.mem_ready = '1' then
 			if v.pc(2 downto 1) = "00" then
-				v.instr := fetchctrl_i.rdata(31 downto 0);
+				v.instr := imem_o.mem_rdata(31 downto 0);
 			elsif v.pc(2 downto 1) = "01" then
-				v.instr := fetchctrl_i.rdata(47 downto 16);
+				v.instr := imem_o.mem_rdata(47 downto 16);
 			elsif v.pc(2 downto 1) = "10" then
-				v.instr := fetchctrl_i.rdata(63 downto 32);
+				v.instr := imem_o.mem_rdata(63 downto 32);
 			elsif v.pc(2 downto 1) = "11" then
-				if and_reduce(fetchctrl_i.rdata(49 downto 48)) = '0' then
-					v.instr := X"0000" & fetchctrl_i.rdata(63 downto 48);
+				if and_reduce(imem_o.mem_rdata(49 downto 48)) = '0' then
+					v.instr := X"0000" & imem_o.mem_rdata(63 downto 48);
 				else
 					v.stall := '1';
 				end if;
 			end if;
-		elsif fetchctrl_i.ready = '0' then
+		elsif imem_o.mem_ready = '0' then
 			v.stall := '1';
 		end if;
 
-		fetchctrl_o.fpc <= v.fpc;
 		fetchctrl_o.instr <= v.instr;
 		fetchctrl_o.stall <= v.stall;
+		fetchctrl_o.flush <= imem_o.mem_flush;
+
+		imem_i.mem_valid <= fetchctrl_i.valid;
+		imem_i.mem_instr <= '1';
+		imem_i.mem_spec <= fetchctrl_i.spec;
+		imem_i.mem_invalid <= fetchctrl_i.fence;
+		imem_i.mem_addr <= v.fpc;
+		imem_i.mem_wdata <= (others => '0');
+		imem_i.mem_wstrb <= (others => '0');
 
 		fetchram_i.wren <= v.wrbuf;
 		fetchram_i.waddr <= v.wid;
-		fetchram_i.wdata <= fetchctrl_i.rdata;
+		fetchram_i.wdata <= imem_o.mem_rdata;
 
 		rin <= v;
 
