@@ -45,7 +45,6 @@ architecture behavior of storectrl is
 		store   : std_logic;
 		load    : std_logic;
 		full    : std_logic;
-		flush   : std_logic;
 		invalid : std_logic;
 	end record;
 
@@ -67,7 +66,6 @@ architecture behavior of storectrl is
 		store   => '0',
 		load    => '0',
 		full    => '0',
-		flush   => '0',
 		invalid => '0'
 	);
 
@@ -101,33 +99,26 @@ begin
 
 		if r.invalid = '1' then
 			v.invalid := '0';
-			v.flush := '0';
 		elsif r.load = '1' then
 			if ready = '1' then
 				v.load := '0';
-				v.flush := '0';
 			end if;
 		end if;
 
-		storectrl_o.mem_flush <= dmem_o.mem_flush or r.flush;
+		storectrl_o.mem_flush <= dmem_o.mem_flush;
 		storectrl_o.mem_ready <= ready;
 		storectrl_o.mem_rdata <= rdata;
 
 		v.store := '0';
 
 		if storectrl_i.mem_valid = '1' then
-			v.flush := '0';
 			v.inv := storectrl_i.mem_invalid;
 			v.st := or_reduce(storectrl_i.mem_wstrb);
 			v.ld := nor_reduce(storectrl_i.mem_wstrb);
 			v.saddr := storectrl_i.mem_addr;
 			v.sdata := storectrl_i.mem_wdata;
 			v.sstrb := storectrl_i.mem_wstrb;
-			if v.inv = '1' then
-				v.flush := '1';
-			elsif v.ld = '1' then
-				v.flush := '1';
-			elsif v.st = '1' then
+			if v.st = '1' then
 				v.store := '1';
 			end if;
 		end if;
@@ -137,14 +128,14 @@ begin
 		end if;
 
 		v.wren := '0';
-		v.full := '1';
+		v.full := '0';
 		if v.store = '1' then
 			if v.oflow = '1' and v.wid < v.rid then
 				v.wren := '1';
-				v.full := '0';
 			elsif v.oflow = '0' then
 				v.wren := '1';
-				v.full := '0';
+			else
+				v.full := '1';
 			end if;
 		end if;
 
@@ -188,6 +179,7 @@ begin
 				v.load := '1';
 			end if;
 			v.inv := '0';
+			v.ld := '0';
 		end if;
 
 		if v.rden = '1' then
