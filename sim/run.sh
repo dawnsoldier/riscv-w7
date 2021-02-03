@@ -249,6 +249,8 @@ $ANALYS $DIR/vhdl/stage/writeback_stage.vhd
 
 $SYNTAX $DIR/vhdl/unit/pipeline.vhd
 $ANALYS $DIR/vhdl/unit/pipeline.vhd
+$SYNTAX $DIR/vhdl/unit/core.vhd
+$ANALYS $DIR/vhdl/unit/core.vhd
 
 $SYNTAX $DIR/vhdl/tb/cpu.vhd
 $ANALYS $DIR/vhdl/tb/cpu.vhd

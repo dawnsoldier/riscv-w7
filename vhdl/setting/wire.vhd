@@ -840,7 +840,6 @@ package wire is
 	end record;
 
 	type fetchbuffer_out_type is record
-		fpc   : std_logic_vector(63 downto 0);
 		instr : std_logic_vector(31 downto 0);
 		stall : std_logic;
 		flush : std_logic;
@@ -954,11 +953,27 @@ package wire is
 		mem_wstrb   : std_logic_vector(7 downto 0);
 	end record;
 
+	constant init_mem_in : mem_in_type := (
+		mem_valid   => '0',
+		mem_instr   => '0',
+		mem_spec    => '0',
+		mem_invalid => '0',
+		mem_addr    => (others => '0'),
+		mem_wdata   => (others => '0'),
+		mem_wstrb   => (others => '0')
+	);
+
 	type mem_out_type is record
 		mem_flush : std_logic;
 		mem_ready : std_logic;
 		mem_rdata : std_logic_vector(63 downto 0);
 	end record;
+
+	constant init_mem_out : mem_out_type := (
+		mem_flush => '0',
+		mem_ready => '0',
+		mem_rdata => (others => '0')
+	);
 
 	type fifo_in_type is record
 		we    : std_logic;

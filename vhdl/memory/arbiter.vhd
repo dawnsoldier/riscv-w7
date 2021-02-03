@@ -12,10 +12,10 @@ entity arbiter is
 	port(
 		reset        : in  std_logic;
 		clock        : in  std_logic;
-		imem_i       : in  mem_in_type;
-		imem_o       : out mem_out_type;
-		dmem_i       : in  mem_in_type;
-		dmem_o       : out mem_out_type;
+		ibus_i       : in  mem_in_type;
+		ibus_o       : out mem_out_type;
+		dbus_i       : in  mem_in_type;
+		dbus_o       : out mem_out_type;
 		memory_valid : out std_logic;
 		memory_ready : in  std_logic;
 		memory_instr : out std_logic;
@@ -36,11 +36,11 @@ signal release_type : std_logic := instr_access;
 
 begin
 
-	process(imem_i,dmem_i,memory_ready,memory_rdata,access_type,release_type)
+	process(ibus_i,dbus_i,memory_ready,memory_rdata,access_type,release_type)
 
 	begin
 
-		if dmem_i.mem_valid = '1' then
+		if dbus_i.mem_valid = '1' then
 			access_type <= data_access;
 		else
 			access_type <= instr_access;
@@ -54,34 +54,38 @@ begin
 			memory_wstrb <= (others => '0');
 		else
 			if access_type = instr_access then
-				memory_valid <= imem_i.mem_valid;
-				memory_instr <= imem_i.mem_instr;
-				memory_addr <= imem_i.mem_addr;
-				memory_wdata <= imem_i.mem_wdata;
-				memory_wstrb <= imem_i.mem_wstrb;
+				memory_valid <= ibus_i.mem_valid;
+				memory_instr <= ibus_i.mem_instr;
+				memory_addr <= ibus_i.mem_addr;
+				memory_wdata <= ibus_i.mem_wdata;
+				memory_wstrb <= ibus_i.mem_wstrb;
 			else
-				memory_valid <= dmem_i.mem_valid;
-				memory_instr <= dmem_i.mem_instr;
-				memory_addr <= dmem_i.mem_addr;
-				memory_wdata <= dmem_i.mem_wdata;
-				memory_wstrb <= dmem_i.mem_wstrb;
+				memory_valid <= dbus_i.mem_valid;
+				memory_instr <= dbus_i.mem_instr;
+				memory_addr <= dbus_i.mem_addr;
+				memory_wdata <= dbus_i.mem_wdata;
+				memory_wstrb <= dbus_i.mem_wstrb;
 			end if;
 		end if;
 
 		if release_type = instr_access then
-			imem_o.mem_ready <= memory_ready;
-			imem_o.mem_rdata <= memory_rdata;
+			ibus_o.mem_flush <= '0';
+			ibus_o.mem_ready <= memory_ready;
+			ibus_o.mem_rdata <= memory_rdata;
 		else
-			imem_o.mem_ready <= '0';
-			imem_o.mem_rdata <= (others => '0');
+			ibus_o.mem_flush <= '0';
+			ibus_o.mem_ready <= '0';
+			ibus_o.mem_rdata <= (others => '0');
 		end if;
 
 		if release_type = data_access then
-			dmem_o.mem_ready <= memory_ready;
-			dmem_o.mem_rdata <= memory_rdata;
+			dbus_o.mem_flush <= '0';
+			dbus_o.mem_ready <= memory_ready;
+			dbus_o.mem_rdata <= memory_rdata;
 		else
-			dmem_o.mem_ready <= '0';
-			dmem_o.mem_rdata <= (others => '0');
+			dbus_o.mem_flush <= '0';
+			dbus_o.mem_ready <= '0';
+			dbus_o.mem_rdata <= (others => '0');
 		end if;
 
 	end process;
