@@ -589,6 +589,7 @@ package wire is
 		fence_n     : std_logic;
 		valid_n     : std_logic;
 		stall       : std_logic;
+		flush       : std_logic;
 		clear       : std_logic;
 	end record;
 
@@ -643,6 +644,7 @@ package wire is
 		valid_n     : std_logic;
 		clear       : std_logic;
 		stall       : std_logic;
+		flush       : std_logic;
 	end record;
 
 	constant init_memory_reg : memory_reg_type := (
@@ -695,7 +697,8 @@ package wire is
 		fence_n     => '0',
 		valid_n     => '0',
 		clear       => '0',
-		stall       => '0'
+		stall       => '0',
+		flush       => '0'
 	);
 
 	type writeback_out_type is record

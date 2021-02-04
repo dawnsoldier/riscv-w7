@@ -96,6 +96,8 @@ begin
 
 		v.stall := sbuffer_o.mem_flush;
 
+		v.flush := sbuffer_o.mem_flush;
+
 		v.clear := d.w.clear;
 
 		if (v.load or v.fpu_load) = '1' then
@@ -183,6 +185,7 @@ begin
 		y.fence <= v.fence;
 		y.valid <= v.valid;
 		y.stall <= v.stall;
+		y.flush <= v.flush;
 		y.clear <= v.clear;
 
 		y.int_wren_n <= v.int_wren_n;
@@ -233,6 +236,7 @@ begin
 		q.fence <= r.fence;
 		q.valid <= r.valid;
 		q.stall <= r.stall;
+		q.flush <= r.flush;
 		q.clear <= r.clear;
 
 		q.int_wren_n <= r.int_wren_n;

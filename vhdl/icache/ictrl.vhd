@@ -280,7 +280,7 @@ begin
 		if r_next.state = HIT then
 			v.ready := v.en and v.hit;
 		elsif r_next.state = UPDATE then
-			v.ready := not v.spec;
+			v.ready := '1';
 		elsif r_next.state = INVALIDATE then
 			if v.state = HIT then
 				v.ready := '1';
