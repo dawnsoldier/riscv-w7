@@ -101,7 +101,7 @@ begin
 			v.rden := '1';
 		end if;
 
-		if imem_o.mem_ready = '1' then
+		if imem_o.mem_ready = '1' and imem_o.mem_flush = '0' then
 			if v.wren = '1' then
 				v.wrbuf := '1';
 				v.fpc := std_logic_vector(unsigned(v.fpc) + 8);
@@ -140,7 +140,7 @@ begin
 					v.instr := fetchram_o.rdata;
 				end if;
 			end if;
-		elsif imem_o.mem_ready = '1' then
+		elsif imem_o.mem_ready = '1' and imem_o.mem_flush = '0' then
 			if v.pc(2 downto 1) = "00" then
 				v.instr := imem_o.mem_rdata(31 downto 0);
 			elsif v.pc(2 downto 1) = "01" then

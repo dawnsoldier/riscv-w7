@@ -181,6 +181,8 @@ begin
 
 				v.spec := '0';
 
+				v.flush := '0';
+
 			when MISS =>
 
 				if r_next.miss = '1' then
@@ -209,6 +211,8 @@ begin
 
 				end if;
 
+				v.flush := '0';
+
 			when UPDATE =>
 
 				v.wen := (others => '0');
@@ -216,12 +220,16 @@ begin
 				v.valid := '0';
 				v.state := HIT;
 
+				v.flush := '0';
+
 			when INVALIDATE =>
 
 				v.wen := (others => '0');
 				v.wvec := (others => '0');
 				v.valid := '0';
 				v.invalid := '1';
+
+				v.flush := '1';
 
 			when others =>
 
@@ -271,16 +279,16 @@ begin
 
 		if r_next.state = HIT then
 			v.ready := v.en and v.hit;
-			v.flush := '0';
 		elsif r_next.state = UPDATE then
 			v.ready := not v.spec;
-			v.flush := '0';
 		elsif r_next.state = INVALIDATE then
-			v.ready := '0';
-			v.flush := '1';
+			if v.state = HIT then
+				v.ready := '1';
+			else
+				v.ready := '0';
+			end if;
 		else
 			v.ready := '0';
-			v.flush := '0';
 		end if;
 
 		if (r.invalid) = '1' then

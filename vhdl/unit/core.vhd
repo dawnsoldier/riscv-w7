@@ -106,12 +106,43 @@ architecture behavior of core is
 	end component;
 
 	type access_type is (CACHE_ACCESS, IO_MEM_ACCESS, NO_ACCESS);
+	type mode_type is (FREE,BUSY);
 
-	signal pre_imem_access : access_type;
-	signal pre_dmem_access : access_type;
+	type ireg_type is record
+		acc_t    : access_type;
+		mod_t    : mode_type;
+		io_mem_o : mem_out_type;
+		icache_i : mem_in_type;
+		imem_o   : mem_out_type;
+		ibus_i   : mem_in_type;
+	end record;
 
-	signal post_imem_access : access_type;
-	signal post_dmem_access : access_type;
+	constant init_ireg : ireg_type := (
+		acc_t    => CACHE_ACCESS,
+		mod_t    => BUSY,
+		io_mem_o => init_mem_out,
+		icache_i => init_mem_in,
+		imem_o   => init_mem_out,
+		ibus_i   => init_mem_in
+	);
+
+	type dreg_type is record
+		acc_t    : access_type;
+		mod_t    : mode_type;
+		do_mem_o : mem_out_type;
+		dcache_i : mem_in_type;
+		dmem_o   : mem_out_type;
+		dbus_i   : mem_in_type;
+	end record;
+
+	constant init_dreg : dreg_type := (
+		acc_t    => CACHE_ACCESS,
+		mod_t    => BUSY,
+		do_mem_o => init_mem_out,
+		dcache_i => init_mem_in,
+		dmem_o   => init_mem_out,
+		dbus_i   => init_mem_in
+	);
 
 	signal icache_i : mem_in_type;
 	signal icache_o : mem_out_type;
@@ -124,7 +155,9 @@ architecture behavior of core is
 	signal dmem_o : mem_out_type;
 
 	signal io_mem_i : mem_in_type;
+	signal io_mem_o : mem_out_type;
 	signal do_mem_i : mem_in_type;
+	signal do_mem_o : mem_out_type;
 
 	signal ipmp_i : pmp_in_type;
 	signal ipmp_o : pmp_out_type;
@@ -134,51 +167,81 @@ architecture behavior of core is
 	signal fpu_o : fpu_out_type;
 	signal fpu_i : fpu_in_type;
 
+	signal ir, irin : ireg_type := init_ireg;
+	signal dr, drin : dreg_type := init_dreg;
+
 begin
 
-	process(imem_i,io_mem_i,ibus_o,icache_i,icache_o,pre_imem_access,post_imem_access)
+	process(ir,imem_i,io_mem_i,icache_o,ibus_o)
+
+	variable v : ireg_type;
 
 	begin
 
-		if imem_i.mem_valid = '1' then
-			if (unsigned(imem_i.mem_addr) >= unsigned(cache_base_addr) and
-					unsigned(imem_i.mem_addr) < unsigned(cache_top_addr)) then
-				icache_i.mem_valid <= '1';
-				pre_imem_access <= CACHE_ACCESS;
-			elsif imem_i.mem_invalid = '1' then
-				icache_i.mem_valid <= '1';
-				pre_imem_access <= CACHE_ACCESS;
+		v := ir;
+
+		if v.mod_t = BUSY then
+			if v.acc_t = CACHE_ACCESS then
+				if icache_o.mem_ready = '1' then
+					v.mod_t := FREE;
+				end if;
+				v.imem_o := icache_o;
+				v.ibus_i := io_mem_i;
+				v.io_mem_o := ibus_o;
+			elsif v.acc_t = IO_MEM_ACCESS then
+				if ibus_o.mem_ready = '1' then
+					v.mod_t := FREE;
+				end if;
+				v.imem_o := ibus_o;
+				v.ibus_i := imem_i;
+				v.io_mem_o := init_mem_out;
 			else
-				icache_i.mem_valid <= '0';
-				pre_imem_access <= IO_MEM_ACCESS;
+				v.imem_o := init_mem_out;
+				v.ibus_i := init_mem_in;
+				v.io_mem_o := init_mem_out;
 			end if;
 		else
-			icache_i.mem_valid <= '0';
-			pre_imem_access <= NO_ACCESS;
+			v.imem_o := init_mem_out;
+			v.ibus_i := init_mem_in;
+			v.io_mem_o := init_mem_out;
 		end if;
 
-		icache_i.mem_instr <= imem_i.mem_instr;
-		icache_i.mem_spec <= imem_i.mem_spec;
-		icache_i.mem_invalid <= imem_i.mem_invalid;
-		icache_i.mem_addr <= imem_i.mem_addr;
-		icache_i.mem_wdata <= imem_i.mem_wdata;
-		icache_i.mem_wstrb <= imem_i.mem_wstrb;
-
-		if icache_enable = false or pre_imem_access = IO_MEM_ACCESS then
-			ibus_i <= imem_i;
-		elsif icache_enable = true and post_imem_access = CACHE_ACCESS then
-			ibus_i <= io_mem_i;
+		if v.mod_t = FREE then
+			if imem_i.mem_valid = '1' then
+				if (unsigned(imem_i.mem_addr) >= unsigned(cache_base_addr) and
+						unsigned(imem_i.mem_addr) < unsigned(cache_top_addr)) then
+					v.acc_t := CACHE_ACCESS;
+					v.mod_t := BUSY;
+					v.icache_i := imem_i;
+					v.ibus_i := init_mem_in;
+				elsif imem_i.mem_invalid = '1' then
+					v.acc_t := CACHE_ACCESS;
+					v.mod_t := BUSY;
+					v.icache_i := imem_i;
+					v.ibus_i := init_mem_in;
+				else
+					v.acc_t := IO_MEM_ACCESS;
+					v.mod_t := BUSY;
+					v.icache_i := init_mem_in;
+					v.ibus_i := imem_i;
+				end if;
+			else
+				v.acc_t := NO_ACCESS;
+				v.mod_t := FREE;
+				v.icache_i := init_mem_in;
+				v.ibus_i := init_mem_in;
+			end if;
 		else
-			ibus_i <= init_mem_in;
+			v.icache_i := init_mem_in;
 		end if;
 
-		if icache_enable = false or post_imem_access = IO_MEM_ACCESS then
-			imem_o <= ibus_o;
-		elsif icache_enable = true and post_imem_access = CACHE_ACCESS then
-			imem_o <= icache_o;
-		else
-			imem_o <= init_mem_out;
-		end if;
+		icache_i <= v.icache_i;
+		ibus_i <= v.ibus_i;
+		imem_o <= v.imem_o;
+		io_mem_o <= v.io_mem_o;
+
+
+		irin <= v;
 
 	end process;
 
@@ -188,59 +251,83 @@ begin
 
 		if rising_edge(clock) then
 			if reset = '0' then
-				post_imem_access <= NO_ACCESS;
+				ir <= init_ireg;
 			else
-				if imem_i.mem_valid = '1' then
-					post_imem_access <= pre_imem_access;
-				end if;
+				ir <= irin;
 			end if;
 		end if;
 
 	end process;
 
-	process(dmem_i,do_mem_i,dbus_o,dcache_i,dcache_o,pre_dmem_access,post_dmem_access)
+	process(dr,dmem_i,do_mem_i,dcache_o,dbus_o)
+
+	variable v : dreg_type;
 
 	begin
 
-		if dmem_i.mem_valid = '1' then
-			if (unsigned(dmem_i.mem_addr) >= unsigned(cache_base_addr) and
-					unsigned(dmem_i.mem_addr) < unsigned(cache_top_addr)) then
-				dcache_i.mem_valid <= '1';
-				pre_dmem_access <= CACHE_ACCESS;
-			elsif dmem_i.mem_invalid = '1' then
-				dcache_i.mem_valid <= '1';
-				pre_dmem_access <= CACHE_ACCESS;
+		v := dr;
+
+		if v.mod_t = BUSY then
+			if v.acc_t = CACHE_ACCESS then
+				if dcache_o.mem_ready = '1' then
+					v.mod_t := FREE;
+				end if;
+				v.dmem_o := dcache_o;
+				v.dbus_i := do_mem_i;
+				v.do_mem_o := dbus_o;
+			elsif v.acc_t = IO_MEM_ACCESS then
+				if dbus_o.mem_ready = '1' then
+					v.mod_t := FREE;
+				end if;
+				v.dmem_o := dbus_o;
+				v.dbus_i := dmem_i;
+				v.do_mem_o := init_mem_out;
 			else
-				dcache_i.mem_valid <= '0';
-				pre_dmem_access <= IO_MEM_ACCESS;
+				v.dmem_o := init_mem_out;
+				v.dbus_i := init_mem_in;
+				v.do_mem_o := init_mem_out;
 			end if;
 		else
-			dcache_i.mem_valid <= '0';
-			pre_dmem_access <= NO_ACCESS;
+			v.dmem_o := init_mem_out;
+			v.dbus_i := init_mem_in;
+			v.do_mem_o := init_mem_out;
 		end if;
 
-		dcache_i.mem_instr <= dmem_i.mem_instr;
-		dcache_i.mem_spec <= dmem_i.mem_spec;
-		dcache_i.mem_invalid <= dmem_i.mem_invalid;
-		dcache_i.mem_addr <= dmem_i.mem_addr;
-		dcache_i.mem_wdata <= dmem_i.mem_wdata;
-		dcache_i.mem_wstrb <= dmem_i.mem_wstrb;
-
-		if dcache_enable = false or pre_dmem_access = IO_MEM_ACCESS then
-			dbus_i <= dmem_i;
-		elsif dcache_enable = true and post_dmem_access = CACHE_ACCESS then
-			dbus_i <= do_mem_i;
+		if v.mod_t = FREE then
+			if dmem_i.mem_valid = '1' then
+				if (unsigned(dmem_i.mem_addr) >= unsigned(cache_base_addr) and
+						unsigned(dmem_i.mem_addr) < unsigned(cache_top_addr)) then
+					v.acc_t := CACHE_ACCESS;
+					v.mod_t := BUSY;
+					v.dcache_i := dmem_i;
+					v.dbus_i := init_mem_in;
+				elsif dmem_i.mem_invalid = '1' then
+					v.acc_t := CACHE_ACCESS;
+					v.mod_t := BUSY;
+					v.dcache_i := dmem_i;
+					v.dbus_i := init_mem_in;
+				else
+					v.acc_t := IO_MEM_ACCESS;
+					v.mod_t := BUSY;
+					v.dcache_i := init_mem_in;
+					v.dbus_i := dmem_i;
+				end if;
+			else
+				v.acc_t := NO_ACCESS;
+				v.mod_t := FREE;
+				v.dcache_i := init_mem_in;
+				v.dbus_i := init_mem_in;
+			end if;
 		else
-			dbus_i <= init_mem_in;
+			v.dcache_i := init_mem_in;
 		end if;
 
-		if dcache_enable = false or post_dmem_access = IO_MEM_ACCESS then
-			dmem_o <= dbus_o;
-		elsif dcache_enable = true and post_dmem_access = CACHE_ACCESS then
-			dmem_o <= dcache_o;
-		else
-			dmem_o <= init_mem_out;
-		end if;
+		dcache_i <= v.dcache_i;
+		dbus_i <= v.dbus_i;
+		dmem_o <= v.dmem_o;
+		do_mem_o <= v.do_mem_o;
+
+		drin <= v;
 
 	end process;
 
@@ -250,11 +337,9 @@ begin
 
 		if rising_edge(clock) then
 			if reset = '0' then
-				post_dmem_access <= NO_ACCESS;
+				dr <= init_dreg;
 			else
-				if dmem_i.mem_valid = '1' then
-					post_dmem_access <= pre_dmem_access;
-				end if;
+				dr <= drin;
 			end if;
 		end if;
 
@@ -290,7 +375,7 @@ begin
 			clock   => clock,
 			cache_i => icache_i,
 			cache_o => icache_o,
-			mem_o   => ibus_o,
+			mem_o   => io_mem_o,
 			mem_i   => io_mem_i
 		);
 
@@ -306,7 +391,7 @@ begin
 			clock   => clock,
 			cache_i => dcache_i,
 			cache_o => dcache_o,
-			mem_o   => dbus_o,
+			mem_o   => do_mem_o,
 			mem_i   => do_mem_i
 		);
 
