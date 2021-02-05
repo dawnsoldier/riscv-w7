@@ -278,11 +278,10 @@ begin
 	begin
 
 		if rising_edge(clock) then
-			if bram_valid = '1' then
-				check(bram_addr,bram_wstrb,bram_wdata);
-			elsif uart_valid = '1' and or_reduce(uart_addr) = '0' and or_reduce(uart_wstrb) = '1' then
+			if uart_valid = '1' and or_reduce(uart_addr) = '0' and or_reduce(uart_wstrb) = '1' then
 				print(massage,index,memory_wdata(7 downto 0));
 			elsif memory_valid = '1' then
+				check(memory_addr,memory_wstrb,memory_wdata);
 				if (bram_valid or timer_valid or uart_valid) = '0' then
 					exceed;
 				end if;

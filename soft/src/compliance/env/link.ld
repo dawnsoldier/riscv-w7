@@ -11,7 +11,7 @@ SECTIONS
   .data : { *(.data) }
   .data.string : { *(.data.string)}
   .bss : { *(.bss) }
-  . = ALIGN(0x30000);
+  . = ALIGN(0x300000);
   .tohost : { *(.tohost) }
   _end = .;
 }

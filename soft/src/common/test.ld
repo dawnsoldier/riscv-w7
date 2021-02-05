@@ -56,7 +56,7 @@ SECTIONS
     _tbss_end = .;
   }
 
-  . = ALIGN(0x30000);
+  . = ALIGN(0x300000);
   .tohost : { *(.tohost) }
 
   /* End of uninitalized data segement */
