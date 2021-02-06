@@ -32,12 +32,18 @@ architecture behavior of fetchctrl is
 		npc    : std_logic_vector(63 downto 0);
 		fpc    : std_logic_vector(63 downto 0);
 		instr  : std_logic_vector(31 downto 0);
+		rdata  : std_logic_vector(63 downto 0);
+		ready  : std_logic;
+		flush  : std_logic;
 		wren   : std_logic;
 		rden   : std_logic;
 		wrdis  : std_logic;
 		wrbuf  : std_logic;
 		equal  : std_logic;
 		full   : std_logic;
+		valid  : std_logic;
+		spec   : std_logic;
+		fence  : std_logic;
 		wid    : natural range 0 to 2**fetchbuffer_depth-1;
 		rid    : natural range 0 to 2**fetchbuffer_depth-1;
 		stall  : std_logic;
@@ -48,12 +54,18 @@ architecture behavior of fetchctrl is
 		npc    => bram_base_addr,
 		fpc    => bram_base_addr,
 		instr  => nop,
+		rdata  => (others => '0'),
+		ready  => '0',
+		flush  => '0',
 		wren   => '0',
 		rden   => '0',
 		wrdis  => '0',
 		wrbuf  => '0',
 		equal  => '0',
 		full   => '0',
+		valid  => '0',
+		spec   => '0',
+		fence  => '0',
 		wid    => 0,
 		rid    => 0,
 		stall  => '0'
@@ -76,14 +88,21 @@ begin
 		v.wrdis := '0';
 		v.wrbuf := '0';
 
+		v.rdata := imem_o.mem_rdata;
+		v.ready := imem_o.mem_ready;
+		v.flush := imem_o.mem_flush;
+
+		v.valid := fetchctrl_i.valid;
+		v.spec := fetchctrl_i.spec;
+		v.fence := fetchctrl_i.fence;
 		v.pc := fetchctrl_i.pc;
 		v.npc := fetchctrl_i.npc;
 
-		if fetchctrl_i.fence = '1' then
+		if v.fence = '1' then
 			v.fpc := v.pc(63 downto 3) & "000";
 		end if;
 
-		if fetchctrl_i.valid = '1' then
+		if v.valid = '1' then
 			v.wid := to_integer(unsigned(v.fpc(fetchbuffer_depth downto 1)));
 			v.rid := to_integer(unsigned(v.pc(fetchbuffer_depth downto 1)));
 		end if;
@@ -101,30 +120,30 @@ begin
 			v.rden := '1';
 		end if;
 
-		if imem_o.mem_ready = '1' and imem_o.mem_flush = '0' then
+		if v.ready = '1' and v.flush = '0' and v.fence = '0' then
 			if v.wren = '1' then
 				v.wrbuf := '1';
 				v.fpc := std_logic_vector(unsigned(v.fpc) + 8);
 			end if;
-		elsif imem_o.mem_ready = '0' then
+		else
 			if v.wren = '1' then
 				v.wrdis := '1';
 			end if;
 		end if;
 
-		if fetchctrl_i.spec = '1' then
+		if v.spec = '1' then
 			v.fpc := v.npc(63 downto 3) & "000";
 		end if;
 
 		fetchram_i.raddr <= v.rid;
 
-		if v.rden = '1' then
+		if v.rden = '1' and v.flush = '0' and v.fence = '0' then
 			if v.rid = 2**fetchbuffer_depth-1 then
 				if (v.wid = 0) then
 					if v.wrdis = '1' then
 						v.stall := '1';
 					else
-						v.instr := imem_o.mem_rdata(15 downto 0) & fetchram_o.rdata(15 downto 0);
+						v.instr := v.rdata(15 downto 0) & fetchram_o.rdata(15 downto 0);
 					end if;
 				else
 					v.instr := fetchram_o.rdata;
@@ -134,45 +153,45 @@ begin
 					if v.wrdis = '1' then
 						v.stall := '1';
 					else
-						v.instr := imem_o.mem_rdata(15 downto 0) & fetchram_o.rdata(15 downto 0);
+						v.instr := v.rdata(15 downto 0) & fetchram_o.rdata(15 downto 0);
 					end if;
 				else
 					v.instr := fetchram_o.rdata;
 				end if;
 			end if;
-		elsif imem_o.mem_ready = '1' and imem_o.mem_flush = '0' then
+		elsif v.ready = '1' and v.flush = '0' and v.fence = '0' then
 			if v.pc(2 downto 1) = "00" then
-				v.instr := imem_o.mem_rdata(31 downto 0);
+				v.instr := v.rdata(31 downto 0);
 			elsif v.pc(2 downto 1) = "01" then
-				v.instr := imem_o.mem_rdata(47 downto 16);
+				v.instr := v.rdata(47 downto 16);
 			elsif v.pc(2 downto 1) = "10" then
-				v.instr := imem_o.mem_rdata(63 downto 32);
+				v.instr := v.rdata(63 downto 32);
 			elsif v.pc(2 downto 1) = "11" then
-				if and_reduce(imem_o.mem_rdata(49 downto 48)) = '0' then
-					v.instr := X"0000" & imem_o.mem_rdata(63 downto 48);
+				if and_reduce(v.rdata(49 downto 48)) = '0' then
+					v.instr := X"0000" & v.rdata(63 downto 48);
 				else
 					v.stall := '1';
 				end if;
 			end if;
-		elsif imem_o.mem_ready = '0' then
+		else
 			v.stall := '1';
 		end if;
 
 		fetchctrl_o.instr <= v.instr;
 		fetchctrl_o.stall <= v.stall;
-		fetchctrl_o.flush <= imem_o.mem_flush;
+		fetchctrl_o.flush <= v.flush;
 
-		imem_i.mem_valid <= fetchctrl_i.valid;
+		imem_i.mem_valid <= v.valid;
 		imem_i.mem_instr <= '1';
-		imem_i.mem_spec <= fetchctrl_i.spec;
-		imem_i.mem_invalid <= fetchctrl_i.fence;
+		imem_i.mem_spec <= v.spec;
+		imem_i.mem_invalid <= v.fence;
 		imem_i.mem_addr <= v.fpc;
 		imem_i.mem_wdata <= (others => '0');
 		imem_i.mem_wstrb <= (others => '0');
 
 		fetchram_i.wren <= v.wrbuf;
 		fetchram_i.waddr <= v.wid;
-		fetchram_i.wdata <= imem_o.mem_rdata;
+		fetchram_i.wdata <= v.rdata;
 
 		rin <= v;
 

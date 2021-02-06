@@ -30,7 +30,7 @@ SECTIONS
   .data : { *(section1*) *(section2*) }
 
 
-  . = ALIGN(0x1000);
+  . = ALIGN(0x300000);
   .tohost : { *(.tohost) }
   .rodata : { *(rodata) }
 
