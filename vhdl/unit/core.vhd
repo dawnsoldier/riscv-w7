@@ -11,10 +11,6 @@ use work.constants.all;
 use work.fp_wire.all;
 use work.wire.all;
 
-library std;
-use std.textio.all;
-use std.env.all;
-
 entity core is
 	generic(
 		fpu_enable      : boolean := fpu_enable;

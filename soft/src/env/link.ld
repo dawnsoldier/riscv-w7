@@ -10,7 +10,7 @@ SECTIONS
   . = ALIGN(0x1000);
   .data : { *(.data) }
   .bss : { *(.bss) }
+  _end = .;
   . = ALIGN(0x300000);
   .tohost : { *(.tohost) }
-  _end = .;
 }
