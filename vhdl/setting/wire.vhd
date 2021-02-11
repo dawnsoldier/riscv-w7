@@ -968,11 +968,13 @@ package wire is
 
 	type mem_out_type is record
 		mem_flush : std_logic;
+		mem_busy  : std_logic;
 		mem_ready : std_logic;
 		mem_rdata : std_logic_vector(63 downto 0);
 	end record;
 
 	constant init_mem_out : mem_out_type := (
+		mem_busy  => '0',
 		mem_flush => '0',
 		mem_ready => '0',
 		mem_rdata => (others => '0')

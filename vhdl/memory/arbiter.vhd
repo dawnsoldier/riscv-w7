@@ -69,20 +69,24 @@ begin
 		end if;
 
 		if release_type = instr_access then
+			ibus_o.mem_busy  <= '0';
 			ibus_o.mem_flush <= '0';
 			ibus_o.mem_ready <= memory_ready;
 			ibus_o.mem_rdata <= memory_rdata;
 		else
+			ibus_o.mem_busy  <= '0';
 			ibus_o.mem_flush <= '0';
 			ibus_o.mem_ready <= '0';
 			ibus_o.mem_rdata <= (others => '0');
 		end if;
 
 		if release_type = data_access then
+			dbus_o.mem_busy  <= '0';
 			dbus_o.mem_flush <= '0';
 			dbus_o.mem_ready <= memory_ready;
 			dbus_o.mem_rdata <= memory_rdata;
 		else
+			dbus_o.mem_busy  <= '0';
 			dbus_o.mem_flush <= '0';
 			dbus_o.mem_ready <= '0';
 			dbus_o.mem_rdata <= (others => '0');

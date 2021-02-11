@@ -77,6 +77,7 @@ architecture behavior of dctrl is
 		wid     : integer range 0 to 2**cache_ways-1;
 		invalid : std_logic;
 		flush   : std_logic;
+		busy    : std_logic;
 		valid   : std_logic;
 		hit     : std_logic;
 		miss    : std_logic;
@@ -108,6 +109,7 @@ architecture behavior of dctrl is
 		count   => 0,
 		invalid => '0',
 		flush   => '0',
+		busy    => '0',
 		valid   => '0',
 		hit     => '0',
 		miss    => '0',
@@ -405,16 +407,21 @@ begin
 
 		if r_next.state = HIT then
 			v.ready := v.rden and v.hit;
+			v.busy := '0';
 		elsif r_next.state = UPDATE then
 			v.ready := '1';
+			v.busy := '0';
 		elsif r_next.state = INVALIDATE then
 			if v.state = HIT then
 				v.ready := '1';
+				v.busy := '0';
 			else
 				v.ready := '0';
+				v.busy := '1';
 			end if;
 		else
 			v.ready := '0';
+			v.busy := '1';
 		end if;
 
 		mem_i.mem_valid <= v.valid;
@@ -428,6 +435,7 @@ begin
 		cache_o.mem_rdata <= v.rdata;
 		cache_o.mem_ready <= v.ready;
 		cache_o.mem_flush <= v.flush;
+		cache_o.mem_busy <= v.busy;
 
 		rin_next <= v;
 

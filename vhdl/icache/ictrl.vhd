@@ -38,7 +38,6 @@ architecture behavior of ictrl is
 		sid     : integer range 0 to 2**cache_sets-1;
 		lid     : integer range 0 to 2**cache_words-1;
 		invalid : std_logic;
-		spec    : std_logic;
 		en      : std_logic;
 	end record;
 
@@ -48,7 +47,6 @@ architecture behavior of ictrl is
 		sid     => 0,
 		lid     => 0,
 		invalid => '0',
-		spec    => '0',
 		en      => '0'
 	);
 
@@ -65,12 +63,12 @@ architecture behavior of ictrl is
 		count   : integer range 0 to 2**cache_words-1;
 		wid     : integer range 0 to 2**cache_ways-1;
 		invalid : std_logic;
+		busy    : std_logic;
 		flush   : std_logic;
 		valid   : std_logic;
 		hit     : std_logic;
 		miss    : std_logic;
 		en      : std_logic;
-		spec    : std_logic;
 		ready   : std_logic;
 	end record;
 
@@ -87,12 +85,12 @@ architecture behavior of ictrl is
 		wid     => 0,
 		count   => 0,
 		invalid => '0',
+		busy    => '0',
 		flush   => '0',
 		valid   => '0',
 		hit     => '0',
 		miss    => '0',
 		en      => '0',
-		spec    => '0',
 		ready   => '0'
 	);
 
@@ -111,13 +109,11 @@ begin
 
 		v.invalid := '0';
 		v.en := '0';
-		v.spec := '0';
 
 		if cache_i.mem_valid = '1' then
 			if cache_i.mem_invalid = '1' then
 				v.invalid := cache_i.mem_invalid;
 			else
-				v.spec := cache_i.mem_spec;
 				v.en := cache_i.mem_valid;
 				v.addr(63 downto cache_words+3) := cache_i.mem_addr(63 downto cache_words+3);
 				v.addr(cache_words+2 downto 0) := (others => '0');
@@ -178,8 +174,6 @@ begin
 					v.cline := ctrl_i.data_o(v.wid).rdata;
 					v.valid := '0';
 				end if;
-
-				v.spec := '0';
 
 				v.flush := '0';
 
@@ -267,10 +261,6 @@ begin
 			end if;
 		end if;
 
-		if (r.spec) = '1' then
-			v.spec := '1';
-		end if;
-
 		for i in 0 to 2**cache_words-1 loop
 			if v.lid = i then
 				v.rdata := v.cline(64*(i+1)-1 downto 64*i);
@@ -279,16 +269,21 @@ begin
 
 		if r_next.state = HIT then
 			v.ready := v.en and v.hit;
+			v.busy := '0';
 		elsif r_next.state = UPDATE then
 			v.ready := '1';
+			v.busy := '0';
 		elsif r_next.state = INVALIDATE then
 			if v.state = HIT then
 				v.ready := '1';
+				v.busy := '0';
 			else
 				v.ready := '0';
+				v.busy := '1';
 			end if;
 		else
 			v.ready := '0';
+			v.busy := '1';
 		end if;
 
 		if (r.invalid) = '1' then
@@ -307,6 +302,7 @@ begin
 		cache_o.mem_rdata <= v.rdata;
 		cache_o.mem_ready <= v.ready;
 		cache_o.mem_flush <= v.flush;
+		cache_o.mem_busy <= v.busy;
 
 		rin_next <= v;
 
