@@ -35,6 +35,7 @@ architecture behavior of fetchctrl is
 		rdata  : std_logic_vector(63 downto 0);
 		ready  : std_logic;
 		flush  : std_logic;
+		busy   : std_logic;
 		wren   : std_logic;
 		rden   : std_logic;
 		wrdis  : std_logic;
@@ -57,6 +58,7 @@ architecture behavior of fetchctrl is
 		rdata  => (others => '0'),
 		ready  => '0',
 		flush  => '0',
+		busy   => '0',
 		wren   => '0',
 		rden   => '0',
 		wrdis  => '0',
@@ -91,6 +93,13 @@ begin
 		v.rdata := imem_o.mem_rdata;
 		v.ready := imem_o.mem_ready;
 		v.flush := imem_o.mem_flush;
+		v.busy := imem_o.mem_busy;
+
+		if v.ready = '1' then
+			if r.busy = '1' then
+				v.ready := '0';
+			end if;
+		end if;
 
 		v.valid := fetchctrl_i.valid;
 		v.spec := fetchctrl_i.spec;
