@@ -10,10 +10,10 @@ use work.configure.all;
 use work.constants.all;
 use work.wire.all;
 
-entity top_cpu is
-end entity top_cpu;
+entity soc is
+end entity soc;
 
-architecture behavior of top_cpu is
+architecture behavior of soc is
 
 	component cpu
 		port(
