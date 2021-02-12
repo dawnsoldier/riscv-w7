@@ -112,6 +112,8 @@ $SYNTAX $DIR/vhdl/memory/timer.vhd
 $ANALYS $DIR/vhdl/memory/timer.vhd
 $SYNTAX $DIR/vhdl/memory/uart.vhd
 $ANALYS $DIR/vhdl/memory/uart.vhd
+$SYNTAX $DIR/vhdl/memory/axi.vhd
+$ANALYS $DIR/vhdl/memory/axi.vhd
 
 $SYNTAX $DIR/vhdl/icache/iwire.vhd
 $ANALYS $DIR/vhdl/icache/iwire.vhd

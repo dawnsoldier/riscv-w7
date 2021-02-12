@@ -13,11 +13,35 @@ use work.wire.all;
 
 entity cpu is
 	port(
-		reset : in  std_logic;
-		clock : in  std_logic;
-		rtc   : in  std_logic;
-		rx    : in  std_logic;
-		tx    : out std_logic
+		reset         : in  std_logic;
+		clock         : in  std_logic;
+		rtc           : in  std_logic;
+		rx            : in  std_logic;
+		tx            : out std_logic;
+		-- Master interface write address
+		m_axi_awvalid : out std_logic;
+		m_axi_awready : in  std_logic;
+		m_axi_awaddr  : out std_logic_vector(63 downto 0);
+		m_axi_awprot  : out std_logic_vector(2 downto 0);
+		-- Master interface write data
+		m_axi_wvalid  : out std_logic;
+		m_axi_wready  : in  std_logic;
+		m_axi_wdata   : out std_logic_vector(63 downto 0);
+		m_axi_wstrb   : out std_logic_vector(7 downto 0);
+		-- Master interface write response
+		m_axi_bvalid  : in  std_logic;
+		m_axi_bready  : out std_logic;
+		m_axi_bresp   : in  std_logic;
+		-- Master interface read address
+		m_axi_arvalid : out std_logic;
+		m_axi_arready : in  std_logic;
+		m_axi_araddr  : out std_logic_vector(63 downto 0);
+		m_axi_arprot  : out std_logic_vector(2 downto 0);
+		-- Master interface read data return
+		m_axi_rvalid  : in  std_logic;
+		m_axi_rready  : out std_logic;
+		m_axi_rdata   : in  std_logic_vector(63 downto 0);
+		m_axi_rresp   : in  std_logic
 	);
 end entity cpu;
 
@@ -103,6 +127,44 @@ architecture behavior of cpu is
 		);
 	end component;
 
+	component axi
+		port(
+			reset         : in  std_logic;
+			clock         : in  std_logic;
+			axi_valid     : in  std_logic;
+			axi_ready     : out std_logic;
+			axi_instr     : in  std_logic;
+			axi_addr      : in  std_logic_vector(63 downto 0);
+			axi_wdata     : in  std_logic_vector(63 downto 0);
+			axi_wstrb     : in  std_logic_vector(7 downto 0);
+			axi_rdata     : out std_logic_vector(63 downto 0);
+			-- Master interface write address
+			m_axi_awvalid : out std_logic;
+			m_axi_awready : in  std_logic;
+			m_axi_awaddr  : out std_logic_vector(63 downto 0);
+			m_axi_awprot  : out std_logic_vector(2 downto 0);
+			-- Master interface write data
+			m_axi_wvalid  : out std_logic;
+			m_axi_wready  : in  std_logic;
+			m_axi_wdata   : out std_logic_vector(63 downto 0);
+			m_axi_wstrb   : out std_logic_vector(7 downto 0);
+			-- Master interface write response
+			m_axi_bvalid  : in  std_logic;
+			m_axi_bready  : out std_logic;
+			m_axi_bresp   : in  std_logic;
+			-- Master interface read address
+			m_axi_arvalid : out std_logic;
+			m_axi_arready : in  std_logic;
+			m_axi_araddr  : out std_logic_vector(63 downto 0);
+			m_axi_arprot  : out std_logic_vector(2 downto 0);
+			-- Master interface read data return
+			m_axi_rvalid  : in  std_logic;
+			m_axi_rready  : out std_logic;
+			m_axi_rdata   : in  std_logic_vector(63 downto 0);
+			m_axi_rresp   : in  std_logic
+		);
+	end component;
+
 	signal ibus_i : mem_in_type;
 	signal ibus_o : mem_out_type;
 	signal dbus_i : mem_in_type;
@@ -140,40 +202,60 @@ architecture behavior of cpu is
 	signal timer_wstrb : std_logic_vector(7 downto 0);
 	signal timer_rdata : std_logic_vector(63 downto 0);
 
+	signal axi_valid : std_logic;
+	signal axi_ready : std_logic;
+	signal axi_instr : std_logic;
+	signal axi_addr  : std_logic_vector(63 downto 0);
+	signal axi_wdata : std_logic_vector(63 downto 0);
+	signal axi_wstrb : std_logic_vector(7 downto 0);
+	signal axi_rdata : std_logic_vector(63 downto 0);
+
 	signal timer_irpt : std_logic;
 
 begin
 
 	process(memory_valid,memory_instr,memory_addr,memory_wdata,memory_wstrb,
-					bram_rdata,bram_ready,uart_rdata,uart_ready,timer_rdata,timer_ready)
+					bram_rdata,bram_ready,uart_rdata,uart_ready,timer_rdata,timer_ready,
+					axi_rdata,axi_ready)
 
 	begin
 
 		if memory_valid = '1' then
-			if (unsigned(memory_addr) >= unsigned(timer_base_addr) and
+			if (unsigned(memory_addr) >= unsigned(axi_base_addr) and
+					unsigned(memory_addr) < unsigned(axi_top_addr)) then
+				bram_valid <= '0';
+				uart_valid <= '0';
+				timer_valid <= '0';
+				axi_valid <= memory_valid;
+			elsif (unsigned(memory_addr) >= unsigned(timer_base_addr) and
 					unsigned(memory_addr) < unsigned(timer_top_addr)) then
 				bram_valid <= '0';
 				uart_valid <= '0';
 				timer_valid <= memory_valid;
+				axi_valid <= '0';
 			elsif (unsigned(memory_addr) >= unsigned(uart_base_addr) and
 					unsigned(memory_addr) < unsigned(uart_top_addr)) then
 				bram_valid <= '0';
 				uart_valid <= memory_valid;
 				timer_valid <= '0';
+				axi_valid <= '0';
 			elsif (unsigned(memory_addr) >= unsigned(bram_base_addr) and
 					unsigned(memory_addr) < unsigned(bram_top_addr)) then
 				bram_valid <= memory_valid;
 				uart_valid <= '0';
 				timer_valid <= '0';
+				axi_valid <= '0';
 			else
 				bram_valid <= '0';
 				uart_valid <= '0';
 				timer_valid <= '0';
+				axi_valid <= '0';
 			end if;
 		else
 			bram_valid <= '0';
 			uart_valid <= '0';
 			timer_valid <= '0';
+			axi_valid <= '0';
 		end if;
 
 		bram_instr <= memory_instr;
@@ -191,6 +273,11 @@ begin
 		timer_wdata <= memory_wdata;
 		timer_wstrb <= memory_wstrb;
 
+		axi_instr <= memory_instr;
+		axi_addr <= memory_addr xor axi_base_addr;
+		axi_wdata <= memory_wdata;
+		axi_wstrb <= memory_wstrb;
+
 		if (bram_ready = '1') then
 			memory_rdata <= bram_rdata;
 			memory_ready <= bram_ready;
@@ -200,6 +287,9 @@ begin
 		elsif (timer_ready = '1') then
 			memory_rdata <= timer_rdata;
 			memory_ready <= timer_ready;
+		elsif (axi_ready = '1') then
+			memory_rdata <= axi_rdata;
+			memory_ready <= axi_ready;
 		else
 			memory_rdata <= (others => '0');
 			memory_ready <= '0';
@@ -277,6 +367,43 @@ begin
 			timer_wstrb => timer_wstrb,
 			timer_rdata => timer_rdata,
 			timer_irpt  => timer_irpt
+		);
+
+	axi_comp : axi
+		port map(
+			reset         => reset,
+			clock         => clock,
+			axi_valid     => axi_valid,
+			axi_ready     => axi_ready,
+			axi_instr     => axi_instr,
+			axi_addr      => axi_addr,
+			axi_wdata     => axi_wdata,
+			axi_wstrb     => axi_wstrb,
+			axi_rdata     => axi_rdata,
+			-- Master interface write address
+			m_axi_awvalid => m_axi_awvalid,
+			m_axi_awready => m_axi_awready,
+			m_axi_awaddr  => m_axi_awaddr,
+			m_axi_awprot  => m_axi_awprot,
+			-- Master interface write data
+			m_axi_wvalid  => m_axi_wvalid,
+			m_axi_wready  => m_axi_wready,
+			m_axi_wdata   => m_axi_wdata,
+			m_axi_wstrb   => m_axi_wstrb,
+			-- Master interface write response
+			m_axi_bvalid  => m_axi_bvalid,
+			m_axi_bready  => m_axi_bready,
+			m_axi_bresp   => m_axi_bresp,
+			-- Master interface read address
+			m_axi_arvalid => m_axi_arvalid,
+			m_axi_arready => m_axi_arready,
+			m_axi_araddr  => m_axi_araddr,
+			m_axi_arprot  => m_axi_arprot,
+			-- Master interface read data return
+			m_axi_rvalid  => m_axi_rvalid,
+			m_axi_rready  => m_axi_rready,
+			m_axi_rdata   => m_axi_rdata,
+			m_axi_rresp   => m_axi_rresp
 		);
 
 end architecture;
