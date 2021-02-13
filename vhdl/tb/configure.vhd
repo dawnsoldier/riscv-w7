@@ -48,4 +48,7 @@ package configure is
 	constant clks_per_bit      : integer := 1;
 	constant clk_divider_rtc   : integer := 1;
 
+	constant ram_read_divider  : integer := 1;
+	constant ram_write_divider : integer := 1;
+
 end configure;

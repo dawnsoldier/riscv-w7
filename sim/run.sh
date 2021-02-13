@@ -114,6 +114,8 @@ $SYNTAX $DIR/vhdl/memory/uart.vhd
 $ANALYS $DIR/vhdl/memory/uart.vhd
 $SYNTAX $DIR/vhdl/memory/axi.vhd
 $ANALYS $DIR/vhdl/memory/axi.vhd
+$SYNTAX $DIR/vhdl/memory/sram.vhd
+$ANALYS $DIR/vhdl/memory/sram.vhd
 
 $SYNTAX $DIR/vhdl/icache/iwire.vhd
 $ANALYS $DIR/vhdl/icache/iwire.vhd

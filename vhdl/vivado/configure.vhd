@@ -57,4 +57,10 @@ package configure is
 	constant clk_divider_rtc   : integer := (clk_freq/rtc_freq)/2-1;
 	constant clks_per_bit      : integer := clk_pll/baudrate-1;
 
+	constant ram_read_freq     : integer := 4761904;
+	constant ram_write_freq    : integer := 3846153;
+
+	constant ram_read_divider  : integer := clk_pll/ram_read_freq;
+	constant ram_write_divider : integer := clk_pll/ram_write_freq;
+
 end configure;
