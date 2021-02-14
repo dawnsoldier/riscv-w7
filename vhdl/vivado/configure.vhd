@@ -42,10 +42,16 @@ package configure is
 	constant timer_base_addr   : std_logic_vector(63 downto 0) := X"0000000000200000";
 	constant timer_top_addr    : std_logic_vector(63 downto 0) := X"0000000000200010";
 
-	constant axi_base_addr     : std_logic_vector(63 downto 0) := X"0000000001000000";
+	constant qspi_base_addr    : std_logic_vector(63 downto 0) := X"0000000001000000";
+	constant qspi_top_addr     : std_logic_vector(63 downto 0) := X"0000000002000000";
+
+	constant sram_base_addr    : std_logic_vector(63 downto 0) := X"0000000008000000";
+	constant sram_top_addr     : std_logic_vector(63 downto 0) := X"0000000010000000";
+
+	constant axi_base_addr     : std_logic_vector(63 downto 0) := X"0000000010000000";
 	constant axi_top_addr      : std_logic_vector(63 downto 0) := X"0000000100000000";
 
-	constant cache_base_addr   : std_logic_vector(63 downto 0) := X"0000000080000000";
+	constant cache_base_addr   : std_logic_vector(63 downto 0) := X"0000000010000000";
 	constant cache_top_addr    : std_logic_vector(63 downto 0) := X"0000000100000000";
 
 	constant clk_freq          : integer := 100000000;
