@@ -12,34 +12,51 @@ use work.wire.all;
 
 entity soc is
 	port(
-		rst           : in  std_logic;
-		clk           : in  std_logic;
-		rx            : in  std_logic;
-		tx            : out std_logic;
+		reset         : in    std_logic;
+		clock         : in    std_logic;
+		-- UART interface
+		uart_rx       : in    std_logic;
+		uart_tx       : out   std_logic;
+		-- QSPI Flash interface
+		spi_cs        : out   std_logic;
+		spi_dq0       : inout std_logic;
+		spi_dq1       : inout std_logic;
+		spi_dq2       : inout std_logic;
+		spi_dq3       : inout std_logic;
+		spi_sck       : out   std_logic;
+		-- SRAM interface
+		ram_a         : out   std_logic_vector(26 downto 0);
+		ram_dq_i      : out   std_logic_vector(15 downto 0);
+		ram_dq_o      : in    std_logic_vector(15 downto 0);
+		ram_cen       : out   std_logic;
+		ram_oen       : out   std_logic;
+		ram_wen       : out   std_logic;
+		ram_ub        : out   std_logic;
+		ram_lb        : out   std_logic;
 		-- Master interface write address
-		m_axi_awvalid : out std_logic;
-		m_axi_awready : in  std_logic;
-		m_axi_awaddr  : out std_logic_vector(63 downto 0);
-		m_axi_awprot  : out std_logic_vector(2 downto 0);
+		m_axi_awvalid : out   std_logic;
+		m_axi_awready : in    std_logic;
+		m_axi_awaddr  : out   std_logic_vector(63 downto 0);
+		m_axi_awprot  : out   std_logic_vector(2 downto 0);
 		-- Master interface write data
-		m_axi_wvalid  : out std_logic;
-		m_axi_wready  : in  std_logic;
-		m_axi_wdata   : out std_logic_vector(63 downto 0);
-		m_axi_wstrb   : out std_logic_vector(7 downto 0);
+		m_axi_wvalid  : out   std_logic;
+		m_axi_wready  : in    std_logic;
+		m_axi_wdata   : out   std_logic_vector(63 downto 0);
+		m_axi_wstrb   : out   std_logic_vector(7 downto 0);
 		-- Master interface write response
-		m_axi_bvalid  : in  std_logic;
-		m_axi_bready  : out std_logic;
-		m_axi_bresp   : in  std_logic;
+		m_axi_bvalid  : in    std_logic;
+		m_axi_bready  : out   std_logic;
+		m_axi_bresp   : in    std_logic;
 		-- Master interface read address
-		m_axi_arvalid : out std_logic;
-		m_axi_arready : in  std_logic;
-		m_axi_araddr  : out std_logic_vector(63 downto 0);
-		m_axi_arprot  : out std_logic_vector(2 downto 0);
+		m_axi_arvalid : out   std_logic;
+		m_axi_arready : in    std_logic;
+		m_axi_araddr  : out   std_logic_vector(63 downto 0);
+		m_axi_arprot  : out   std_logic_vector(2 downto 0);
 		-- Master interface read data return
-		m_axi_rvalid  : in  std_logic;
-		m_axi_rready  : out std_logic;
-		m_axi_rdata   : in  std_logic_vector(63 downto 0);
-		m_axi_rresp   : in  std_logic
+		m_axi_rvalid  : in    std_logic;
+		m_axi_rready  : out   std_logic;
+		m_axi_rdata   : in    std_logic_vector(63 downto 0);
+		m_axi_rresp   : in    std_logic
 	);
 end entity soc;
 
@@ -47,35 +64,51 @@ architecture behavior of soc is
 
 	component cpu
 		port(
-			reset         : in  std_logic;
-			clock         : in  std_logic;
-			rtc           : in  std_logic;
-			rx            : in  std_logic;
-			tx            : out std_logic;
+			reset         : in    std_logic;
+			clock         : in    std_logic;
+			rtc           : in    std_logic;
+			uart_rx       : in    std_logic;
+			uart_tx       : out   std_logic;
+			-- QSPI Flash interface
+			spi_cs        : out   std_logic;
+			spi_dq0       : inout std_logic;
+			spi_dq1       : inout std_logic;
+			spi_dq2       : inout std_logic;
+			spi_dq3       : inout std_logic;
+			spi_sck       : out   std_logic;
+			-- SRAM interface
+			ram_a         : out   std_logic_vector(26 downto 0);
+			ram_dq_i      : out   std_logic_vector(15 downto 0);
+			ram_dq_o      : in    std_logic_vector(15 downto 0);
+			ram_cen       : out   std_logic;
+			ram_oen       : out   std_logic;
+			ram_wen       : out   std_logic;
+			ram_ub        : out   std_logic;
+			ram_lb        : out   std_logic;
 			-- Master interface write address
-			m_axi_awvalid : out std_logic;
-			m_axi_awready : in  std_logic;
-			m_axi_awaddr  : out std_logic_vector(63 downto 0);
-			m_axi_awprot  : out std_logic_vector(2 downto 0);
+			m_axi_awvalid : out   std_logic;
+			m_axi_awready : in    std_logic;
+			m_axi_awaddr  : out   std_logic_vector(63 downto 0);
+			m_axi_awprot  : out   std_logic_vector(2 downto 0);
 			-- Master interface write data
-			m_axi_wvalid  : out std_logic;
-			m_axi_wready  : in  std_logic;
-			m_axi_wdata   : out std_logic_vector(63 downto 0);
-			m_axi_wstrb   : out std_logic_vector(7 downto 0);
+			m_axi_wvalid  : out   std_logic;
+			m_axi_wready  : in    std_logic;
+			m_axi_wdata   : out   std_logic_vector(63 downto 0);
+			m_axi_wstrb   : out   std_logic_vector(7 downto 0);
 			-- Master interface write response
-			m_axi_bvalid  : in  std_logic;
-			m_axi_bready  : out std_logic;
-			m_axi_bresp   : in  std_logic;
+			m_axi_bvalid  : in    std_logic;
+			m_axi_bready  : out   std_logic;
+			m_axi_bresp   : in    std_logic;
 			-- Master interface read address
-			m_axi_arvalid : out std_logic;
-			m_axi_arready : in  std_logic;
-			m_axi_araddr  : out std_logic_vector(63 downto 0);
-			m_axi_arprot  : out std_logic_vector(2 downto 0);
+			m_axi_arvalid : out   std_logic;
+			m_axi_arready : in    std_logic;
+			m_axi_araddr  : out   std_logic_vector(63 downto 0);
+			m_axi_arprot  : out   std_logic_vector(2 downto 0);
 			-- Master interface read data return
-			m_axi_rvalid  : in  std_logic;
-			m_axi_rready  : out std_logic;
-			m_axi_rdata   : in  std_logic_vector(63 downto 0);
-			m_axi_rresp   : in  std_logic
+			m_axi_rvalid  : in    std_logic;
+			m_axi_rready  : out   std_logic;
+			m_axi_rdata   : in    std_logic_vector(63 downto 0);
+			m_axi_rresp   : in    std_logic
 		);
 	end component;
 
@@ -114,8 +147,25 @@ begin
 			reset         => rst,
 			clock         => clk_pll,
 			rtc           => rtc,
-			rx            => rx,
-			tx            => tx,
+			-- UART interface
+			uart_rx       => uart_rx,
+			uart_tx       => uart_tx,
+			-- QSPI Flash interface
+			spi_cs        => spi_cs,
+			spi_dq0       => spi_dq0,
+			spi_dq1       => spi_dq1,
+			spi_dq2       => spi_dq2,
+			spi_dq3       => spi_dq3,
+			spi_sck       => spi_sck,
+			-- SRAM interface
+			ram_a         => ram_a,
+			ram_dq_i      => ram_dq_i,
+			ram_dq_o      => ram_dq_o,
+			ram_cen       => ram_cen,
+			ram_oen       => ram_oen,
+			ram_wen       => ram_wen,
+			ram_ub        => ram_ub,
+			ram_lb        => ram_lb,
 			-- Master interface write address
 			m_axi_awvalid => m_axi_awvalid,
 			m_axi_awready => m_axi_awready,

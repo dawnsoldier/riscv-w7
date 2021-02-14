@@ -16,8 +16,8 @@ entity cpu is
 		reset         : in    std_logic;
 		clock         : in    std_logic;
 		rtc           : in    std_logic;
-		rx            : in    std_logic;
-		tx            : out   std_logic;
+		uart_rx       : in    std_logic;
+		uart_tx       : out   std_logic;
 		-- QSPI Flash interface
 		spi_cs        : out   std_logic;
 		spi_dq0       : inout std_logic;
@@ -468,8 +468,8 @@ begin
 			uart_wdata => uart_wdata,
 			uart_wstrb => uart_wstrb,
 			uart_rdata => uart_rdata,
-			uart_rx    => rx,
-			uart_tx    => tx
+			uart_rx    => uart_rx,
+			uart_tx    => uart_tx
 		);
 
 	timer_comp : timer
