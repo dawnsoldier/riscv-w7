@@ -123,6 +123,7 @@ begin
 						v.ready := '1';
 					else
 						v.iter := v.iter + 1;
+						v.a := std_logic_vector(unsigned(v.a)+1);
 					end if;
 				else
 					v.count := v.count + 1;
@@ -148,6 +149,7 @@ begin
 						v.ready := '1';
 					else
 						v.iter := v.iter + 1;
+						v.a := std_logic_vector(unsigned(v.a)+1);
 					end if;
 				else
 					v.count := v.count + 1;
@@ -174,13 +176,13 @@ begin
 
 		rin <= v;
 
-		ram_a <= r.a;
-		ram_dq_i <= r.dq;
-		ram_cen <= r.cen;
-		ram_oen <= r.oen;
-		ram_wen <= r.wen;
-		ram_ub <= r.ub;
-		ram_lb <= r.lb;
+		ram_a <= v.a;
+		ram_dq_i <= v.dq;
+		ram_cen <= v.cen;
+		ram_oen <= v.oen;
+		ram_wen <= v.wen;
+		ram_ub <= v.ub;
+		ram_lb <= v.lb;
 
 		sram_rdata <= r.rdata;
 		sram_ready <= r.ready;
