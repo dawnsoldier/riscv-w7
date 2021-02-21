@@ -51,4 +51,7 @@ package configure is
 	constant ram_read_divider  : integer := 1;
 	constant ram_write_divider : integer := 1;
 
+	constant spi_read_divider  : integer := 1;
+	constant spi_write_divider : integer := 1;
+
 end configure;

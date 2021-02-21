@@ -69,4 +69,10 @@ package configure is
 	constant ram_read_divider  : integer := clk_pll/ram_read_freq;
 	constant ram_write_divider : integer := clk_pll/ram_write_freq;
 
+	constant spi_read_freq     : integer := 25000000;
+	constant spi_write_freq    : integer := 133000000;
+
+	constant spi_read_divider  : integer := clk_pll/spi_read_freq;
+	constant spi_write_divider : integer := clk_pll/spi_write_freq;
+
 end configure;

@@ -120,11 +120,11 @@ architecture behavior of soc is
 
 begin
 
-	process (clk)
+	process (clock)
 
 	begin
 
-		if (rising_edge(clk)) then
+		if (rising_edge(clock)) then
 			if count = clk_divider_rtc then
 				rtc <= not rtc;
 				count <= (others => '0');
@@ -144,7 +144,7 @@ begin
 
 	cpu_comp : cpu
 		port map(
-			reset         => rst,
+			reset         => reset,
 			clock         => clk_pll,
 			rtc           => rtc,
 			-- UART interface
