@@ -34,15 +34,40 @@ end qspi;
 
 architecture behavior of qspi is
 
-	type state_type is (IDLE, LOAD, STORE);
+	-- Supported commands:
+	----------------------------------------------------
+	--     0x03 Read Data byte
+	--     0x0B Read Data bytes at Fast Speed
+	--     0x3B Dual Output Read
+	--     0x6B Quad Output Read
+	--     0xBB Dual I/O High Performance Read
+	--     0xEB Quad I/O High Performance Read
+	----------------------------------------------------
+	--     0x06 Write Enable
+	--     0x04 Write Disable
+	----------------------------------------------------
+	--     0x60 Bulk Erase
+	----------------------------------------------------
+	--     0x02 Page Programming
+	--     0x32 Quad Page Programming
+	----------------------------------------------------
+	--     0x05 Read Status Register
+	--     0x01 Write (Status & Configuration) Register
+	--     0x35 Read Configuration Register (CFG)
+	--     0x30 Reset the Erase and Program Fail Flag (SR5 and SR6) and restore normal operation
+	----------------------------------------------------
+	--     0xAB Deep Power-Down
+	--     0xB9 Release from Deep Power-Down Mode
 
-	type mode_type is (IDLE,INSTR, ADDR, MODE, DUMMY, LD, SD);
+	type state_type is (IDLE, LOAD, STORE, ERASE, CONFIGURE);
+
+	type mode_type is (IDLE, INSTR, ADDR, MODE, DUMMY, LD, SD);
 
 	type register_type is record
 		state : state_type;
 		smode : mode_type;
 		instr : std_logic_vector(7 downto 0);
-		addr  : std_logic_vector(31 downto 0);
+		addr  : std_logic_vector(23 downto 0);
 		mode  : std_logic_vector(7 downto 0);
 		data  : std_logic_vector(63 downto 0);
 		strb  : std_logic_vector(7 downto 0);
@@ -59,7 +84,7 @@ architecture behavior of qspi is
 
 	constant init_register : register_type := (
 		state => IDLE,
-		smode => INSTR,
+		smode => IDLE,
 		instr => (others => '0'),
 		addr  => (others => '0'),
 		mode  => (others => '0'),
@@ -90,6 +115,10 @@ begin
 		v := r;
 
 		case r.state is
+			when CONFIGURE =>
+
+			when ERASE =>
+
 			when IDLE =>
 				v.state := IDLE;
 				v.smode := IDLE;
@@ -101,7 +130,7 @@ begin
 				v.sck := '1';
 				v.count := 0;
 				v.iter := 0;
-				if qspi_valid = '1' and nor_reduce(qspi_addr(63 downto 32)) = '1' then
+				if qspi_valid = '1' and nor_reduce(qspi_addr(63 downto 24)) = '1' then
 					if or_reduce(qspi_wstrb) = '0' then
 						v.state := LOAD;
 						v.instr := X"6C"; -- 4QOR
@@ -112,7 +141,7 @@ begin
 					v.smode := INSTR;
 					v.iter := 8;
 					v.inc := 1;
-					v.addr := qspi_addr(31 downto 0);
+					v.addr := qspi_addr(23 downto 0);
 					v.data := qspi_wdata;
 					v.strb := qspi_wstrb;
 					v.cs := '0';
@@ -131,7 +160,7 @@ begin
 							case v.smode is
 								when INSTR =>
 									v.smode := ADDR;
-									v.iter := 32;
+									v.iter := 24;
 									v.inc := 4;
 								when ADDR =>
 									v.smode := MODE;
@@ -202,7 +231,7 @@ begin
 								case v.smode is
 									when INSTR =>
 										v.smode := ADDR;
-										v.iter := 32;
+										v.iter := 24;
 										v.inc := 4;
 									when ADDR =>
 										v.smode := MODE;
