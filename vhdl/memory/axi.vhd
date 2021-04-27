@@ -32,7 +32,6 @@ entity axi is
 		-- Master interface write response
 		m_axi_bvalid  : in  std_logic;
 		m_axi_bready  : out std_logic;
-		m_axi_bresp   : in  std_logic;
 		-- Master interface read address
 		m_axi_arvalid : out std_logic;
 		m_axi_arready : in  std_logic;
@@ -41,8 +40,7 @@ entity axi is
 		-- Master interface read data return
 		m_axi_rvalid  : in  std_logic;
 		m_axi_rready  : out std_logic;
-		m_axi_rdata   : in  std_logic_vector(63 downto 0);
-		m_axi_rresp   : in  std_logic
+		m_axi_rdata   : in  std_logic_vector(63 downto 0)
 	);
 end axi;
 

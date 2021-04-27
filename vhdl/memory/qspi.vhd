@@ -311,6 +311,9 @@ begin
 		spi_dq2 <= v.dq2;
 		spi_dq3 <= v.dq3;
 
+		qspi_rdata <= (others => '0');
+		qspi_ready <= '0';
+
 	end process;
 
 	process(clock)
