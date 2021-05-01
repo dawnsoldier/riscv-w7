@@ -42,4 +42,5 @@ _start:
 
 _mtvec:
 
-  j handle_timer_interrupt
+  jal handle_timer_interrupt
+  mret
