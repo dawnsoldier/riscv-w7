@@ -17,11 +17,50 @@ use std.env.all;
 
 entity cpu is
 	port(
-		reset : in  std_logic;
-		clock : in  std_logic;
-		rtc   : in  std_logic;
-		rx    : in  std_logic;
-		tx    : out std_logic
+		reset         : in    std_logic;
+		clock         : in    std_logic;
+		rtc           : in    std_logic;
+		-- UART interface
+		uart_rx       : in    std_logic;
+		uart_tx       : out   std_logic;
+		-- QSPI Flash interface
+		spi_cs        : out   std_logic;
+		spi_dq0       : inout std_logic;
+		spi_dq1       : inout std_logic;
+		spi_dq2       : inout std_logic;
+		spi_dq3       : inout std_logic;
+		spi_sck       : out   std_logic;
+		-- SRAM interface
+		ram_a         : out   std_logic_vector(26 downto 0);
+		ram_dq_i      : out   std_logic_vector(15 downto 0);
+		ram_dq_o      : in    std_logic_vector(15 downto 0);
+		ram_cen       : out   std_logic;
+		ram_oen       : out   std_logic;
+		ram_wen       : out   std_logic;
+		ram_ub        : out   std_logic;
+		ram_lb        : out   std_logic;
+		-- Master interface write address
+		m_axi_awvalid : out   std_logic;
+		m_axi_awready : in    std_logic;
+		m_axi_awaddr  : out   std_logic_vector(63 downto 0);
+		m_axi_awprot  : out   std_logic_vector(2 downto 0);
+		-- Master interface write data
+		m_axi_wvalid  : out   std_logic;
+		m_axi_wready  : in    std_logic;
+		m_axi_wdata   : out   std_logic_vector(63 downto 0);
+		m_axi_wstrb   : out   std_logic_vector(7 downto 0);
+		-- Master interface write response
+		m_axi_bvalid  : in    std_logic;
+		m_axi_bready  : out   std_logic;
+		-- Master interface read address
+		m_axi_arvalid : out   std_logic;
+		m_axi_arready : in    std_logic;
+		m_axi_araddr  : out   std_logic_vector(63 downto 0);
+		m_axi_arprot  : out   std_logic_vector(2 downto 0);
+		-- Master interface read data return
+		m_axi_rvalid  : in    std_logic;
+		m_axi_rready  : out   std_logic;
+		m_axi_rdata   : in    std_logic_vector(63 downto 0)
 	);
 end entity cpu;
 
@@ -107,6 +146,84 @@ architecture behavior of cpu is
 		);
 	end component;
 
+	component qspi
+		port(
+			reset      : in    std_logic;
+			clock      : in    std_logic;
+			qspi_valid : in    std_logic;
+			qspi_ready : out   std_logic;
+			qspi_instr : in    std_logic;
+			qspi_addr  : in    std_logic_vector(63 downto 0);
+			qspi_wdata : in    std_logic_vector(63 downto 0);
+			qspi_wstrb : in    std_logic_vector(7 downto 0);
+			qspi_rdata : out   std_logic_vector(63 downto 0);
+			spi_cs     : out   std_logic;
+			spi_dq0    : inout std_logic;
+			spi_dq1    : inout std_logic;
+			spi_dq2    : inout std_logic;
+			spi_dq3    : inout std_logic;
+			spi_sck    : out   std_logic
+		);
+	end component;
+
+	component sram
+		port(
+			reset      : in  std_logic;
+			clock      : in  std_logic;
+			sram_valid : in  std_logic;
+			sram_ready : out std_logic;
+			sram_instr : in  std_logic;
+			sram_addr  : in  std_logic_vector(63 downto 0);
+			sram_wdata : in  std_logic_vector(63 downto 0);
+			sram_wstrb : in  std_logic_vector(7 downto 0);
+			sram_rdata : out std_logic_vector(63 downto 0);
+			ram_a      : out std_logic_vector(26 downto 0);
+			ram_dq_i   : out std_logic_vector(15 downto 0);
+			ram_dq_o   : in  std_logic_vector(15 downto 0);
+			ram_cen    : out std_logic;
+			ram_oen    : out std_logic;
+			ram_wen    : out std_logic;
+			ram_ub     : out std_logic;
+			ram_lb     : out std_logic
+		);
+	end component;
+
+	component axi
+		port(
+			reset         : in  std_logic;
+			clock         : in  std_logic;
+			axi_valid     : in  std_logic;
+			axi_ready     : out std_logic;
+			axi_instr     : in  std_logic;
+			axi_addr      : in  std_logic_vector(63 downto 0);
+			axi_wdata     : in  std_logic_vector(63 downto 0);
+			axi_wstrb     : in  std_logic_vector(7 downto 0);
+			axi_rdata     : out std_logic_vector(63 downto 0);
+			-- Master interface write address
+			m_axi_awvalid : out std_logic;
+			m_axi_awready : in  std_logic;
+			m_axi_awaddr  : out std_logic_vector(63 downto 0);
+			m_axi_awprot  : out std_logic_vector(2 downto 0);
+			-- Master interface write data
+			m_axi_wvalid  : out std_logic;
+			m_axi_wready  : in  std_logic;
+			m_axi_wdata   : out std_logic_vector(63 downto 0);
+			m_axi_wstrb   : out std_logic_vector(7 downto 0);
+			-- Master interface write response
+			m_axi_bvalid  : in  std_logic;
+			m_axi_bready  : out std_logic;
+			-- Master interface read address
+			m_axi_arvalid : out std_logic;
+			m_axi_arready : in  std_logic;
+			m_axi_araddr  : out std_logic_vector(63 downto 0);
+			m_axi_arprot  : out std_logic_vector(2 downto 0);
+			-- Master interface read data return
+			m_axi_rvalid  : in  std_logic;
+			m_axi_rready  : out std_logic;
+			m_axi_rdata   : in  std_logic_vector(63 downto 0)
+		);
+	end component;
+
 	signal ibus_i : mem_in_type;
 	signal ibus_o : mem_out_type;
 	signal dbus_i : mem_in_type;
@@ -144,9 +261,31 @@ architecture behavior of cpu is
 	signal timer_wstrb : std_logic_vector(7 downto 0);
 	signal timer_rdata : std_logic_vector(63 downto 0);
 
-	signal timer_irpt : std_logic;
+	signal qspi_valid : std_logic;
+	signal qspi_ready : std_logic;
+	signal qspi_instr : std_logic;
+	signal qspi_addr  : std_logic_vector(63 downto 0);
+	signal qspi_wdata : std_logic_vector(63 downto 0);
+	signal qspi_wstrb : std_logic_vector(7 downto 0);
+	signal qspi_rdata : std_logic_vector(63 downto 0);
 
-	signal massage      : string(1 to 511) := (others => character'val(0));
+	signal sram_valid : std_logic;
+	signal sram_ready : std_logic;
+	signal sram_instr : std_logic;
+	signal sram_addr  : std_logic_vector(63 downto 0);
+	signal sram_wdata : std_logic_vector(63 downto 0);
+	signal sram_wstrb : std_logic_vector(7 downto 0);
+	signal sram_rdata : std_logic_vector(63 downto 0);
+
+	signal axi_valid : std_logic;
+	signal axi_ready : std_logic;
+	signal axi_instr : std_logic;
+	signal axi_addr  : std_logic_vector(63 downto 0);
+	signal axi_wdata : std_logic_vector(63 downto 0);
+	signal axi_wstrb : std_logic_vector(7 downto 0);
+	signal axi_rdata : std_logic_vector(63 downto 0);
+
+	signal timer_irpt : std_logic;signal massage      : string(1 to 511) := (others => character'val(0));
 	signal index        : natural range 1 to 511 := 1;
 
 	procedure print(
@@ -211,35 +350,75 @@ architecture behavior of cpu is
 begin
 
 	process(memory_valid,memory_instr,memory_addr,memory_wdata,memory_wstrb,
-					bram_rdata,bram_ready,uart_rdata,uart_ready,timer_rdata,timer_ready)
+					bram_rdata,bram_ready,uart_rdata,uart_ready,timer_rdata,timer_ready,
+					qspi_rdata,qspi_ready,sram_rdata,sram_ready,axi_rdata,axi_ready)
 
 	begin
 
 		if memory_valid = '1' then
-			if (unsigned(memory_addr) >= unsigned(timer_base_addr) and
+			if (unsigned(memory_addr) >= unsigned(axi_base_addr) and
+					unsigned(memory_addr) < unsigned(axi_top_addr)) then
+				bram_valid <= '0';
+				uart_valid <= '0';
+				timer_valid <= '0';
+				sram_valid <= '0';
+				qspi_valid <= '0';
+				axi_valid <= memory_valid;
+			elsif (unsigned(memory_addr) >= unsigned(sram_base_addr) and
+					unsigned(memory_addr) < unsigned(sram_top_addr)) then
+				bram_valid <= '0';
+				uart_valid <= '0';
+				timer_valid <= '0';
+				qspi_valid <= '0';
+				sram_valid <= memory_valid;
+				axi_valid <= '0';
+			elsif (unsigned(memory_addr) >= unsigned(qspi_base_addr) and
+					unsigned(memory_addr) < unsigned(qspi_top_addr)) then
+				bram_valid <= '0';
+				uart_valid <= '0';
+				timer_valid <= '0';
+				qspi_valid <= memory_valid;
+				sram_valid <= '0';
+				axi_valid <= '0';
+			elsif (unsigned(memory_addr) >= unsigned(timer_base_addr) and
 					unsigned(memory_addr) < unsigned(timer_top_addr)) then
 				bram_valid <= '0';
 				uart_valid <= '0';
 				timer_valid <= memory_valid;
+				qspi_valid <= '0';
+				sram_valid <= '0';
+				axi_valid <= '0';
 			elsif (unsigned(memory_addr) >= unsigned(uart_base_addr) and
 					unsigned(memory_addr) < unsigned(uart_top_addr)) then
 				bram_valid <= '0';
 				uart_valid <= memory_valid;
 				timer_valid <= '0';
+				qspi_valid <= '0';
+				sram_valid <= '0';
+				axi_valid <= '0';
 			elsif (unsigned(memory_addr) >= unsigned(bram_base_addr) and
 					unsigned(memory_addr) < unsigned(bram_top_addr)) then
 				bram_valid <= memory_valid;
 				uart_valid <= '0';
 				timer_valid <= '0';
+				qspi_valid <= '0';
+				sram_valid <= '0';
+				axi_valid <= '0';
 			else
 				bram_valid <= '0';
 				uart_valid <= '0';
 				timer_valid <= '0';
+				qspi_valid <= '0';
+				sram_valid <= '0';
+				axi_valid <= '0';
 			end if;
 		else
 			bram_valid <= '0';
 			uart_valid <= '0';
 			timer_valid <= '0';
+			qspi_valid <= '0';
+			sram_valid <= '0';
+			axi_valid <= '0';
 		end if;
 
 		bram_instr <= memory_instr;
@@ -257,6 +436,21 @@ begin
 		timer_wdata <= memory_wdata;
 		timer_wstrb <= memory_wstrb;
 
+		qspi_instr <= memory_instr;
+		qspi_addr <= memory_addr xor qspi_base_addr;
+		qspi_wdata <= memory_wdata;
+		qspi_wstrb <= memory_wstrb;
+
+		sram_instr <= memory_instr;
+		sram_addr <= memory_addr xor sram_base_addr;
+		sram_wdata <= memory_wdata;
+		sram_wstrb <= memory_wstrb;
+
+		axi_instr <= memory_instr;
+		axi_addr <= memory_addr xor axi_base_addr;
+		axi_wdata <= memory_wdata;
+		axi_wstrb <= memory_wstrb;
+
 		if (bram_ready = '1') then
 			memory_rdata <= bram_rdata;
 			memory_ready <= bram_ready;
@@ -266,6 +460,15 @@ begin
 		elsif (timer_ready = '1') then
 			memory_rdata <= timer_rdata;
 			memory_ready <= timer_ready;
+		elsif (qspi_ready = '1') then
+			memory_rdata <= qspi_rdata;
+			memory_ready <= qspi_ready;
+		elsif (sram_ready = '1') then
+			memory_rdata <= sram_rdata;
+			memory_ready <= sram_ready;
+		elsif (axi_ready = '1') then
+			memory_rdata <= axi_rdata;
+			memory_ready <= axi_ready;
 		else
 			memory_rdata <= (others => '0');
 			memory_ready <= '0';
@@ -343,8 +546,8 @@ begin
 			uart_wdata => uart_wdata,
 			uart_wstrb => uart_wstrb,
 			uart_rdata => uart_rdata,
-			uart_rx    => rx,
-			uart_tx    => tx
+			uart_rx    => uart_rx,
+			uart_tx    => uart_tx
 		);
 
 	timer_comp : timer
@@ -360,6 +563,81 @@ begin
 			timer_wstrb => timer_wstrb,
 			timer_rdata => timer_rdata,
 			timer_irpt  => timer_irpt
+		);
+
+	qspi_comp : qspi
+		port map(
+			reset      => reset,
+			clock      => clock,
+			qspi_valid => qspi_valid,
+			qspi_ready => qspi_ready,
+			qspi_instr => qspi_instr,
+			qspi_addr  => qspi_addr,
+			qspi_wdata => qspi_wdata,
+			qspi_wstrb => qspi_wstrb,
+			qspi_rdata => qspi_rdata,
+			spi_cs     => spi_cs,
+			spi_dq0    => spi_dq0,
+			spi_dq1    => spi_dq1,
+			spi_dq2    => spi_dq2,
+			spi_dq3    => spi_dq3,
+			spi_sck    => spi_sck
+		);
+
+	sram_comp : sram
+		port map(
+			reset      => reset,
+			clock      => clock,
+			sram_valid => sram_valid,
+			sram_ready => sram_ready,
+			sram_instr => sram_instr,
+			sram_addr  => sram_addr,
+			sram_wdata => sram_wdata,
+			sram_wstrb => sram_wstrb,
+			sram_rdata => sram_rdata,
+			ram_a      => ram_a,
+			ram_dq_i   => ram_dq_i,
+			ram_dq_o   => ram_dq_o,
+			ram_cen    => ram_cen,
+			ram_oen    => ram_oen,
+			ram_wen    => ram_wen,
+			ram_ub     => ram_ub,
+			ram_lb     => ram_lb
+		);
+
+	axi_comp : axi
+		port map(
+			reset         => reset,
+			clock         => clock,
+			axi_valid     => axi_valid,
+			axi_ready     => axi_ready,
+			axi_instr     => axi_instr,
+			axi_addr      => axi_addr,
+			axi_wdata     => axi_wdata,
+			axi_wstrb     => axi_wstrb,
+			axi_rdata     => axi_rdata,
+			-- Master interface write address
+			m_axi_awvalid => m_axi_awvalid,
+			m_axi_awready => m_axi_awready,
+			m_axi_awaddr  => m_axi_awaddr,
+			m_axi_awprot  => m_axi_awprot,
+			-- Master interface write data
+			m_axi_wvalid  => m_axi_wvalid,
+			m_axi_wready  => m_axi_wready,
+			m_axi_wdata   => m_axi_wdata,
+			m_axi_wstrb   => m_axi_wstrb,
+			-- Master interface write response
+			m_axi_bvalid  => m_axi_bvalid,
+			m_axi_bready  => m_axi_bready,
+			-- Master interface read address
+			m_axi_arvalid => m_axi_arvalid,
+			m_axi_arready => m_axi_arready,
+			m_axi_araddr  => m_axi_araddr,
+			m_axi_arprot  => m_axi_arprot,
+			-- Master interface read data return
+			m_axi_rvalid  => m_axi_rvalid,
+			m_axi_rready  => m_axi_rready,
+			m_axi_rdata   => m_axi_rdata
 		);
 
 end architecture;

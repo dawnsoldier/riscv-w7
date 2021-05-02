@@ -47,7 +47,6 @@ entity cpu is
 		-- Master interface write response
 		m_axi_bvalid  : in    std_logic;
 		m_axi_bready  : out   std_logic;
-		m_axi_bresp   : in    std_logic;
 		-- Master interface read address
 		m_axi_arvalid : out   std_logic;
 		m_axi_arready : in    std_logic;
@@ -56,8 +55,7 @@ entity cpu is
 		-- Master interface read data return
 		m_axi_rvalid  : in    std_logic;
 		m_axi_rready  : out   std_logic;
-		m_axi_rdata   : in    std_logic_vector(63 downto 0);
-		m_axi_rresp   : in    std_logic
+		m_axi_rdata   : in    std_logic_vector(63 downto 0)
 	);
 end entity cpu;
 
@@ -209,7 +207,6 @@ architecture behavior of cpu is
 			-- Master interface write response
 			m_axi_bvalid  : in  std_logic;
 			m_axi_bready  : out std_logic;
-			m_axi_bresp   : in  std_logic;
 			-- Master interface read address
 			m_axi_arvalid : out std_logic;
 			m_axi_arready : in  std_logic;
@@ -218,8 +215,7 @@ architecture behavior of cpu is
 			-- Master interface read data return
 			m_axi_rvalid  : in  std_logic;
 			m_axi_rready  : out std_logic;
-			m_axi_rdata   : in  std_logic_vector(63 downto 0);
-			m_axi_rresp   : in  std_logic
+			m_axi_rdata   : in  std_logic_vector(63 downto 0)
 		);
 	end component;
 
@@ -551,7 +547,6 @@ begin
 			-- Master interface write response
 			m_axi_bvalid  => m_axi_bvalid,
 			m_axi_bready  => m_axi_bready,
-			m_axi_bresp   => m_axi_bresp,
 			-- Master interface read address
 			m_axi_arvalid => m_axi_arvalid,
 			m_axi_arready => m_axi_arready,
@@ -560,8 +555,7 @@ begin
 			-- Master interface read data return
 			m_axi_rvalid  => m_axi_rvalid,
 			m_axi_rready  => m_axi_rready,
-			m_axi_rdata   => m_axi_rdata,
-			m_axi_rresp   => m_axi_rresp
+			m_axi_rdata   => m_axi_rdata
 		);
 
 end architecture;

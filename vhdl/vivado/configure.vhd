@@ -26,11 +26,11 @@ package configure is
 	constant fetchbuffer_depth : integer := 4;
 	constant storebuffer_depth : integer := 4;
 
-	constant fpu_enable        : boolean := true;
-	constant fpu_performance   : boolean := true;
+	constant fpu_enable        : boolean := false;
+	constant fpu_performance   : boolean := false;
 	constant mul_performance   : boolean := true;
 
-	constant pmp_enable        : boolean := true;
+	constant pmp_enable        : boolean := false;
 	constant pmp_regions       : integer := 8;
 
 	constant bram_base_addr    : std_logic_vector(63 downto 0) := X"0000000000000000";
