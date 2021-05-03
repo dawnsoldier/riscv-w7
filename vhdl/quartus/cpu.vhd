@@ -97,13 +97,10 @@ architecture behavior of cpu is
 
 	component bram_mem
 		port(
-			reset      : in  std_logic;
 			clock      : in  std_logic;
 			bram_wen   : in  std_logic;
-			bram_ren   : in  std_logic;
-			bram_ready : out std_logic;
-			bram_instr : in  std_logic;
-			bram_addr  : in  std_logic_vector(bram_depth-1 downto 0);
+			bram_waddr : in  integer range 0 to 2**bram_depth-1;
+			bram_raddr : in  integer range 0 to 2**bram_depth-1;
 			bram_wdata : in  std_logic_vector(63 downto 0);
 			bram_wstrb : in  std_logic_vector(7 downto 0);
 			bram_rdata : out std_logic_vector(63 downto 0)
@@ -238,10 +235,10 @@ architecture behavior of cpu is
 
 	signal bram_valid : std_logic;
 	signal bram_wen   : std_logic;
-	signal bram_ren   : std_logic;
 	signal bram_ready : std_logic;
 	signal bram_instr : std_logic;
-	signal bram_addr  : std_logic_vector(bram_depth-1 downto 0);
+	signal bram_waddr : integer range 0 to 2**bram_depth-1;
+	signal bram_raddr : integer range 0 to 2**bram_depth-1;
 	signal bram_wdata : std_logic_vector(63 downto 0);
 	signal bram_wstrb : std_logic_vector(7 downto 0);
 	signal bram_rdata : std_logic_vector(63 downto 0);
@@ -364,9 +361,8 @@ begin
 		end if;
 
 		bram_wen <= bram_valid and or_reduce(memory_wstrb);
-		bram_ren <= bram_valid and nor_reduce(memory_wstrb);
-		bram_instr <= memory_instr;
-		bram_addr <= memory_addr(bram_depth+2 downto 3) xor bram_base_addr(bram_depth+2 downto 3);
+		bram_waddr <= to_integer(unsigned(memory_addr(bram_depth+2 downto 3) xor bram_base_addr(bram_depth+2 downto 3)));
+		bram_raddr <= to_integer(unsigned(memory_addr(bram_depth+2 downto 3) xor bram_base_addr(bram_depth+2 downto 3)));
 		bram_wdata <= memory_wdata;
 		bram_wstrb <= memory_wstrb;
 
@@ -420,6 +416,21 @@ begin
 
 	end process;
 
+	process(clock)
+	begin
+
+		if rising_edge(clock) then
+
+			if bram_valid = '1' then
+				bram_ready <= '1';
+			else
+				bram_ready <= '0';
+			end if;
+
+		end if;
+
+	end process;
+
 	core_comp : core
 		port map(
 			reset     => reset,
@@ -451,13 +462,10 @@ begin
 
 	bram_comp : bram_mem
 		port map(
-			reset      => reset,
 			clock      => clock,
 			bram_wen   => bram_wen,
-			bram_ren   => bram_ren,
-			bram_ready => bram_ready,
-			bram_instr => bram_instr,
-			bram_addr  => bram_addr,
+			bram_waddr => bram_waddr,
+			bram_raddr => bram_raddr,
 			bram_wdata => bram_wdata,
 			bram_wstrb => bram_wstrb,
 			bram_rdata => bram_rdata
