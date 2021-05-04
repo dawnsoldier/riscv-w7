@@ -39,7 +39,6 @@ architecture behavior of bram_mem is
 	attribute ramstyle of memory_block : signal is "M10K";
 
 	signal rdata : word_type := (others => (others => '0'));
-	signal ready : std_logic := '0';
 
 begin
 
