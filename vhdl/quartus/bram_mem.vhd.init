@@ -19,8 +19,8 @@ entity bram_mem is
 		clock      : in  std_logic;
 		-- BRAM Interface
 		bram_wen   : in  std_logic;
-		bram_waddr : in  integer range 0 to 2**bram_depth-1;
-		bram_raddr : in  integer range 0 to 2**bram_depth-1;
+		bram_waddr : in  std_logic_vector(bram_depth-1 downto 0);
+		bram_raddr : in  std_logic_vector(bram_depth-1 downto 0);
 		bram_wdata : in  std_logic_vector(63 downto 0);
 		bram_wstrb : in  std_logic_vector(7 downto 0);
 		bram_rdata : out std_logic_vector(63 downto 0)
@@ -55,33 +55,33 @@ begin
 			if bram_wen = '1' then
 
 				if bram_wstrb(7) = '1' then
-					memory_block(bram_waddr)(7) <= bram_wdata(63 downto 56);
+					memory_block(to_integer(unsigned(bram_waddr)))(7) <= bram_wdata(63 downto 56);
 				end if;
 				if bram_wstrb(6) = '1' then
-					memory_block(bram_waddr)(6) <= bram_wdata(55 downto 48);
+					memory_block(to_integer(unsigned(bram_waddr)))(6) <= bram_wdata(55 downto 48);
 				end if;
 				if bram_wstrb(5) = '1' then
-					memory_block(bram_waddr)(5) <= bram_wdata(47 downto 40);
+					memory_block(to_integer(unsigned(bram_waddr)))(5) <= bram_wdata(47 downto 40);
 				end if;
 				if bram_wstrb(4) = '1' then
-					memory_block(bram_waddr)(4) <= bram_wdata(39 downto 32);
+					memory_block(to_integer(unsigned(bram_waddr)))(4) <= bram_wdata(39 downto 32);
 				end if;
 				if bram_wstrb(3) = '1' then
-					memory_block(bram_waddr)(3) <= bram_wdata(31 downto 24);
+					memory_block(to_integer(unsigned(bram_waddr)))(3) <= bram_wdata(31 downto 24);
 				end if;
 				if bram_wstrb(2) = '1' then
-					memory_block(bram_waddr)(2) <= bram_wdata(23 downto 16);
+					memory_block(to_integer(unsigned(bram_waddr)))(2) <= bram_wdata(23 downto 16);
 				end if;
 				if bram_wstrb(1) = '1' then
-					memory_block(bram_waddr)(1) <= bram_wdata(15 downto 8);
+					memory_block(to_integer(unsigned(bram_waddr)))(1) <= bram_wdata(15 downto 8);
 				end if;
 				if bram_wstrb(0) = '1' then
-					memory_block(bram_waddr)(0) <= bram_wdata(7 downto 0);
+					memory_block(to_integer(unsigned(bram_waddr)))(0) <= bram_wdata(7 downto 0);
 				end if;
 
 			end if;
 
-			rdata <= memory_block(bram_raddr);
+			rdata <= memory_block(to_integer(unsigned(bram_raddr)));
 
 		end if;
 

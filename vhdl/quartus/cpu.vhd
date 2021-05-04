@@ -99,8 +99,8 @@ architecture behavior of cpu is
 		port(
 			clock      : in  std_logic;
 			bram_wen   : in  std_logic;
-			bram_waddr : in  integer range 0 to 2**bram_depth-1;
-			bram_raddr : in  integer range 0 to 2**bram_depth-1;
+			bram_waddr : in  std_logic_vector(bram_depth-1 downto 0);
+			bram_raddr : in  std_logic_vector(bram_depth-1 downto 0);
 			bram_wdata : in  std_logic_vector(63 downto 0);
 			bram_wstrb : in  std_logic_vector(7 downto 0);
 			bram_rdata : out std_logic_vector(63 downto 0)
@@ -237,8 +237,7 @@ architecture behavior of cpu is
 	signal bram_wen   : std_logic;
 	signal bram_ready : std_logic;
 	signal bram_instr : std_logic;
-	signal bram_waddr : integer range 0 to 2**bram_depth-1;
-	signal bram_raddr : integer range 0 to 2**bram_depth-1;
+	signal bram_addr : std_logic_vector(bram_depth-1 downto 0);
 	signal bram_wdata : std_logic_vector(63 downto 0);
 	signal bram_wstrb : std_logic_vector(7 downto 0);
 	signal bram_rdata : std_logic_vector(63 downto 0);
@@ -361,8 +360,8 @@ begin
 		end if;
 
 		bram_wen <= bram_valid and or_reduce(memory_wstrb);
-		bram_waddr <= to_integer(unsigned(memory_addr(bram_depth+2 downto 3) xor bram_base_addr(bram_depth+2 downto 3)));
-		bram_raddr <= to_integer(unsigned(memory_addr(bram_depth+2 downto 3) xor bram_base_addr(bram_depth+2 downto 3)));
+		bram_instr <= memory_instr;
+		bram_addr <= memory_addr(bram_depth+2 downto 3) xor bram_base_addr(bram_depth+2 downto 3);
 		bram_wdata <= memory_wdata;
 		bram_wstrb <= memory_wstrb;
 
@@ -464,8 +463,8 @@ begin
 		port map(
 			clock      => clock,
 			bram_wen   => bram_wen,
-			bram_waddr => bram_waddr,
-			bram_raddr => bram_raddr,
+			bram_waddr => bram_addr,
+			bram_raddr => bram_addr,
 			bram_wdata => bram_wdata,
 			bram_wstrb => bram_wstrb,
 			bram_rdata => bram_rdata
