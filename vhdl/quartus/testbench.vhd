@@ -33,7 +33,7 @@ architecture behavior of testbench is
 begin
 
 	reset <= '1' after 100 ns;
-	clock <= not clock after 20 ns;
+	clock <= not clock after 10 ns;
 
 	soc_comp : soc
 		port map(
