@@ -63,27 +63,57 @@ begin
 		feedback <= not(count(8) xor count(6) xor count(5) xor count(4));
 	end generate COUNT_256;
 
-	process(clock)
+	LOWER : if cache_ways=1 generate
 
-	begin
+		process(clock)
 
-		if rising_edge(clock) then
+		begin
 
-			if reset = '0' then
+			if rising_edge(clock) then
 
-				count <= (others => '0');
+				if reset = '0' then
 
-			else
+					count <= (others => '0');
 
-				if random_i.miss = '1' then
-					count <= count(cache_ways-1 downto 1) & feedback;
+				else
+
+					if random_i.miss = '1' then
+						count <= (others => feedback);
+					end if;
+
 				end if;
 
 			end if;
 
-		end if;
+		end process;
 
-	end process;
+	end generate LOWER;
+
+	HIGHER : if cache_ways>1 generate
+
+		process(clock)
+
+		begin
+
+			if rising_edge(clock) then
+
+				if reset = '0' then
+
+					count <= (others => '0');
+
+				else
+
+					if random_i.miss = '1' then
+						count <= count(cache_ways-1 downto 1) & feedback;
+					end if;
+
+				end if;
+
+			end if;
+
+		end process;
+
+	end generate HIGHER;
 
 	random_o.wid <= to_integer(unsigned(count(cache_ways downto 1)));
 
