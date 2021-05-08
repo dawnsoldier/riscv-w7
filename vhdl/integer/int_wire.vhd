@@ -180,6 +180,7 @@ package int_wire is
 	type int_decode_reg_type is record
 		instr     : std_logic_vector(31 downto 0);
 		imm       : std_logic_vector(63 downto 0);
+		imm_csr   : std_logic_vector(63 downto 0);
 		imm_c     : std_logic_vector(63 downto 0);
 		imm_i     : std_logic_vector(63 downto 0);
 		imm_s     : std_logic_vector(63 downto 0);

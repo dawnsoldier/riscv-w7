@@ -36,7 +36,7 @@ $(eval $(call compile_template,rv64uc,$(src_dir),$(bld_dir),-march=rv64ic -mabi=
 $(eval $(call compile_template,rv64um,$(src_dir),$(bld_dir),-march=rv64im -mabi=lp64 -DXLEN=64))
 $(eval $(call compile_template,rv64uf,$(src_dir),$(bld_dir),-march=rv64if -mabi=lp64 -DXLEN=64))
 $(eval $(call compile_template,rv64ud,$(src_dir),$(bld_dir),-march=rv64id -mabi=lp64 -DXLEN=64))
-$(eval $(call compile_template,rv64mi,$(src_dir),$(bld_dir),-march=rv64i -mabi=lp64 -DXLEN=64))
+$(eval $(call compile_template,rv64mi,$(src_dir),$(bld_dir),-march=rv64imfd -mabi=lp64 -DXLEN=64))
 
 all: $(tests)
 

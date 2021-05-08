@@ -31,6 +31,8 @@ begin
 	begin
 		v.instr := int_decode_i.instr;
 
+		v.imm_csr := std_logic_vector(resize(unsigned(v.instr(19 downto 15)), 64));
+
 		v.imm_c := std_logic_vector(resize(signed(v.instr(19 downto 15)), 64));
 		v.imm_i := std_logic_vector(resize(signed(v.instr(31 downto 20)), 64));
 		v.imm_s := std_logic_vector(resize(signed(v.instr(31 downto 25) & v.instr(11 downto 7)), 64));
@@ -219,7 +221,7 @@ begin
 
 			when opcode_system =>
 
-				v.imm := v.imm_c;
+				v.imm := v.imm_csr;
 				case v.funct3 is
 					when "000" =>
 						case v.csr_addr is
