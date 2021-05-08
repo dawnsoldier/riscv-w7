@@ -23,26 +23,26 @@ end ras;
 
 architecture behavior of ras is
 
-  type stack_type is array (0 to 2**ras_depth-1) of std_logic_vector(63 downto 0);
+	type stack_type is array (0 to 2**ras_depth-1) of std_logic_vector(63 downto 0);
 
-  signal stack : stack_type := (others => (others => '0'));
+	signal stack : stack_type := (others => (others => '0'));
 
 begin
 
-  ras_o.rdata <= stack(ras_i.raddr);
+	ras_o.rdata <= stack(ras_i.raddr);
 
-  process(clock)
+	process(clock)
 
-  begin
+	begin
 
-  if rising_edge(clock) then
+	if rising_edge(clock) then
 
-    if ras_i.wen = '1' then
-      stack(ras_i.waddr) <= ras_i.wdata;
-    end if;
+		if ras_i.wen = '1' then
+			stack(ras_i.waddr) <= ras_i.wdata;
+		end if;
 
-  end if;
+	end if;
 
-  end process;
+	end process;
 
 end architecture;

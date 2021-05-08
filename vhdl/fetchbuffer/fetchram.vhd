@@ -29,34 +29,34 @@ architecture behavior of fetchram is
 
 begin
 
-  process(fetchram_i,fetch_ram)
+	process(fetchram_i,fetch_ram)
 
-  begin
+	begin
 
-    if fetchram_i.raddr = 2**fetchbuffer_depth-1 then
-      fetchram_o.rdata <= fetch_ram(0) & fetch_ram(fetchram_i.raddr);
-    else
-      fetchram_o.rdata <= fetch_ram(fetchram_i.raddr+1) & fetch_ram(fetchram_i.raddr);
-    end if;
+		if fetchram_i.raddr = 2**fetchbuffer_depth-1 then
+			fetchram_o.rdata <= fetch_ram(0) & fetch_ram(fetchram_i.raddr);
+		else
+			fetchram_o.rdata <= fetch_ram(fetchram_i.raddr+1) & fetch_ram(fetchram_i.raddr);
+		end if;
 
-  end process;
+	end process;
 
-  process(clock)
+	process(clock)
 
-  begin
+	begin
 
-    if rising_edge(clock) then
+		if rising_edge(clock) then
 
-      if fetchram_i.wren = '1' then
-        fetch_ram(fetchram_i.waddr) <= fetchram_i.wdata(15 downto 0);
-        fetch_ram(fetchram_i.waddr+1) <= fetchram_i.wdata(31 downto 16);
-        fetch_ram(fetchram_i.waddr+2) <= fetchram_i.wdata(47 downto 32);
-        fetch_ram(fetchram_i.waddr+3) <= fetchram_i.wdata(63 downto 48);
-      end if;
+			if fetchram_i.wren = '1' then
+				fetch_ram(fetchram_i.waddr) <= fetchram_i.wdata(15 downto 0);
+				fetch_ram(fetchram_i.waddr+1) <= fetchram_i.wdata(31 downto 16);
+				fetch_ram(fetchram_i.waddr+2) <= fetchram_i.wdata(47 downto 32);
+				fetch_ram(fetchram_i.waddr+3) <= fetchram_i.wdata(63 downto 48);
+			end if;
 
-    end if;
+		end if;
 
-  end process;
+	end process;
 
 
 end architecture;

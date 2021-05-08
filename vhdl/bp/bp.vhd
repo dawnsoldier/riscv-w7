@@ -235,7 +235,7 @@ begin
 
 			rin_ras <= v;
 
-	  	end process;
+		end process;
 
 		process(clock)
 

@@ -29,20 +29,20 @@ architecture behavior of btb is
 
 begin
 
-  btb_o.rdata <= target(btb_i.raddr);
+	btb_o.rdata <= target(btb_i.raddr);
 
-  process(clock)
+	process(clock)
 
-  begin
+	begin
 
-  if rising_edge(clock) then
+	if rising_edge(clock) then
 
-    if btb_i.wen = '1' then
-      target(btb_i.waddr) <= btb_i.wdata;
-    end if;
+		if btb_i.wen = '1' then
+			target(btb_i.waddr) <= btb_i.wdata;
+		end if;
 
-  end if;
+	end if;
 
-  end process;
+	end process;
 
 end architecture;

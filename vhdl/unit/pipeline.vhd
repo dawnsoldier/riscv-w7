@@ -206,8 +206,8 @@ architecture behavior of pipeline is
 			fbuffer_o : out fetchbuffer_out_type;
 			imem_o    : in  mem_out_type;
 			imem_i    : out mem_in_type
-  	);
-  end component;
+		);
+	end component;
 
 	component storebuffer
 		port(

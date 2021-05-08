@@ -11,19 +11,19 @@ end entity testbench;
 architecture behavior of testbench is
 
 	component soc
-    port(
-      reset   : in  std_logic;
-      clock   : in  std_logic;
-      uart_rx : in  std_logic;
-      uart_tx : out std_logic
-    );
+		port(
+			reset   : in  std_logic;
+			clock   : in  std_logic;
+			uart_rx : in  std_logic;
+			uart_tx : out std_logic
+		);
 	end component;
 
-  signal reset   : std_logic := '0';
-  signal clock   : std_logic := '0';
+	signal reset   : std_logic := '0';
+	signal clock   : std_logic := '0';
 
-  signal uart_rx : std_logic := '1';
-  signal uart_tx : std_logic := '1';
+	signal uart_rx : std_logic := '1';
+	signal uart_tx : std_logic := '1';
 
 begin
 

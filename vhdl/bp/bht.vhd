@@ -23,27 +23,27 @@ end bht;
 
 architecture behavior of bht is
 
-  type pattern_type is array (0 to 2**bht_depth-1) of unsigned(1 downto 0);
+	type pattern_type is array (0 to 2**bht_depth-1) of unsigned(1 downto 0);
 
-  signal pattern : pattern_type := (others => (others => '0'));
+	signal pattern : pattern_type := (others => (others => '0'));
 
 begin
 
-  bht_o.rdata1 <= pattern(bht_i.raddr1);
-  bht_o.rdata2 <= pattern(bht_i.raddr2);
+	bht_o.rdata1 <= pattern(bht_i.raddr1);
+	bht_o.rdata2 <= pattern(bht_i.raddr2);
 
-  process(clock)
+	process(clock)
 
-  begin
+	begin
 
-  if rising_edge(clock) then
+	if rising_edge(clock) then
 
-    if bht_i.wen = '1' then
-      pattern(bht_i.waddr) <= bht_i.wdata;
-    end if;
+		if bht_i.wen = '1' then
+			pattern(bht_i.waddr) <= bht_i.wdata;
+		end if;
 
-  end if;
+	end if;
 
-  end process;
+	end process;
 
 end architecture;
