@@ -80,15 +80,15 @@ package csr_wire is
 	end record;
 
 	type csr_exception_out_type is record
-		fs        : std_logic_vector(1 downto 0);
-		tvec      : std_logic_vector(63 downto 0);
-		epc       : std_logic_vector(63 downto 0);
-		frm       : std_logic_vector(2 downto 0);
-		pmpcfg    : csr_pmpcfg_type;
-		pmpaddr   : csr_pmpaddr_type;
-		priv_mode : std_logic_vector(1 downto 0);
-		exc       : std_logic;
-		mret      : std_logic;
+		fs      : std_logic_vector(1 downto 0);
+		tvec    : std_logic_vector(63 downto 0);
+		epc     : std_logic_vector(63 downto 0);
+		frm     : std_logic_vector(2 downto 0);
+		pmpcfg  : csr_pmpcfg_type;
+		pmpaddr : csr_pmpaddr_type;
+		mode    : std_logic_vector(1 downto 0);
+		exc     : std_logic;
+		mret    : std_logic;
 	end record;
 
 	type csr_alu_in_type is record

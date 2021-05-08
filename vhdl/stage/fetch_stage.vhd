@@ -123,7 +123,7 @@ begin
 		ipmp_i.mem_instr <= '1';
 		ipmp_i.mem_addr <= v.pc;
 		ipmp_i.mem_wstrb <= (others => '0');
-		ipmp_i.priv_mode <= csr_eo.priv_mode;
+		ipmp_i.mode <= csr_eo.mode;
 		ipmp_i.pmpcfg <= csr_eo.pmpcfg;
 		ipmp_i.pmpaddr <= csr_eo.pmpaddr;
 

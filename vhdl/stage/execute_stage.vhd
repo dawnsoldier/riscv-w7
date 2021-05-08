@@ -259,7 +259,7 @@ begin
 		dpmp_i.mem_instr <= '0';
 		dpmp_i.mem_addr <= v.address;
 		dpmp_i.mem_wstrb <= v.strobe;
-		dpmp_i.priv_mode <= csr_eo.priv_mode;
+		dpmp_i.mode <= csr_eo.mode;
 		dpmp_i.pmpcfg <= csr_eo.pmpcfg;
 		dpmp_i.pmpaddr <= csr_eo.pmpaddr;
 

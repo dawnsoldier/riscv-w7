@@ -234,16 +234,16 @@ begin
 				v.ecause := except_illegal_instruction;
 			elsif v.ecall = '1' then
 				v.exc := '1';
-				if csr_eo.priv_mode = u_mode then
+				if csr_eo.mode = u_mode then
 					v.ecause := except_env_call_user;
-				elsif csr_eo.priv_mode = m_mode then
+				elsif csr_eo.mode = m_mode then
 					v.ecause := except_env_call_mach;
 				end if;
 			elsif v.ebreak = '1' then
 				v.exc := '1';
 				v.ecause := except_breakpoint;
 			elsif v.csr = '1' then
-				if unsigned(v.csr_mode) > unsigned(csr_eo.priv_mode) then
+				if unsigned(v.csr_mode) > unsigned(csr_eo.mode) then
 					v.exc := '1';
 					v.etval := X"00000000" & v.instr;
 					v.ecause := except_illegal_instruction;

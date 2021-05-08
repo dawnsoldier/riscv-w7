@@ -823,7 +823,7 @@ package wire is
 		mem_instr : std_logic;
 		mem_addr  : std_logic_vector(63 downto 0);
 		mem_wstrb : std_logic_vector(7 downto 0);
-		priv_mode : std_logic_vector(1 downto 0);
+		mode      : std_logic_vector(1 downto 0);
 		pmpcfg    : csr_pmpcfg_type;
 		pmpaddr   : csr_pmpaddr_type;
 	end record;
