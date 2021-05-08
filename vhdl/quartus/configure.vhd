@@ -8,17 +8,17 @@ package configure is
 
 	constant bram_depth        : integer := 10;
 
-	constant icache_enable     : boolean := true;
+	constant icache_enable     : boolean := false;
 	constant icache_sets       : integer := 10;
 	constant icache_ways       : integer := 1;
 	constant icache_words      : integer := 2;
 
-	constant dcache_enable     : boolean := true;
+	constant dcache_enable     : boolean := false;
 	constant dcache_sets       : integer := 9;
 	constant dcache_ways       : integer := 2;
 	constant dcache_words      : integer := 2;
 
-	constant bp_enable         : boolean := true;
+	constant bp_enable         : boolean := false;
 	constant btb_depth         : integer := 6;
 	constant bht_depth         : integer := 6;
 	constant ras_depth         : integer := 2;
@@ -28,7 +28,7 @@ package configure is
 
 	constant fpu_enable        : boolean := false;
 	constant fpu_performance   : boolean := false;
-	constant mul_performance   : boolean := true;
+	constant mul_performance   : boolean := false;
 
 	constant pmp_enable        : boolean := false;
 	constant pmp_regions       : integer := 8;
