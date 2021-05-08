@@ -110,7 +110,7 @@ architecture behavior of core is
 	end record;
 
 	constant init_reg : reg_type := (
-		acc_t    => CACHE_ACCESS,
+		acc_t    => IO_MEM_ACCESS,
 		mod_t    => BUSY
 	);
 
