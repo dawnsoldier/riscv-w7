@@ -245,7 +245,7 @@ begin
 
 	ASYNCHRONOUS : if reset_async = true generate
 
-		process(reset,clock)
+		write_machine_csr : process(reset,clock)
 
 		begin
 
@@ -299,7 +299,7 @@ begin
 					end if;
 				end if;
 
-		elsif rising_edge(clock) then
+			elsif rising_edge(clock) then
 
 				mcsr.mcycle <= mcsr.mcycle + X"0000000000000001";
 
@@ -621,7 +621,7 @@ begin
 
 	SYNCHRONOUS : if reset_async = false generate
 
-		process(clock)
+		write_machine_csr : process(clock)
 
 		begin
 
