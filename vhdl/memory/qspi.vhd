@@ -322,11 +322,11 @@ begin
 
 		begin
 
-			if (reset = reset_active) then
+			if reset = reset_active then
 
 				r <= init_register;
 
-			elsif (rising_edge(clock)) then
+			elsif rising_edge(clock) then
 
 				r <= rin;
 
@@ -342,9 +342,9 @@ begin
 
 		begin
 
-			if (rising_edge(clock)) then
+			if rising_edge(clock) then
 
-				if (reset = reset_active) then
+				if reset = reset_active then
 					r <= init_register;
 				else
 					r <= rin;

@@ -164,12 +164,12 @@ begin
 
 		begin
 
-			if (reset = reset_active) then
+			if reset = reset_active then
 
 				r_tx <= init_register_tx;
 				r_rx <= init_register_rx;
 
-			elsif (rising_edge(clock)) then
+			elsif rising_edge(clock) then
 
 				r_tx <= rin_tx;
 				r_rx <= rin_rx;
@@ -186,9 +186,9 @@ begin
 
 		begin
 
-			if (rising_edge(clock)) then
+			if rising_edge(clock) then
 
-				if (reset = reset_active) then
+				if reset = reset_active then
 					r_tx <= init_register_tx;
 					r_rx <= init_register_rx;
 				else

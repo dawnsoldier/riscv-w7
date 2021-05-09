@@ -119,7 +119,7 @@ begin
 
 	begin
 
-		if (rising_edge(clock)) then
+		if rising_edge(clock) then
 
 			if count = clk_divider_rtc then
 				rtc <= not rtc;

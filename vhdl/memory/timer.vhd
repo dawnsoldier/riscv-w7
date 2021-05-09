@@ -42,14 +42,14 @@ begin
 
 		begin
 
-			if (reset = reset_active) then
+			if reset = reset_active then
 
 				mtimecmp <= (others => '0');
 				rdata <= (others => '0');
 				ready <= '0';
 				irpt <= '0';
 
-			elsif (rising_edge(clock)) then
+			elsif rising_edge(clock) then
 
 				ready <= '0';
 				if (timer_valid = '1') then
@@ -117,9 +117,9 @@ begin
 
 		begin
 
-			if (rising_edge(clock)) then
+			if rising_edge(clock) then
 
-				if (reset = reset_active) then
+				if reset = reset_active then
 					mtimecmp <= (others => '0');
 					rdata <= (others => '0');
 					ready <= '0';
