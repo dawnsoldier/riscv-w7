@@ -147,23 +147,49 @@ begin
 
 	end process;
 
-	process(clock)
-	begin
-		if rising_edge(clock) then
+	ASYNCHRONOUS : if reset_async = true generate
+
+		process(reset,clock)
+		begin
 
 			if reset = reset_active then
 
 				r <= init_writeback_reg;
 
-			else
+			elsif rising_edge(clock) then
 
 				r <= rin;
 				r.clear <= '0';
 
 			end if;
 
-		end if;
+		end process;
 
-	end process;
+	end generate ASYNCHRONOUS;
+
+	SYNCHRONOUS : if reset_async = false generate
+
+		process(clock)
+
+		begin
+
+			if rising_edge(clock) then
+
+				if reset = reset_active then
+
+					r <= init_writeback_reg;
+
+				else
+
+					r <= rin;
+					r.clear <= '0';
+
+				end if;
+
+			end if;
+
+		end process;
+
+	end generate SYNCHRONOUS;
 
 end architecture;

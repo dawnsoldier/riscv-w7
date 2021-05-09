@@ -162,20 +162,44 @@ begin
 	axi_ready <= m_axi_bvalid or m_axi_rvalid;
 	axi_rdata <= m_axi_rdata;
 
-	process(clock)
+	ASYNCHRONOUS : if reset_async = true generate
 
-	begin
+		process(reset,clock)
 
-		if (rising_edge(clock)) then
+		begin
 
 			if (reset = reset_active) then
+
 				r <= init_register;
-			else
+
+			elsif (rising_edge(clock)) then
+
 				r <= rin;
+
 			end if;
 
-		end if;
+		end process;
 
-	end process;
+	end generate ASYNCHRONOUS;
+
+	SYNCHRONOUS : if reset_async = false generate
+
+		process(clock)
+
+		begin
+
+			if (rising_edge(clock)) then
+
+				if (reset = reset_active) then
+					r <= init_register;
+				else
+					r <= rin;
+				end if;
+
+			end if;
+
+		end process;
+
+	end generate SYNCHRONOUS;
 
 end architecture;

@@ -158,22 +158,48 @@ begin
 	uart_rdata <= x"00000000000000" & r_rx.data_re;
 	uart_ready <= r_tx.ready_tx or r_rx.ready_re;
 
-	process(clock)
+	ASYNCHRONOUS : if reset_async = true generate
 
-	begin
+		process(reset,clock)
 
-		if (rising_edge(clock)) then
+		begin
 
 			if (reset = reset_active) then
+
 				r_tx <= init_register_tx;
 				r_rx <= init_register_rx;
-			else
+
+			elsif (rising_edge(clock)) then
+
 				r_tx <= rin_tx;
 				r_rx <= rin_rx;
+
 			end if;
 
-		end if;
+		end process;
 
-	end process;
+	end generate ASYNCHRONOUS;
+
+	SYNCHRONOUS : if reset_async = false generate
+
+		process(clock)
+
+		begin
+
+			if (rising_edge(clock)) then
+
+				if (reset = reset_active) then
+					r_tx <= init_register_tx;
+					r_rx <= init_register_rx;
+				else
+					r_tx <= rin_tx;
+					r_rx <= rin_rx;
+				end if;
+
+			end if;
+
+		end process;
+
+	end generate SYNCHRONOUS;
 
 end architecture;

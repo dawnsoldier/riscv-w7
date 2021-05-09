@@ -94,15 +94,18 @@ begin
 
 	end process;
 
-	process(clock)
+	ASYNCHRONOUS : if reset_async = true generate
 
-	begin
+		process(reset,clock)
 
-		if rising_edge(clock) then
+		begin
 
 			if reset = reset_active then
+
 				release_type <= instr_access;
-			else
+
+			elsif rising_edge(clock) then
+
 				if release_type = instr_access then
 					if access_type = data_access then
 						release_type <= data_access;
@@ -115,8 +118,37 @@ begin
 
 			end if;
 
-		end if;
+		end process;
 
-	end process;
+	end generate ASYNCHRONOUS;
+
+	SYNCHRONOUS : if reset_async = false generate
+
+		process(clock)
+
+		begin
+
+			if rising_edge(clock) then
+
+				if reset = reset_active then
+					release_type <= instr_access;
+				else
+					if release_type = instr_access then
+						if access_type = data_access then
+							release_type <= data_access;
+						end if;
+					elsif release_type = data_access then
+						if memory_ready = '1' and access_type = instr_access then
+							release_type <= instr_access;
+						end if;
+					end if;
+
+				end if;
+
+			end if;
+
+		end process;
+
+	end generate SYNCHRONOUS;
 
 end architecture;

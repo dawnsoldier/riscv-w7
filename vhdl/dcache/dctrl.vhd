@@ -441,26 +441,52 @@ begin
 
 	end process;
 
-	process(clock)
+	ASYNCHRONOUS : if reset_async = true generate
 
-	begin
+		process(reset,clock)
 
-		if rising_edge(clock) then
+		begin
 
 			if reset = reset_active then
 
 				r <= init_ctrl_type;
 				r_next <= init_data_type;
 
-			else
+			elsif rising_edge(clock) then
 
 				r <= rin;
 				r_next <= rin_next;
 
 			end if;
 
-		end if;
+		end process;
 
-	end process;
+	end generate ASYNCHRONOUS;
+
+	SYNCHRONOUS : if reset_async = false generate
+
+		process(clock)
+
+		begin
+
+			if rising_edge(clock) then
+
+				if reset = reset_active then
+
+					r <= init_ctrl_type;
+					r_next <= init_data_type;
+
+				else
+
+					r <= rin;
+					r_next <= rin_next;
+
+				end if;
+
+			end if;
+
+		end process;
+
+	end generate SYNCHRONOUS;
 
 end architecture;

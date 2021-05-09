@@ -237,11 +237,11 @@ begin
 
 		end process;
 
-		process(clock)
+		ASYNCHRONOUS : if reset_async = true generate
 
-		begin
+			process(reset,clock)
 
-			if rising_edge(clock) then
+			begin
 
 				if reset = reset_active then
 
@@ -249,7 +249,7 @@ begin
 					r_bht <= init_reg_bht;
 					r_ras <= init_reg_ras;
 
-				else
+				elsif rising_edge(clock) then
 
 					r_btb <= rin_btb;
 					r_bht <= rin_bht;
@@ -257,9 +257,37 @@ begin
 
 				end if;
 
-			end if;
+			end process;
 
-		end process;
+		end generate ASYNCHRONOUS;
+
+		SYNCHRONOUS : if reset_async = false generate
+
+			process(clock)
+
+			begin
+
+				if rising_edge(clock) then
+
+					if reset = reset_active then
+
+						r_btb <= init_reg_btb;
+						r_bht <= init_reg_bht;
+						r_ras <= init_reg_ras;
+
+					else
+
+						r_btb <= rin_btb;
+						r_bht <= rin_bht;
+						r_ras <= rin_ras;
+
+					end if;
+
+				end if;
+
+			end process;
+
+		end generate SYNCHRONOUS;
 
 	end generate BP_ON;
 

@@ -65,17 +65,17 @@ begin
 
 	LOWER : if cache_ways=1 generate
 
-		process(clock)
+		ASYNCHRONOUS : if reset_async = true generate
 
-		begin
+			process(reset,clock)
 
-			if rising_edge(clock) then
+			begin
 
 				if reset = reset_active then
 
 					count <= (others => '0');
 
-				else
+				elsif rising_edge(clock) then
 
 					if random_i.miss = '1' then
 						count <= (others => feedback);
@@ -83,25 +83,51 @@ begin
 
 				end if;
 
-			end if;
+			end process;
 
-		end process;
+		end generate ASYNCHRONOUS;
+
+		SYNCHRONOUS : if reset_async = false generate
+
+			process(clock)
+
+			begin
+
+				if rising_edge(clock) then
+
+					if reset = reset_active then
+
+						count <= (others => '0');
+
+					else
+
+						if random_i.miss = '1' then
+							count <= (others => feedback);
+						end if;
+
+					end if;
+
+				end if;
+
+			end process;
+
+		end generate SYNCHRONOUS;
 
 	end generate LOWER;
 
 	HIGHER : if cache_ways>1 generate
 
-		process(clock)
+		ASYNCHRONOUS : if reset_async = true generate
 
-		begin
+			process(reset,clock)
 
-			if rising_edge(clock) then
+			begin
 
 				if reset = reset_active then
 
 					count <= (others => '0');
 
-				else
+				elsif rising_edge(clock) then
 
 					if random_i.miss = '1' then
 						count <= count(cache_ways-1 downto 1) & feedback;
@@ -109,9 +135,35 @@ begin
 
 				end if;
 
-			end if;
+			end process;
 
-		end process;
+		end generate ASYNCHRONOUS;
+
+		SYNCHRONOUS : if reset_async = false generate
+
+			process(clock)
+
+			begin
+
+				if rising_edge(clock) then
+
+					if reset = reset_active then
+
+						count <= (others => '0');
+
+					else
+
+						if random_i.miss = '1' then
+							count <= count(cache_ways-1 downto 1) & feedback;
+						end if;
+
+					end if;
+
+				end if;
+
+			end process;
+
+		end generate SYNCHRONOUS;
 
 	end generate HIGHER;
 
