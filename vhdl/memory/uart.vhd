@@ -164,7 +164,7 @@ begin
 
 		if (rising_edge(clock)) then
 
-			if (reset = '0') then
+			if (reset = reset_active) then
 				r_tx <= init_register_tx;
 				r_rx <= init_register_rx;
 			else

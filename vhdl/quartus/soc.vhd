@@ -108,6 +108,8 @@ architecture behavior of soc is
 		);
 	end component;
 
+	signal rst   : std_logic := '0';
+
 	signal rtc   : std_logic := '0';
 	signal count : unsigned(31 downto 0) := (others => '0');
 
@@ -154,6 +156,8 @@ architecture behavior of soc is
 
 begin
 
+	rst <= not(reset);
+
 	process (clock)
 
 	begin
@@ -178,7 +182,7 @@ begin
 
 	cpu_comp : cpu
 		port map(
-			reset         => reset,
+			reset         => rst,
 			clock         => clk_pll,
 			rtc           => rtc,
 			-- UART interface

@@ -243,7 +243,7 @@ begin
 
 			if rising_edge(clock) then
 
-				if reset = '0' then
+				if reset = reset_active then
 
 					r_btb <= init_reg_btb;
 					r_bht <= init_reg_bht;
@@ -271,6 +271,22 @@ begin
 		bp_o.pred_raddr <= (others => '0');
 		bp_o.pred_return <= '0';
 		bp_o.pred_uncond <= '0';
+
+		btb_i.raddr <= 0;
+		btb_i.wen <= '0';
+		btb_i.waddr <= 0;
+		btb_i.wdata <= (others => '0');
+
+		bht_i.raddr1 <= 0;
+		bht_i.raddr2 <= 0;
+		bht_i.wen <= '0';
+		bht_i.waddr <= 0;
+		bht_i.wdata <= (others => '0');
+
+		ras_i.raddr <= 0;
+		ras_i.wen <= '0';
+		ras_i.waddr <= 0;
+		ras_i.wdata <= (others => '0');
 
 	end generate BP_OFF;
 

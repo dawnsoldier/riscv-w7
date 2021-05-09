@@ -314,7 +314,7 @@ begin
 
 		if rising_edge(clock) then
 
-			if reset = '0' then
+			if reset = reset_active then
 
 				r <= init_ctrl_type;
 				r_next <= init_data_type;

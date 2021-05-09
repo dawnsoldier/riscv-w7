@@ -42,7 +42,7 @@ begin
 
 		if (rising_edge(clock)) then
 
-			if (reset = '0') then
+			if (reset = reset_active) then
 				mtimecmp <= (others => '0');
 				rdata <= (others => '0');
 				ready <= '0';
@@ -110,7 +110,7 @@ begin
 
 		if (rising_edge(clock)) then
 
-			if (reset = '0') then
+			if (reset = reset_active) then
 				irpt <= '0';
 			else
 				if (unsigned(mtime) >= unsigned(mtimecmp)) then

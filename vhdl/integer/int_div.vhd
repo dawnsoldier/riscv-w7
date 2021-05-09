@@ -4,6 +4,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+use work.configure.all;
 use work.lzc_wire.all;
 use work.int_constants.all;
 use work.int_wire.all;
@@ -139,7 +140,7 @@ begin
 	begin
 		if rising_edge(clock) then
 
-			if reset = '0' then
+			if reset = reset_active then
 
 				r <= init_int_div_reg;
 

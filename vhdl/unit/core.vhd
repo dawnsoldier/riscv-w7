@@ -214,7 +214,7 @@ begin
 	begin
 
 		if rising_edge(clock) then
-			if reset = '0' then
+			if reset = reset_active then
 				ir <= init_reg;
 			else
 				ir <= irin;
@@ -294,7 +294,7 @@ begin
 	begin
 
 		if rising_edge(clock) then
-			if reset = '0' then
+			if reset = reset_active then
 				dr <= init_reg;
 			else
 				dr <= drin;

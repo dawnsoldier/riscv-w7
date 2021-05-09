@@ -6,6 +6,9 @@ use ieee.numeric_std.all;
 
 package configure is
 
+	constant reset_active      : std_logic := '1';
+	constant reset_async       : std_logic := '1';
+
 	constant bram_depth        : integer := 10;
 
 	constant icache_enable     : boolean := false;

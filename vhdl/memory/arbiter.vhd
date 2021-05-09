@@ -100,7 +100,7 @@ begin
 
 		if rising_edge(clock) then
 
-			if reset = '0' then
+			if reset = reset_active then
 				release_type <= instr_access;
 			else
 				if release_type = instr_access then

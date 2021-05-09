@@ -5,6 +5,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.std_logic_misc.all;
 
+use work.configure.all;
 use work.lzc_wire.all;
 use work.fp_cons.all;
 use work.fp_typ.all;
@@ -488,7 +489,7 @@ begin
 	begin
 		if rising_edge(clock) then
 
-			if reset = '0' then
+			if reset = reset_active then
 
 				r_1 <= init_fp_fma_reg_1;
 				r_2 <= init_fp_fma_reg_2;

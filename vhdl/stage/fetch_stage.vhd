@@ -159,7 +159,7 @@ begin
 	begin
 		if rising_edge(clock) then
 
-			if reset = '0' then
+			if reset = reset_active then
 
 				r <= init_fetch_reg;
 
