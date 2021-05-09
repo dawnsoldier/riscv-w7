@@ -7,7 +7,7 @@ use ieee.numeric_std.all;
 package configure is
 
 	constant reset_active      : std_logic := '0';
-	constant reset_async       : std_logic := '0';
+	constant reset_async       : boolean := false;
 
 	constant bram_depth        : integer := 15;
 
