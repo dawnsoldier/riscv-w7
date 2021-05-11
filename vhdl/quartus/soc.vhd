@@ -60,6 +60,15 @@ end entity soc;
 
 architecture behavior of soc is
 
+	component pll
+		port (
+			refclk   : in  std_logic := '0';
+			rst      : in  std_logic := '0';
+			outclk_0 : out std_logic;
+			outclk_1 : out std_logic
+		);
+	end component;
+
 	component cpu
 		port(
 			reset         : in    std_logic;
@@ -108,13 +117,9 @@ architecture behavior of soc is
 		);
 	end component;
 
-	signal rst   : std_logic := '0';
-
-	signal rtc   : std_logic := '0';
-	signal count : unsigned(31 downto 0) := (others => '0');
-
-	signal clk_pll   : std_logic := '0';
-	signal count_pll : unsigned(31 downto 0) := (others => '0');
+	signal rst           : std_logic := '0';
+	signal rtc           : std_logic := '0';
+	signal clk_pll       : std_logic := '0';
 	-- QSPI Flash interface
 	signal spi_cs        : std_logic := '0';
 	signal spi_dq0       : std_logic := '0';
@@ -158,27 +163,13 @@ begin
 
 	rst <= not(reset);
 
-	process (clock)
-
-	begin
-
-		if rising_edge(clock) then
-			if count = clk_divider_rtc then
-				rtc <= not rtc;
-				count <= (others => '0');
-			else
-				count <= count + 1;
-			end if;
-
-			if count_pll = clk_divider_pll then
-				clk_pll <= not clk_pll;
-				count_pll <= (others => '0');
-			else
-				count_pll <= count_pll + 1;
-			end if;
-		end if;
-
-	end process;
+	pll_comp : pll
+		port map(
+			refclk   => clock,
+			rst      => rst,
+			outclk_0 => clk_pll,
+			outclk_1 => rtc
+		);
 
 	cpu_comp : cpu
 		port map(
