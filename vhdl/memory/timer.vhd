@@ -36,21 +36,17 @@ architecture behavior of timer is
 
 begin
 
-	ASYNCHRONOUS : if reset_async = true generate
+	process(clock)
 
-		process(reset,clock)
+	begin
 
-		begin
+		if (rising_edge(clock)) then
 
-			if reset = reset_active then
-
+			if (reset = reset_active) then
 				mtimecmp <= (others => '0');
 				rdata <= (others => '0');
 				ready <= '0';
-				irpt <= '0';
-
-			elsif rising_edge(clock) then
-
+			else
 				ready <= '0';
 				if (timer_valid = '1') then
 					if (unsigned(timer_addr) = 0) then
@@ -98,98 +94,35 @@ begin
 						end if;
 					end if;
 				end if;
+			end if;
 
+		end if;
+
+	end process;
+
+	timer_rdata <= rdata;
+	timer_ready <= ready;
+	timer_irpt <= irpt;
+
+	process(clock)
+
+	begin
+
+		if (rising_edge(clock)) then
+
+			if (reset = reset_active) then
+				irpt <= '0';
+			else
 				if (unsigned(mtime) >= unsigned(mtimecmp)) then
 					irpt <= '1';
 				else
 					irpt <= '0';
 				end if;
-
 			end if;
 
-		end process;
+		end if;
 
-	end generate ASYNCHRONOUS;
-
-	SYNCHRONOUS : if reset_async = false generate
-
-		process(clock)
-
-		begin
-
-			if rising_edge(clock) then
-
-				if reset = reset_active then
-					mtimecmp <= (others => '0');
-					rdata <= (others => '0');
-					ready <= '0';
-					irpt <= '0';
-				else
-					ready <= '0';
-					if (timer_valid = '1') then
-						if (unsigned(timer_addr) = 0) then
-							if (or_reduce(timer_wstrb) = '0') then
-								rdata <= mtimecmp;
-								ready <= '1';
-							else
-								if (timer_wstrb(0) = '1') then
-									mtimecmp(7 downto 0) <= timer_wdata(7 downto 0);
-									ready <= '1';
-								end if;
-								if (timer_wstrb(1) = '1') then
-									mtimecmp(15 downto 8) <= timer_wdata(15 downto 8);
-									ready <= '1';
-								end if;
-								if (timer_wstrb(2) = '1') then
-									mtimecmp(23 downto 16) <= timer_wdata(23 downto 16);
-									ready <= '1';
-								end if;
-								if (timer_wstrb(3) = '1') then
-									mtimecmp(31 downto 24) <= timer_wdata(31 downto 24);
-									ready <= '1';
-								end if;
-								if (timer_wstrb(4) = '1') then
-									mtimecmp(39 downto 32) <= timer_wdata(39 downto 32);
-									ready <= '1';
-								end if;
-								if (timer_wstrb(5) = '1') then
-									mtimecmp(47 downto 40) <= timer_wdata(47 downto 40);
-									ready <= '1';
-								end if;
-								if (timer_wstrb(6) = '1') then
-									mtimecmp(55 downto 48) <= timer_wdata(55 downto 48);
-									ready <= '1';
-								end if;
-								if (timer_wstrb(7) = '1') then
-									mtimecmp(63 downto 56) <= timer_wdata(63 downto 56);
-									ready <= '1';
-								end if;
-							end if;
-						elsif (unsigned(timer_addr) = 8) then
-							if (or_reduce(timer_wstrb) = '0') then
-								rdata <= mtime;
-								ready <= '1';
-							end if;
-						end if;
-					end if;
-
-					if (unsigned(mtime) >= unsigned(mtimecmp)) then
-						irpt <= '1';
-					else
-						irpt <= '0';
-					end if;
-
-				end if;
-
-			end if;
-
-		end process;
-
-	end generate SYNCHRONOUS;
-
-	timer_rdata <= rdata;
-	timer_ready <= ready;
-	timer_irpt <= irpt;
+	end process;
 
 	process(rtc)
 

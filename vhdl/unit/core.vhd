@@ -209,6 +209,20 @@ begin
 
 	end process;
 
+	process (clock)
+
+	begin
+
+		if rising_edge(clock) then
+			if reset = reset_active then
+				ir <= init_reg;
+			else
+				ir <= irin;
+			end if;
+		end if;
+
+	end process;
+
 	process(dr,dmem_i,do_mem_i,dcache_o,dbus_o)
 
 	variable v : reg_type;
@@ -275,53 +289,19 @@ begin
 
 	end process;
 
-	ASYNCHRONOUS : if reset_async = true generate
+	process (clock)
 
-		process (reset,clock)
+	begin
 
-		begin
-
+		if rising_edge(clock) then
 			if reset = reset_active then
-
-				ir <= init_reg;
 				dr <= init_reg;
-
-			elsif rising_edge(clock) then
-
+			else
 				dr <= drin;
-				ir <= irin;
-
 			end if;
+		end if;
 
-		end process;
-
-	end generate ASYNCHRONOUS;
-
-	SYNCHRONOUS : if reset_async = false generate
-
-		process (clock)
-
-		begin
-
-			if rising_edge(clock) then
-
-				if reset = reset_active then
-
-					ir <= init_reg;
-					dr <= init_reg;
-
-				else
-
-					dr <= drin;
-					ir <= irin;
-
-				end if;
-
-			end if;
-
-		end process;
-
-	end generate SYNCHRONOUS;
+	end process;
 
 	pipeline_comp : pipeline
 		port map(
