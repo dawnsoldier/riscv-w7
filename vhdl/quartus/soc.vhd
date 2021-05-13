@@ -166,7 +166,6 @@ begin
 	pll_comp : pll
 		port map(
 			refclk   => clock,
-			rst      => rst,
 			outclk_0 => clk_pll,
 			outclk_1 => rtc
 		);
