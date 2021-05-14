@@ -65,7 +65,8 @@ architecture behavior of soc is
 			refclk   : in  std_logic := '0';
 			rst      : in  std_logic := '0';
 			outclk_0 : out std_logic;
-			outclk_1 : out std_logic
+			outclk_1 : out std_logic;
+			locked   : out std_logic
 		);
 	end component;
 
@@ -119,7 +120,9 @@ architecture behavior of soc is
 
 	signal rst           : std_logic := '0';
 	signal rtc           : std_logic := '0';
+	signal rst_pll       : std_logic := '0';
 	signal clk_pll       : std_logic := '0';
+	signal locked        : std_logic := '0';
 	-- QSPI Flash interface
 	signal spi_cs        : std_logic := '0';
 	signal spi_dq0       : std_logic := '0';
@@ -162,17 +165,20 @@ architecture behavior of soc is
 begin
 
 	rst <= not(reset);
+	rst_pll <= not(locked);
 
 	pll_comp : pll
 		port map(
 			refclk   => clock,
+			rst      => rst,
 			outclk_0 => clk_pll,
-			outclk_1 => rtc
+			outclk_1 => rtc,
+			locked   => locked
 		);
 
 	cpu_comp : cpu
 		port map(
-			reset         => rst,
+			reset         => rst_pll,
 			clock         => clk_pll,
 			rtc           => rtc,
 			-- UART interface
