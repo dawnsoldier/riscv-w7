@@ -2,7 +2,8 @@ default: all
 
 src_dir = $(BASEDIR)/soft/src
 bld_dir = $(BASEDIR)/build/aapg/elf
-srcs = $(wildcard $(src_dir)/aapg/setup/common/crt.S) $(wildcard $(src_dir)/aapg/setup/asm/*.S)
+srcs0 = $(wildcard $(src_dir)/aapg/setup/work/common/crt.S) $(wildcard $(src_dir)/aapg/setup/work/asm/*.S)
+srcs = $(filter-out $(wildcard $(src_dir)/aapg/setup/work/asm/*template.S), $(srcs0))
 objs0 = $(srcs:.c=.o)
 objs = $(objs0:.S=.o)
 
@@ -11,7 +12,7 @@ RISCV_GCC_OPTS ?= -march=$(MARCH) -mabi=$(MABI) -g -DPREALLOCATE=1 -mcmodel=meda
 RISCV_LINK_OPTS ?= -static -nostartfiles -lm -lgcc -T $(src_dir)/aapg/link.ld
 RISCV_OBJDUMP ?= $(RISCV)/riscv64-unknown-elf-objdump -S -Mnumeric,no-aliases --disassemble-all --disassemble-zeroes
 RISCV_OBJCOPY ?= $(RISCV)/riscv64-unknown-elf-objcopy -O binary
-RISCV_INCL ?= -I$(src_dir)/aapg/setup/common
+RISCV_INCL ?= -I$(src_dir)/aapg/setup/work/common
 RISCV_NM ?= $(RISCV)/riscv64-unknown-elf-nm -A
 
 aapg.elf: $(objs)

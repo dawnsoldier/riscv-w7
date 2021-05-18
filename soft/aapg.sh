@@ -37,7 +37,7 @@ fi
 cd ${BASEDIR}/soft/src/aapg/setup
 ${AAPG} setup
 
-cp ${BASEDIR}/soft/src/aapg/${CONFIG}.yaml ${BASEDIR}/soft/src/aapg/setup/config.yaml
+cp ${BASEDIR}/soft/src/aapg/${CONFIG}.yaml ${BASEDIR}/soft/src/aapg/setup/work/config.yaml
 ${AAPG} gen --arch rv64
 
 make -f ${BASEDIR}/soft/src/aapg/Makefile || exit

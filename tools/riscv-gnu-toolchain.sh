@@ -14,7 +14,7 @@ sudo chown -R $USER $RISCV_PATH/
 
 sudo apt-get install git autoconf automake autotools-dev curl libmpc-dev \
   libmpfr-dev libgmp-dev gawk build-essential bison flex texinfo gperf libtool \
-  patchutils bc zlib1g-dev libexpat-dev texinfo python
+  patchutils bc zlib1g-dev libexpat-dev texinfo python device-tree-compiler
 
 if [ -d "riscv-gnu-toolchain" ]; then
   rm -rf riscv-gnu-toolchain/
@@ -32,7 +32,7 @@ make -j$(nproc)
 
 git clone --recursive https://github.com/riscv/riscv-isa-sim.git
 
-cd riscv-spike
+cd riscv-isa-sim
 
 mkdir build
 cd build

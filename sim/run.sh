@@ -17,15 +17,17 @@ SIMULA="${GHDL} -r --std=08 --ieee=synopsys"
 
 if [ ! -z "$3" ]
 then
-  if [ ! "$3" = 'all' ] && [ ! "$3" = 'mi' ] && \
-     [ ! "$3" = 'ui' ] && [ ! "$3" = 'um' ] && \
-     [ ! "$3" = 'uf' ] && [ ! "$3" = 'ud' ] && \
-     [ ! "$3" = 'uc' ] && \
+  if [ ! "$3" = 'isa' ] && \
      [ ! "$3" = 'compliance' ] && \
      [ ! "$3" = 'dhrystone' ] && \
      [ ! "$3" = 'coremark' ] && \
      [ ! "$3" = 'csmith' ] && \
-     [ ! "$3" = 'torture' ]
+     [ ! "$3" = 'torture' ] && \
+     [ ! "$3" = 'uart' ] && \
+     [ ! "$3" = 'timer' ] && \
+     [ ! "$3" = 'float' ] && \
+     [ ! "$3" = 'cache' ] && \
+     [ ! "$3" = 'aapg' ]
   then
     cp $3 $DIR/sim/work/bram_mem.dat
   fi
@@ -267,7 +269,43 @@ $ANALYS $DIR/vhdl/tb/soc.vhd
 WAVE=""
 
 $ELABOR soc
-if [ "$3" = 'dhrystone' ]
+
+
+if [ "$3" = 'isa' ]
+then
+  for filename in $DIR/build/isa/dat/*.dat; do
+    cp $filename bram_mem.dat
+    filename=${filename##*/}
+    filename=${filename%.dat}
+    cp $DIR/build/isa/elf/${filename}.host host.dat
+    if [ "$5" = 'wave' ]
+    then
+      WAVE="--wave=${filename}.ghw"
+    elif [ "$5" = 'vcd' ]
+    then
+      WAVE="--vcd=${filename}.vcd"
+    fi
+    echo "${filename}"
+    $SIMULA soc --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
+  done
+elif [ "$3" = 'compliance' ]
+then
+  for filename in $DIR/build/compliance/dat/*.dat; do
+    cp $filename bram_mem.dat
+    filename=${filename##*/}
+    filename=${filename%.dat}
+    cp $DIR/build/compliance/elf/${filename}.host host.dat
+    if [ "$5" = 'wave' ]
+    then
+      WAVE="--wave=${filename}.ghw"
+    elif [ "$5" = 'vcd' ]
+    then
+      WAVE="--vcd=${filename}.vcd"
+    fi
+    echo "${filename}"
+    $SIMULA soc --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
+  done
+elif [ "$3" = 'dhrystone' ]
 then
   if [ "$5" = 'wave' ]
   then
@@ -315,142 +353,66 @@ then
   cp $DIR/build/torture/dat/torture.dat bram_mem.dat
   cp $DIR/build/torture/elf/torture.host host.dat
   $SIMULA soc --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
-elif [ "$3" = 'compliance' ]
+elif [ "$3" = 'uart' ]
 then
-  for filename in $DIR/build/compliance/dat/*.dat; do
-    cp $filename bram_mem.dat
-    filename=${filename##*/}
-    filename=${filename%.dat}
-    cp $DIR/build/compliance/elf/${filename}.host host.dat
-    if [ "$5" = 'wave' ]
-    then
-      WAVE="--wave=${filename}.ghw"
-    elif [ "$5" = 'vcd' ]
-    then
-      WAVE="--vcd=${filename}.vcd"
-    fi
-    echo "${filename}"
-    $SIMULA soc --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
-  done
-elif [ "$3" = 'all' ]
+  if [ "$5" = 'wave' ]
+  then
+    WAVE="--wave=uart.ghw"
+  elif [ "$5" = 'vcd' ]
+  then
+    WAVE="--vcd=uart.vcd"
+  fi
+  cp $DIR/build/uart/dat/uart.dat bram_mem.dat
+  cp $DIR/build/uart/elf/uart.host host.dat
+  $SIMULA soc --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
+elif [ "$3" = 'timer' ]
 then
-  for filename in $DIR/build/isa/dat/*.dat; do
-    cp $filename bram_mem.dat
-    filename=${filename##*/}
-    filename=${filename%.dat}
-    cp $DIR/build/isa/elf/${filename}.host host.dat
-    if [ "$5" = 'wave' ]
-    then
-      WAVE="--wave=${filename}.ghw"
-    elif [ "$5" = 'vcd' ]
-    then
-      WAVE="--vcd=${filename}.vcd"
-    fi
-    echo "${filename}"
-    $SIMULA soc --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
-  done
-elif [ "$3" = 'mi' ]
+  if [ "$5" = 'wave' ]
+  then
+    WAVE="--wave=timer.ghw"
+  elif [ "$5" = 'vcd' ]
+  then
+    WAVE="--vcd=timer.vcd"
+  fi
+  cp $DIR/build/timer/dat/timer.dat bram_mem.dat
+  cp $DIR/build/timer/elf/timer.host host.dat
+  $SIMULA soc --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
+elif [ "$3" = 'float' ]
 then
-  for filename in $DIR/build/isa/dat/rv64mi*.dat; do
-    cp $filename bram_mem.dat
-    filename=${filename##*/}
-    filename=${filename%.dat}
-    cp $DIR/build/isa/elf/${filename}.host host.dat
-    if [ "$5" = 'wave' ]
-    then
-      WAVE="--wave=${filename}.ghw"
-    elif [ "$5" = 'vcd' ]
-    then
-      WAVE="--vcd=${filename}.vcd"
-    fi
-    echo "${filename}"
-    $SIMULA soc --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
-  done
-elif [ "$3" = 'ui' ]
+  if [ "$5" = 'wave' ]
+  then
+    WAVE="--wave=float.ghw"
+  elif [ "$5" = 'vcd' ]
+  then
+    WAVE="--vcd=float.vcd"
+  fi
+  cp $DIR/build/float/dat/float.dat bram_mem.dat
+  cp $DIR/build/float/elf/float.host host.dat
+  $SIMULA soc --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
+elif [ "$3" = 'cache' ]
 then
-  for filename in $DIR/build/isa/dat/rv64ui*.dat; do
-    cp $filename bram_mem.dat
-    filename=${filename##*/}
-    filename=${filename%.dat}
-    cp $DIR/build/isa/elf/${filename}.host host.dat
-    if [ "$5" = 'wave' ]
-    then
-      WAVE="--wave=${filename}.ghw"
-    elif [ "$5" = 'vcd' ]
-    then
-      WAVE="--vcd=${filename}.vcd"
-    fi
-    echo "${filename}"
-    $SIMULA soc --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
-  done
-elif [ "$3" = 'uc' ]
+  if [ "$5" = 'wave' ]
+  then
+    WAVE="--wave=cache.ghw"
+  elif [ "$5" = 'vcd' ]
+  then
+    WAVE="--vcd=cache.vcd"
+  fi
+  cp $DIR/build/cache/dat/cache.dat bram_mem.dat
+  cp $DIR/build/cache/elf/cache.host host.dat
+  $SIMULA soc --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
+elif [ "$3" = 'aapg' ]
 then
-  for filename in $DIR/build/isa/dat/rv64uc*.dat; do
-    cp $filename bram_mem.dat
-    filename=${filename##*/}
-    filename=${filename%.dat}
-    cp $DIR/build/isa/elf/${filename}.host host.dat
-    if [ "$5" = 'wave' ]
-    then
-      WAVE="--wave=${filename}.ghw"
-    elif [ "$5" = 'vcd' ]
-    then
-      WAVE="--vcd=${filename}.vcd"
-    fi
-    echo "${filename}"
-    $SIMULA soc --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
-  done
-elif [ "$3" = 'um' ]
-then
-  for filename in $DIR/build/isa/dat/rv64um*.dat; do
-    cp $filename bram_mem.dat
-    filename=${filename##*/}
-    filename=${filename%.dat}
-    cp $DIR/build/isa/elf/${filename}.host host.dat
-    if [ "$5" = 'wave' ]
-    then
-      WAVE="--wave=${filename}.ghw"
-    elif [ "$5" = 'vcd' ]
-    then
-      WAVE="--vcd=${filename}.vcd"
-    fi
-    echo "${filename}"
-    $SIMULA soc --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
-  done
-elif [ "$3" = 'uf' ]
-then
-  for filename in $DIR/build/isa/dat/rv64uf*.dat; do
-    cp $filename bram_mem.dat
-    filename=${filename##*/}
-    filename=${filename%.dat}
-    cp $DIR/build/isa/elf/${filename}.host host.dat
-    if [ "$5" = 'wave' ]
-    then
-      WAVE="--wave=${filename}.ghw"
-    elif [ "$5" = 'vcd' ]
-    then
-      WAVE="--vcd=${filename}.vcd"
-    fi
-    echo "${filename}"
-    $SIMULA soc --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
-  done
-elif [ "$3" = 'ud' ]
-then
-  for filename in $DIR/build/isa/dat/rv64ud*.dat; do
-    cp $filename bram_mem.dat
-    filename=${filename##*/}
-    filename=${filename%.dat}
-    cp $DIR/build/isa/elf/${filename}.host host.dat
-    if [ "$5" = 'wave' ]
-    then
-      WAVE="--wave=${filename}.ghw"
-    elif [ "$5" = 'vcd' ]
-    then
-      WAVE="--vcd=${filename}.vcd"
-    fi
-    echo "${filename}"
-    $SIMULA soc --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
-  done
+  if [ "$5" = 'wave' ]
+  then
+    WAVE="--wave=aapg.ghw"
+  elif [ "$5" = 'vcd' ]
+  then
+    WAVE="--vcd=aapg.vcd"
+  fi
+  cp $DIR/build/aapg/dat/aapg.dat bram_mem.dat
+  cp $DIR/build/aapg/elf/aapg.host host.dat
+  $SIMULA soc --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
 else
   filename="$3"
   dirname="$3"

@@ -26,11 +26,11 @@ SECTIONS
   .text : { *(.text) }
 
   /* data segment */
-  . = 0x30000;
-  .data : { *(section1*) *(section2*) }
+  . = 0x10000;
+  .data : { *(begin_signature*) }
 
 
-  . = ALIGN(0x300000);
+  . = ALIGN(0x20000);
   .tohost : { *(.tohost) }
   .rodata : { *(rodata) }
 
