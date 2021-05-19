@@ -184,10 +184,6 @@ begin
 					v.acc_t := CACHE_ACCESS;
 					v.mod_t := BUSY;
 					icache_in := imem_i;
-				elsif imem_i.mem_invalid = '1' then
-					v.acc_t := CACHE_ACCESS;
-					v.mod_t := BUSY;
-					icache_in := imem_i;
 				else
 					v.acc_t := IO_MEM_ACCESS;
 					v.mod_t := BUSY;
@@ -196,6 +192,14 @@ begin
 			else
 				v.acc_t := NO_ACCESS;
 				v.mod_t := FREE;
+			end if;
+		end if;
+
+		if imem_i.mem_valid = '1' then
+			if imem_i.mem_invalid = '1' then
+				v.acc_t := CACHE_ACCESS;
+				v.mod_t := BUSY;
+				icache_in := imem_i;
 			end if;
 		end if;
 
@@ -265,10 +269,6 @@ begin
 					v.acc_t := CACHE_ACCESS;
 					v.mod_t := BUSY;
 					dcache_in := dmem_i;
-				elsif dmem_i.mem_invalid = '1' then
-					v.acc_t := CACHE_ACCESS;
-					v.mod_t := BUSY;
-					dcache_in := dmem_i;
 				else
 					v.acc_t := IO_MEM_ACCESS;
 					v.mod_t := BUSY;
@@ -277,6 +277,14 @@ begin
 			else
 				v.acc_t := NO_ACCESS;
 				v.mod_t := FREE;
+			end if;
+		end if;
+
+		if dmem_i.mem_valid = '1' then
+			if dmem_i.mem_invalid = '1' then
+				v.acc_t := CACHE_ACCESS;
+				v.mod_t := BUSY;
+				dcache_in := dmem_i;
 			end if;
 		end if;
 
