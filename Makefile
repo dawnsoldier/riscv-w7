@@ -15,7 +15,7 @@ OFFSET ?= 0x40000 # Number of dwords in blockram (address range is OFFSET * 8)
 TEST ?= dhrystone
 AAPG ?= aapg
 CONFIG ?= integer
-CYCLES ?= 10000000
+CYCLES ?= 1000000000
 WAVE ?= "" # "wave" for saving dump file
 
 generate_isa:
