@@ -253,6 +253,8 @@ architecture behavior of cpu is
 	signal uart_wstrb : std_logic_vector(7 downto 0);
 	signal uart_rdata : std_logic_vector(63 downto 0);
 
+	signal uart_complete : std_logic := '0';
+
 	signal timer_valid : std_logic;
 	signal timer_ready : std_logic;
 	signal timer_instr : std_logic;
@@ -307,7 +309,25 @@ architecture behavior of cpu is
 		end if;
 	end procedure print;
 
+	type host_type is array (0 to 0) of std_logic_vector(63 downto 0);
+
+	impure function init_host(
+		file_name : in string
+	)
+	return host_type is
+		file host_file      : text open read_mode is file_name;
+		variable host_line  : line;
+		variable host_block : host_type;
+	begin
+		readline(host_file, host_line);
+		hread(host_line, host_block(0));
+		return host_block;
+	end function;
+
+	signal host_block : host_type := init_host("host.dat");
+
 	procedure check(
+		host : in std_logic_vector(63 downto 0);
 		addr : in std_logic_vector(63 downto 0);
 		strb : in std_logic_vector(7 downto 0);
 		data : in std_logic_vector(63 downto 0)) is
@@ -315,14 +335,9 @@ architecture behavior of cpu is
 		variable ok : std_logic;
 		constant succ : string := "TEST SUCCEEDED";
 		constant fail : string := "TEST FAILED";
-		file host_file : text open read_mode is "host.dat";
-		variable host_line  : line;
-		variable host_address : std_logic_vector(63 downto 0);
 	begin
-		readline(host_file,host_line);
-		hread(host_line,host_address);
 		ok := '0';
-		if (addr = host_address) and (or_reduce(strb) = '1') then
+		if (addr = host) and (or_reduce(strb) = '1') then
 			ok := '1';
 		end if;
 		if ok = '1' then
@@ -481,13 +496,18 @@ begin
 	begin
 
 		if rising_edge(clock) then
-			if uart_valid = '1' and or_reduce(uart_addr) = '0' and or_reduce(uart_wstrb) = '1' then
+			if uart_complete = '0' and uart_valid = '1' and or_reduce(uart_addr) = '0' and or_reduce(uart_wstrb) = '1' then
 				print(massage,index,memory_wdata(7 downto 0));
 			elsif memory_valid = '1' then
-				check(memory_addr,memory_wstrb,memory_wdata);
+				check(host_block(0),memory_addr,memory_wstrb,memory_wdata);
 				if (bram_valid or timer_valid or uart_valid) = '0' then
 					exceed;
 				end if;
+			end if;
+			if uart_valid = '1' then
+				uart_complete <= '1';
+			else
+				uart_complete <= '0';
 			end if;
 		end if;
 

@@ -14,7 +14,8 @@ use std.env.all;
 
 entity bram_mem is
 	generic(
-		bram_depth : integer := bram_depth
+		bram_depth   : integer := bram_depth;
+		bram_latency : integer := bram_latency
 	);
 	port(
 		reset      : in  std_logic;
@@ -57,6 +58,8 @@ architecture behavior of bram_mem is
 	signal rdata : std_logic_vector(63 downto 0) := (others => '0');
 	signal ready : std_logic := '0';
 
+	signal latency : integer := 0;
+
 begin
 
 	bram_rdata <= rdata;
@@ -67,40 +70,51 @@ begin
 	begin
 		if rising_edge(clock) then
 
-			if bram_valid = '1' then
+			if latency = bram_latency then
 
-				maddr := to_integer(unsigned(bram_addr(27 downto 3)));
+				latency <= 0;
 
-				if bram_wstrb(7) = '1' then
-					memory_block(maddr)(63 downto 56) <= bram_wdata(63 downto 56);
-				end if;
-				if bram_wstrb(6) = '1' then
-					memory_block(maddr)(55 downto 48) <= bram_wdata(55 downto 48);
-				end if;
-				if bram_wstrb(5) = '1' then
-					memory_block(maddr)(47 downto 40) <= bram_wdata(47 downto 40);
-				end if;
-				if bram_wstrb(4) = '1' then
-					memory_block(maddr)(39 downto 32) <= bram_wdata(39 downto 32);
-				end if;
-				if bram_wstrb(3) = '1' then
-					memory_block(maddr)(31 downto 24) <= bram_wdata(31 downto 24);
-				end if;
-				if bram_wstrb(2) = '1' then
-					memory_block(maddr)(23 downto 16) <= bram_wdata(23 downto 16);
-				end if;
-				if bram_wstrb(1) = '1' then
-					memory_block(maddr)(15 downto 8) <= bram_wdata(15 downto 8);
-				end if;
-				if bram_wstrb(0) = '1' then
-					memory_block(maddr)(7 downto 0) <= bram_wdata(7 downto 0);
-				end if;
+				if bram_valid = '1' then
 
-				rdata <= memory_block(maddr);
-				ready <= '1';
+					maddr := to_integer(unsigned(bram_addr(27 downto 3)));
+
+					if bram_wstrb(7) = '1' then
+						memory_block(maddr)(63 downto 56) <= bram_wdata(63 downto 56);
+					end if;
+					if bram_wstrb(6) = '1' then
+						memory_block(maddr)(55 downto 48) <= bram_wdata(55 downto 48);
+					end if;
+					if bram_wstrb(5) = '1' then
+						memory_block(maddr)(47 downto 40) <= bram_wdata(47 downto 40);
+					end if;
+					if bram_wstrb(4) = '1' then
+						memory_block(maddr)(39 downto 32) <= bram_wdata(39 downto 32);
+					end if;
+					if bram_wstrb(3) = '1' then
+						memory_block(maddr)(31 downto 24) <= bram_wdata(31 downto 24);
+					end if;
+					if bram_wstrb(2) = '1' then
+						memory_block(maddr)(23 downto 16) <= bram_wdata(23 downto 16);
+					end if;
+					if bram_wstrb(1) = '1' then
+						memory_block(maddr)(15 downto 8) <= bram_wdata(15 downto 8);
+					end if;
+					if bram_wstrb(0) = '1' then
+						memory_block(maddr)(7 downto 0) <= bram_wdata(7 downto 0);
+					end if;
+
+					rdata <= memory_block(maddr);
+					ready <= '1';
+
+				else
+
+					ready <= '0';
+
+				end if;
 
 			else
 
+				latency <= latency + 1;
 				ready <= '0';
 
 			end if;
