@@ -115,6 +115,10 @@ begin
 
 		v.pc8 := std_logic_vector(unsigned(v.pc) + 8);
 
+		if v.busy = '1' then
+			v.valid := '0';
+		end if;
+
 		if v.valid = '1' then
 			v.raddr1 := to_integer(unsigned(v.pc(fetchbuffer_depth+2 downto 3)));
 			v.raddr2 := to_integer(unsigned(v.pc8(fetchbuffer_depth+2 downto 3)));
@@ -191,8 +195,10 @@ begin
 		if v.valid = '1' then
 			if v.spec = '1' then
 				v.fpc := v.npc(63 downto 3) & "000";
+				v.oflow := '0';
 			elsif v.fence = '1' then
 				v.fpc := v.pc(63 downto 3) & "000";
+				v.oflow := '0';
 			elsif v.ready = '1' and v.wren = '1' then
 				v.fpc := std_logic_vector(unsigned(v.fpc) + 8);
 			end if;
