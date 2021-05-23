@@ -23,23 +23,14 @@ end fetchram;
 
 architecture behavior of fetchram is
 
-	type ram_type is array (0 to 2**fetchbuffer_depth-1) of std_logic_vector(15 downto 0);
+	type ram_type is array (0 to 2**fetchbuffer_depth-1) of std_logic_vector(127 downto 0);
 
 	signal fetch_ram : ram_type := (others => (others => '0'));
 
 begin
 
-	process(fetchram_i,fetch_ram)
-
-	begin
-
-		if fetchram_i.raddr = 2**fetchbuffer_depth-1 then
-			fetchram_o.rdata <= fetch_ram(0) & fetch_ram(fetchram_i.raddr);
-		else
-			fetchram_o.rdata <= fetch_ram(fetchram_i.raddr+1) & fetch_ram(fetchram_i.raddr);
-		end if;
-
-	end process;
+	fetchram_o.rdata1 <= fetch_ram(fetchram_i.raddr1);
+	fetchram_o.rdata2 <= fetch_ram(fetchram_i.raddr2);
 
 	process(clock)
 
@@ -48,10 +39,7 @@ begin
 		if rising_edge(clock) then
 
 			if fetchram_i.wren = '1' then
-				fetch_ram(fetchram_i.waddr) <= fetchram_i.wdata(15 downto 0);
-				fetch_ram(fetchram_i.waddr+1) <= fetchram_i.wdata(31 downto 16);
-				fetch_ram(fetchram_i.waddr+2) <= fetchram_i.wdata(47 downto 32);
-				fetch_ram(fetchram_i.waddr+3) <= fetchram_i.wdata(63 downto 48);
+				fetch_ram(fetchram_i.waddr) <= fetchram_i.wdata;
 			end if;
 
 		end if;
