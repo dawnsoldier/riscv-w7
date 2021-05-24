@@ -32,6 +32,7 @@ architecture behavior of fetchctrl is
 		pc8     : std_logic_vector(63 downto 0);
 		npc     : std_logic_vector(63 downto 0);
 		fpc     : std_logic_vector(63 downto 0);
+		nfpc    : std_logic_vector(63 downto 0);
 		instr   : std_logic_vector(31 downto 0);
 		rdata   : std_logic_vector(63 downto 0);
 		rdata1  : std_logic_vector(127 downto 0);
@@ -47,6 +48,8 @@ architecture behavior of fetchctrl is
 		valid   : std_logic;
 		spec    : std_logic;
 		fence   : std_logic;
+		nspec   : std_logic;
+		nfence  : std_logic;
 		oflow   : std_logic;
 		store   : std_logic;
 		waddr   : natural range 0 to 2**fetchbuffer_depth-1;
@@ -62,6 +65,7 @@ architecture behavior of fetchctrl is
 		pc8     => bram_base_addr,
 		npc     => bram_base_addr,
 		fpc     => bram_base_addr,
+		nfpc    => bram_base_addr,
 		instr   => nop,
 		rdata   => (others => '0'),
 		rdata1  => (others => '0'),
@@ -77,6 +81,8 @@ architecture behavior of fetchctrl is
 		valid   => '0',
 		spec    => '0',
 		fence   => '0',
+		nspec   => '0',
+		nfence  => '0',
 		oflow   => '0',
 		store   => '0',
 		waddr   => 0,
@@ -199,7 +205,7 @@ begin
 		if v.valid = '1' then
 			if r.stall = '1' and v.stall = '1' then
 				if v.store = '1' and v.oflow = '1' then
-					if v.wren = '0' and v.waddr = v.raddr1 then
+					if v.wren = '0' then
 						v.wren := '1';
 						v.oflow := '0';
 					end if;
@@ -215,16 +221,30 @@ begin
 
 		if v.valid = '1' then
 			if v.spec = '1' then
-				v.fpc := v.npc(63 downto 3) & "000";
-				v.waddr_o := to_integer(unsigned(v.fpc(fetchbuffer_depth+2 downto 3)));
-				v.oflow := '0';
+				v.nfpc := v.npc(63 downto 3) & "000";
+				v.nspec := '1';
+				v.spec := '0';
 			elsif v.fence = '1' then
-				v.fpc := v.pc(63 downto 3) & "000";
-				v.waddr_o := to_integer(unsigned(v.fpc(fetchbuffer_depth+2 downto 3)));
-				v.oflow := '0';
+				v.nfpc := v.pc(63 downto 3) & "000";
+				v.nfence := '1';
+				v.fence := '0';
 			elsif v.wren = '1' then
 				v.waddr_o := to_integer(unsigned(v.fpc(fetchbuffer_depth+2 downto 3)));
 				v.fpc := std_logic_vector(unsigned(v.fpc) + 8);
+			end if;
+		end if;
+
+		if v.ready = '1' then
+			if v.valid = '1' then
+				if v.nspec = '1' or v.nfence = '1' then
+					v.fpc := v.nfpc;
+					v.waddr_o := to_integer(unsigned(v.fpc(fetchbuffer_depth+2 downto 3)));
+					v.spec := v.nspec;
+					v.fence := v.nfence;
+					v.nspec := '0';
+					v.nfence := '0';
+					v.oflow := '0';
+				end if;
 			end if;
 		end if;
 
