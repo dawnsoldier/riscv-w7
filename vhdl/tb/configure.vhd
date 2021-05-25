@@ -9,7 +9,7 @@ package configure is
 	constant reset_active      : std_logic := '0';
 
 	constant bram_depth        : integer := 15;
-	constant bram_latency      : integer := 10;
+	constant bram_latency      : integer := 0;
 
 	constant icache_enable     : boolean := true;
 	constant icache_sets       : integer := 10;

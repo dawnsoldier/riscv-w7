@@ -38,25 +38,21 @@ architecture behavior of fetchctrl is
 		rdata1  : std_logic_vector(127 downto 0);
 		rdata2  : std_logic_vector(127 downto 0);
 		wdata   : std_logic_vector(127 downto 0);
+		rden    : std_logic;
 		rden1   : std_logic;
 		rden2   : std_logic;
 		ready   : std_logic;
 		flush   : std_logic;
 		busy    : std_logic;
 		wren    : std_logic;
-		rden    : std_logic;
 		valid   : std_logic;
 		spec    : std_logic;
 		fence   : std_logic;
 		nspec   : std_logic;
 		nfence  : std_logic;
-		oflow   : std_logic;
-		store   : std_logic;
 		waddr   : natural range 0 to 2**fetchbuffer_depth-1;
 		raddr1  : natural range 0 to 2**fetchbuffer_depth-1;
 		raddr2  : natural range 0 to 2**fetchbuffer_depth-1;
-		waddr_o : natural range 0 to 2**fetchbuffer_depth-1;
-		raddr_o : natural range 0 to 2**fetchbuffer_depth-1;
 		stall   : std_logic;
 	end record;
 
@@ -71,25 +67,21 @@ architecture behavior of fetchctrl is
 		rdata1  => (others => '0'),
 		rdata2  => (others => '0'),
 		wdata   => (others => '0'),
+		rden    => '0',
 		rden1   => '0',
 		rden2   => '0',
 		ready   => '0',
 		flush   => '0',
 		busy    => '0',
 		wren    => '0',
-		rden    => '0',
 		valid   => '0',
 		spec    => '0',
 		fence   => '0',
 		nspec   => '0',
 		nfence  => '0',
-		oflow   => '0',
-		store   => '0',
 		waddr   => 0,
 		raddr1  => 0,
 		raddr2  => 0,
-		waddr_o => 0,
-		raddr_o => 0,
 		stall   => '0'
 	);
 
@@ -107,8 +99,8 @@ begin
 
 		v.instr := nop;
 		v.stall := '0';
-		v.store := '0';
 		v.wren := '0';
+		v.rden := '0';
 		v.rden1 := '0';
 		v.rden2 := '0';
 
@@ -135,24 +127,9 @@ begin
 		end if;
 
 		if v.ready = '1' then
-			v.store := '1';
+			v.wren := '1';
 			v.waddr := to_integer(unsigned(v.fpc(fetchbuffer_depth+2 downto 3)));
 			v.wdata := v.fpc(63 downto 3) & "000" & v.rdata;
-		end if;
-
-		if v.oflow = '0' and v.waddr_o = 2**fetchbuffer_depth-1 and v.waddr = 0 then
-			v.oflow := '1';
-		end if;
-		if v.oflow = '1' and v.raddr_o = 2**fetchbuffer_depth-1 and v.raddr1 = 0 then
-			v.oflow := '0';
-		end if;
-
-		if v.store = '1' then
-			if v.oflow = '1' and v.waddr < v.raddr1 then
-				v.wren := '1';
-			elsif v.oflow= '0' then
-				v.wren := '1';
-			end if;
 		end if;
 
 		fetchram_i.raddr1 <= v.raddr1;
@@ -161,6 +138,9 @@ begin
 		v.rdata1 := fetchram_o.rdata1;
 		v.rdata2 := fetchram_o.rdata2;
 
+		if v.rdata1(63 downto 3) = v.fpc(63 downto 3) then
+			v.rden := v.wren;
+		end if;
 		if v.rdata1(127 downto 67) = v.pc(63 downto 3) then
 			v.rden1 := '1';
 		end if;
@@ -168,26 +148,52 @@ begin
 			v.rden2 := '1';
 		end if;
 
+		if v.nfence = '1' then
+			v.rden := '0';
+			v.rden1 := '0';
+			v.rden2 := '0';
+		end if;
+
+		if v.wren = '1' then
+			if v.rden1 = '1' and v.waddr = v.raddr1 then
+				v.wren := '0';
+			elsif v.rden2 = '1' and v.waddr = v.raddr2 then
+				v.wren := '0';
+			end if;
+		end if;
+
 		if v.pc(2 downto 1) = "00" then
-			if v.rden1 = '1' then
+			if v.rden = '1' then
+				v.instr := v.wdata(31 downto 0);
+			elsif v.rden1 = '1' then
 				v.instr := v.rdata1(31 downto 0);
 			else
 				v.stall := '1';
 			end if;
 		elsif v.pc(2 downto 1) = "01" then
-			if v.rden1 = '1' then
+			if v.rden = '1' then
+				v.instr := v.wdata(47 downto 16);
+			elsif v.rden1 = '1' then
 				v.instr := v.rdata1(47 downto 16);
 			else
 				v.stall := '1';
 			end if;
 		elsif v.pc(2 downto 1) = "10" then
-			if v.rden1 = '1' then
+			if v.rden = '1' then
+				v.instr := v.wdata(63 downto 32);
+			elsif v.rden1 = '1' then
 				v.instr := v.rdata1(63 downto 32);
 			else
 				v.stall := '1';
 			end if;
 		elsif v.pc(2 downto 1) = "11" then
-			if v.rden1 = '1' then
+			if v.rden = '1' then
+				if v.wdata(49 downto 48) = "11" then
+					v.stall := '1';
+				else
+					v.instr := X"0000" &  v.wdata(63 downto 48);
+				end if;
+			elsif v.rden1 = '1' then
 				if v.rdata1(49 downto 48) = "11" then
 					if v.rden2 = '1' then
 						v.instr := v.rdata2(15 downto 0) & v.rdata1(63 downto 48);
@@ -203,19 +209,10 @@ begin
 		end if;
 
 		if v.valid = '1' then
-			if r.stall = '1' and v.stall = '1' then
-				if v.store = '1' and v.oflow = '1' then
-					if v.wren = '0' then
-						v.wren := '1';
-						v.oflow := '0';
-					end if;
+			if v.stall = '1' then
+				if v.ready = '1' then
+					v.wren := '1';
 				end if;
-			end if;
-		end if;
-
-		if v.valid = '1' then
-			if v.stall = '0' then
-				v.raddr_o := to_integer(unsigned(v.pc(fetchbuffer_depth+2 downto 3)));
 			end if;
 		end if;
 
@@ -229,7 +226,6 @@ begin
 				v.nfence := '1';
 				v.fence := '0';
 			elsif v.wren = '1' then
-				v.waddr_o := to_integer(unsigned(v.fpc(fetchbuffer_depth+2 downto 3)));
 				v.fpc := std_logic_vector(unsigned(v.fpc) + 8);
 			end if;
 		end if;
@@ -238,12 +234,10 @@ begin
 			if v.valid = '1' then
 				if v.nspec = '1' or v.nfence = '1' then
 					v.fpc := v.nfpc;
-					v.waddr_o := to_integer(unsigned(v.fpc(fetchbuffer_depth+2 downto 3)));
 					v.spec := v.nspec;
 					v.fence := v.nfence;
 					v.nspec := '0';
 					v.nfence := '0';
-					v.oflow := '0';
 				end if;
 			end if;
 		end if;
