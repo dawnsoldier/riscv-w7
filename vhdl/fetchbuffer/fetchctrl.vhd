@@ -29,16 +29,16 @@ architecture behavior of fetchctrl is
 
 	type reg_type is record
 		pc      : std_logic_vector(63 downto 0);
-		pc8     : std_logic_vector(63 downto 0);
 		npc     : std_logic_vector(63 downto 0);
 		fpc     : std_logic_vector(63 downto 0);
 		nfpc    : std_logic_vector(63 downto 0);
 		instr   : std_logic_vector(31 downto 0);
 		rdata   : std_logic_vector(63 downto 0);
-		rdata1  : std_logic_vector(127 downto 0);
-		rdata2  : std_logic_vector(127 downto 0);
-		wdata   : std_logic_vector(127 downto 0);
-		rden    : std_logic;
+		rdata1  : std_logic_vector(63 downto 0);
+		rdata2  : std_logic_vector(63 downto 0);
+		wdata   : std_logic_vector(63 downto 0);
+		incr    : std_logic;
+		oflow   : std_logic;
 		rden1   : std_logic;
 		rden2   : std_logic;
 		ready   : std_logic;
@@ -58,7 +58,6 @@ architecture behavior of fetchctrl is
 
 	constant init_reg : reg_type := (
 		pc      => bram_base_addr,
-		pc8     => bram_base_addr,
 		npc     => bram_base_addr,
 		fpc     => bram_base_addr,
 		nfpc    => bram_base_addr,
@@ -67,7 +66,8 @@ architecture behavior of fetchctrl is
 		rdata1  => (others => '0'),
 		rdata2  => (others => '0'),
 		wdata   => (others => '0'),
-		rden    => '0',
+		incr    => '0',
+		oflow   => '0',
 		rden1   => '0',
 		rden2   => '0',
 		ready   => '0',
@@ -99,8 +99,8 @@ begin
 
 		v.instr := nop;
 		v.stall := '0';
+		v.incr := '0';
 		v.wren := '0';
-		v.rden := '0';
 		v.rden1 := '0';
 		v.rden2 := '0';
 
@@ -115,22 +115,36 @@ begin
 		v.flush := imem_o.mem_flush;
 		v.busy := imem_o.mem_busy;
 
-		v.pc8 := std_logic_vector(unsigned(v.pc) + 8);
-
-		if v.busy = '1' then
-			v.valid := '0';
-		end if;
-
-		if v.valid = '1' then
-			v.raddr1 := to_integer(unsigned(v.pc(fetchbuffer_depth+2 downto 3)));
-			v.raddr2 := to_integer(unsigned(v.pc8(fetchbuffer_depth+2 downto 3)));
-		end if;
-
 		if v.ready = '1' then
-			v.wren := '1';
-			v.waddr := to_integer(unsigned(v.fpc(fetchbuffer_depth+2 downto 3)));
-			v.wdata := v.fpc(63 downto 3) & "000" & v.rdata;
+			if v.oflow = '1' and v.waddr < v.raddr1 then
+				v.wren := '1';
+			elsif v.oflow = '0' then
+				v.wren := '1';
+			end if;
+			v.wdata := v.rdata;
 		end if;
+
+		if v.oflow = '0' and v.raddr1 < v.waddr then
+			v.rden1 := '1';
+		elsif v.oflow = '1' then
+			v.rden1 := '1';
+		end if;
+
+		if v.oflow = '0' and v.raddr2 < v.waddr then
+			v.rden2 := '1';
+		elsif v.oflow = '1' then
+			v.rden2 := '1';
+		end if;
+
+		if (v.nfence or v.nspec or v.busy or v.flush) = '1' then
+			v.wren := '0';
+			v.rden1 := '0';
+			v.rden2 := '0';
+		end if;
+
+		fetchram_i.wren <= v.wren;
+		fetchram_i.waddr <= v.waddr;
+		fetchram_i.wdata <= v.wdata;
 
 		fetchram_i.raddr1 <= v.raddr1;
 		fetchram_i.raddr2 <= v.raddr2;
@@ -138,62 +152,26 @@ begin
 		v.rdata1 := fetchram_o.rdata1;
 		v.rdata2 := fetchram_o.rdata2;
 
-		if v.rdata1(63 downto 3) = v.fpc(63 downto 3) then
-			v.rden := v.wren;
-		end if;
-		if v.rdata1(127 downto 67) = v.pc(63 downto 3) then
-			v.rden1 := '1';
-		end if;
-		if v.rdata2(127 downto 67) = v.pc8(63 downto 3) then
-			v.rden2 := '1';
-		end if;
-
-		if v.nfence = '1' then
-			v.rden := '0';
-			v.rden1 := '0';
-			v.rden2 := '0';
-		end if;
-
-		if v.wren = '1' then
-			if v.rden1 = '1' and v.waddr = v.raddr1 then
-				v.wren := '0';
-			elsif v.rden2 = '1' and v.waddr = v.raddr2 then
-				v.wren := '0';
-			end if;
-		end if;
-
 		if v.pc(2 downto 1) = "00" then
-			if v.rden = '1' then
-				v.instr := v.wdata(31 downto 0);
-			elsif v.rden1 = '1' then
+			if v.rden1 = '1' then
 				v.instr := v.rdata1(31 downto 0);
 			else
 				v.stall := '1';
 			end if;
 		elsif v.pc(2 downto 1) = "01" then
-			if v.rden = '1' then
-				v.instr := v.wdata(47 downto 16);
-			elsif v.rden1 = '1' then
+			if v.rden1 = '1' then
 				v.instr := v.rdata1(47 downto 16);
 			else
 				v.stall := '1';
 			end if;
 		elsif v.pc(2 downto 1) = "10" then
-			if v.rden = '1' then
-				v.instr := v.wdata(63 downto 32);
-			elsif v.rden1 = '1' then
+			if v.rden1 = '1' then
 				v.instr := v.rdata1(63 downto 32);
 			else
 				v.stall := '1';
 			end if;
 		elsif v.pc(2 downto 1) = "11" then
-			if v.rden = '1' then
-				if v.wdata(49 downto 48) = "11" then
-					v.stall := '1';
-				else
-					v.instr := X"0000" &  v.wdata(63 downto 48);
-				end if;
-			elsif v.rden1 = '1' then
+			if v.rden1 = '1' then
 				if v.rdata1(49 downto 48) = "11" then
 					if v.rden2 = '1' then
 						v.instr := v.rdata2(15 downto 0) & v.rdata1(63 downto 48);
@@ -209,10 +187,42 @@ begin
 		end if;
 
 		if v.valid = '1' then
-			if v.stall = '1' then
-				if v.ready = '1' then
-					v.wren := '1';
+			if v.stall = '0' then
+				if v.pc(2 downto 1) = "10" then
+					if v.instr(1 downto 0) = "11" then
+						v.incr := '1';
+					end if;
+				elsif v.pc(2 downto 1) = "11" then
+					v.incr := '1';
 				end if;
+			end if;
+		end if;
+
+		if v.valid = '1' then
+			if v.incr = '1' then
+				if v.raddr1 = 2**fetchbuffer_depth-1 then
+					v.oflow := '0';
+					v.raddr1 := 0;
+				else
+					v.raddr1 := v.raddr1 + 1;
+				end if;
+				if v.raddr2 = 2**fetchbuffer_depth-1 then
+					v.raddr2 := 0;
+				else
+					v.raddr2 := v.raddr2 + 1;
+				end if;
+			end if;
+		end if;
+
+		if v.ready = '1' then
+			if v.wren = '1' then
+				if v.waddr = 2**fetchbuffer_depth-1 then
+					v.oflow := '1';
+					v.waddr := 0;
+				else
+					v.waddr := v.waddr + 1;
+				end if;
+				v.fpc := std_logic_vector(unsigned(v.fpc) + 8);
 			end if;
 		end if;
 
@@ -221,12 +231,18 @@ begin
 				v.nfpc := v.npc(63 downto 3) & "000";
 				v.nspec := '1';
 				v.spec := '0';
+				v.oflow := '0';
+				v.waddr := 0;
+				v.raddr1 := 0;
+				v.raddr2 := 1;
 			elsif v.fence = '1' then
-				v.nfpc := v.pc(63 downto 3) & "000";
+				v.nfpc := v.npc(63 downto 3) & "000";
 				v.nfence := '1';
 				v.fence := '0';
-			elsif v.wren = '1' then
-				v.fpc := std_logic_vector(unsigned(v.fpc) + 8);
+				v.oflow := '0';
+				v.waddr := 0;
+				v.raddr1 := 0;
+				v.raddr2 := 1;
 			end if;
 		end if;
 
@@ -253,10 +269,6 @@ begin
 		imem_i.mem_addr <= v.fpc;
 		imem_i.mem_wdata <= (others => '0');
 		imem_i.mem_wstrb <= (others => '0');
-
-		fetchram_i.wren <= v.wren;
-		fetchram_i.waddr <= v.waddr;
-		fetchram_i.wdata <= v.wdata;
 
 		rin <= v;
 

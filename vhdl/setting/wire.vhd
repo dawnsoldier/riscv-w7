@@ -853,12 +853,12 @@ package wire is
 		raddr2 : integer range 0 to 2**fetchbuffer_depth-1;
 		wren  : std_logic;
 		waddr : integer range 0 to 2**fetchbuffer_depth-1;
-		wdata : std_logic_vector(127 downto 0);
+		wdata : std_logic_vector(63 downto 0);
 	end record;
 
 	type fetchram_out_type is record
-		rdata1 : std_logic_vector(127 downto 0);
-		rdata2 : std_logic_vector(127 downto 0);
+		rdata1 : std_logic_vector(63 downto 0);
+		rdata2 : std_logic_vector(63 downto 0);
 	end record;
 
 	type storebuffer_in_type is record

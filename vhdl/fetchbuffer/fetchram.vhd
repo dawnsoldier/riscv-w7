@@ -23,7 +23,7 @@ end fetchram;
 
 architecture behavior of fetchram is
 
-	type ram_type is array (0 to 2**fetchbuffer_depth-1) of std_logic_vector(127 downto 0);
+	type ram_type is array (0 to 2**fetchbuffer_depth-1) of std_logic_vector(63 downto 0);
 
 	signal fetch_ram : ram_type := (others => (others => '1'));
 
