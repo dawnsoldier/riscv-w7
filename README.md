@@ -5,11 +5,11 @@ RISCV W7 CPU supports riscv64-imfdc instruction set architecture and is implemen
 ## Dhrystone Benchmark ##
 | Cycles | Dhrystone/s/MHz | DMIPS/s/MHz | Iteration |
 | ------ | --------------- | ----------- | --------- |
-|    411 |            2431 |        1.38 |       100 |
+|    400 |            2498 |        1.42 |       100 |
 
 ## Coremark Benchmark ##
 | Cycles | Iteration/s/MHz | Iteration |
 | ------ | --------------- | --------- |
-| 429900 |            2.33 |        10 |
+| 419979 |            2.38 |        10 |
 
 Documentation will be expanded in the future.
