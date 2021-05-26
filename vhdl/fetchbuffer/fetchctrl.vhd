@@ -39,6 +39,8 @@ architecture behavior of fetchctrl is
 		wdata   : std_logic_vector(63 downto 0);
 		incr    : std_logic;
 		oflow   : std_logic;
+		wden1   : std_logic;
+		wden2   : std_logic;
 		rden1   : std_logic;
 		rden2   : std_logic;
 		ready   : std_logic;
@@ -68,6 +70,8 @@ architecture behavior of fetchctrl is
 		wdata   => (others => '0'),
 		incr    => '0',
 		oflow   => '0',
+		wden1   => '0',
+		wden2   => '0',
 		rden1   => '0',
 		rden2   => '0',
 		ready   => '0',
@@ -101,6 +105,8 @@ begin
 		v.stall := '0';
 		v.incr := '0';
 		v.wren := '0';
+		v.wden1 := '0';
+		v.wden2 := '0';
 		v.rden1 := '0';
 		v.rden2 := '0';
 
@@ -136,8 +142,17 @@ begin
 			v.rden2 := '1';
 		end if;
 
+		if v.wren = '1' and v.rden1 = '0' and v.waddr = v.raddr1 then
+			v.wden1 := '1';
+		end if;
+		if v.wren = '1' and v.rden2 = '0' and v.waddr = v.raddr2 then
+			v.wden2 := '1';
+		end if;
+
 		if (v.nfence or v.nspec or v.busy or v.flush) = '1' then
 			v.wren := '0';
+			v.wden1 := '0';
+			v.wden2 := '0';
 			v.rden1 := '0';
 			v.rden2 := '0';
 		end if;
@@ -151,6 +166,15 @@ begin
 
 		v.rdata1 := fetchram_o.rdata1;
 		v.rdata2 := fetchram_o.rdata2;
+
+		if v.wden1 = '1' then
+			v.rden1 := v.wden1;
+			v.rdata1 := v.wdata;
+		end if;
+		if v.wden2 = '1' then
+			v.rden2 := v.wden2;
+			v.rdata2 := v.wdata;
+		end if;
 
 		if v.pc(2 downto 1) = "00" then
 			if v.rden1 = '1' then
