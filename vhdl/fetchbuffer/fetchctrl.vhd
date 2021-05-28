@@ -138,7 +138,7 @@ begin
 
 		if v.oflow = '0' and v.raddr2 < v.waddr then
 			v.rden2 := '1';
-		elsif v.oflow = '1' then
+		elsif v.oflow = '1' and v.waddr /= v.raddr2 then
 			v.rden2 := '1';
 		end if;
 
@@ -286,7 +286,7 @@ begin
 		fetchctrl_o.stall <= v.stall;
 		fetchctrl_o.flush <= v.flush;
 
-		imem_i.mem_valid <= v.valid;
+		imem_i.mem_valid <= '1';
 		imem_i.mem_instr <= '1';
 		imem_i.mem_spec <= v.spec;
 		imem_i.mem_invalid <= v.fence;
