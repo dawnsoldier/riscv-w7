@@ -50,6 +50,7 @@ architecture behavior of fetchctrl is
 		valid   : std_logic;
 		spec    : std_logic;
 		fence   : std_logic;
+		clear   : std_logic;
 		nspec   : std_logic;
 		nfence  : std_logic;
 		waddr   : natural range 0 to 2**fetchbuffer_depth-1;
@@ -81,11 +82,12 @@ architecture behavior of fetchctrl is
 		valid   => '0',
 		spec    => '0',
 		fence   => '0',
+		clear   => '0',
 		nspec   => '0',
 		nfence  => '0',
 		waddr   => 0,
 		raddr1  => 0,
-		raddr2  => 0,
+		raddr2  => 1,
 		stall   => '0'
 	);
 
@@ -111,6 +113,7 @@ begin
 		v.rden2 := '0';
 
 		v.valid := fetchctrl_i.valid;
+		v.clear := fetchctrl_i.clear;
 		v.spec := fetchctrl_i.spec;
 		v.fence := fetchctrl_i.fence;
 		v.pc := fetchctrl_i.pc;
@@ -138,7 +141,7 @@ begin
 
 		if v.oflow = '0' and v.raddr2 < v.waddr then
 			v.rden2 := '1';
-		elsif v.oflow = '1' and v.waddr /= v.raddr2 then
+		elsif v.oflow = '1' and v.raddr2 /= v.waddr then
 			v.rden2 := '1';
 		end if;
 
@@ -286,7 +289,7 @@ begin
 		fetchctrl_o.stall <= v.stall;
 		fetchctrl_o.flush <= v.flush;
 
-		imem_i.mem_valid <= '1';
+		imem_i.mem_valid <= not(v.clear);
 		imem_i.mem_instr <= '1';
 		imem_i.mem_spec <= v.spec;
 		imem_i.mem_invalid <= v.fence;

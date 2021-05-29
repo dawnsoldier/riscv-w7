@@ -117,6 +117,7 @@ begin
 		fbuffer_i.npc <= v.pc;
 		fbuffer_i.spec <= v.spec;
 		fbuffer_i.fence <= d.d.fence;
+		fbuffer_i.clear <= v.clear;
 		fbuffer_i.valid <= v.valid;
 
 		ipmp_i.mem_valid <= v.valid;

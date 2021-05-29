@@ -839,6 +839,7 @@ package wire is
 		npc   : std_logic_vector(63 downto 0);
 		spec  : std_logic;
 		fence : std_logic;
+		clear : std_logic;
 		valid : std_logic;
 	end record;
 

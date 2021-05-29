@@ -31,7 +31,11 @@ architecture behavior of bram_mem is
 	attribute syn_ramstyle : string;
 	attribute syn_ramstyle of memory_block : signal is "block_ram";
 
+	signal rdata : std_logic_vector(63 downto 0) := (others => '0');
+
 begin
+
+	bram_rdata <= rdata;
 
 	process(clock)
 	begin
@@ -67,9 +71,9 @@ begin
 
 			end if;
 
-		end if;
+			rdata <= memory_block(to_integer(unsigned(bram_addr)));
 
-		bram_rdata <= memory_block(to_integer(unsigned(bram_addr)));
+		end if;
 
 	end process;
 
