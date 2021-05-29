@@ -237,7 +237,7 @@ architecture behavior of cpu is
 	signal bram_wen   : std_logic;
 	signal bram_ready : std_logic;
 	signal bram_instr : std_logic;
-	signal bram_addr : std_logic_vector(bram_depth-1 downto 0);
+	signal bram_addr  : std_logic_vector(bram_depth-1 downto 0);
 	signal bram_wdata : std_logic_vector(63 downto 0);
 	signal bram_wstrb : std_logic_vector(7 downto 0);
 	signal bram_rdata : std_logic_vector(63 downto 0);
