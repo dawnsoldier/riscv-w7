@@ -16,14 +16,6 @@ line_in = file_mem.readline()
 cnt = 1
 bram_mem_depth = 2**10
 while line_in:
-    byte0 = "x\""+ line_in[0:2] + "\""
-    byte1 = "x\""+ line_in[2:4] + "\""
-    byte2 = "x\""+ line_in[4:6] + "\""
-    byte3 = "x\""+ line_in[6:8] + "\""
-    byte4 = "x\""+ line_in[8:10] + "\""
-    byte5 = "x\""+ line_in[10:12] + "\""
-    byte6 = "x\""+ line_in[12:14] + "\""
-    byte7 = "x\""+ line_in[14:16] + "\""
     if cnt < bram_mem_depth:
         line_out = "\t\t"+ "x\""+ line_in[0:16] + "\"" + ",\n"
         file_out_vhd.writelines(line_out)
