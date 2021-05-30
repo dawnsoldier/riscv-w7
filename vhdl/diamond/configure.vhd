@@ -10,17 +10,17 @@ package configure is
 
 	constant bram_depth        : integer := 10;
 
-	constant icache_enable     : boolean := true;
+	constant icache_enable     : boolean := false;
 	constant icache_sets       : integer := 10;
 	constant icache_ways       : integer := 1;
 	constant icache_words      : integer := 2;
 
-	constant dcache_enable     : boolean := true;
+	constant dcache_enable     : boolean := false;
 	constant dcache_sets       : integer := 9;
 	constant dcache_ways       : integer := 2;
 	constant dcache_words      : integer := 2;
 
-	constant bp_enable         : boolean := true;
+	constant bp_enable         : boolean := false;
 	constant btb_depth         : integer := 6;
 	constant bht_depth         : integer := 6;
 	constant ras_depth         : integer := 2;
@@ -30,7 +30,7 @@ package configure is
 
 	constant fpu_enable        : boolean := false;
 	constant fpu_performance   : boolean := false;
-	constant mul_performance   : boolean := true;
+	constant mul_performance   : boolean := false;
 
 	constant pmp_enable        : boolean := false;
 	constant pmp_regions       : integer := 8;
@@ -56,8 +56,8 @@ package configure is
 	constant cache_base_addr   : std_logic_vector(63 downto 0) := X"0000000010000000";
 	constant cache_top_addr    : std_logic_vector(63 downto 0) := X"0000000100000000";
 
-	constant clk_freq          : integer := 100000000;
-	constant clk_pll           : integer := 25000000;
+	constant clk_freq          : integer := 200000000;
+	constant clk_pll           : integer := 10000000;
 	constant rtc_freq          : integer := 32768;
 	constant baudrate          : integer := 115200;
 
