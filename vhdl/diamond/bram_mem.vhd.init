@@ -23,13 +23,34 @@ end bram_mem;
 
 architecture behavior of bram_mem is
 
-	type memory_type is array (0 to 2**bram_depth-1) of std_logic_vector(63 downto 0);
+	type memory_type is array (0 to 2**bram_depth-1) of std_logic_vector(7 downto 0);
 
-	signal memory_block : memory_type := (
+	signal memory_block_0 : memory_type := (
+	);
+	signal memory_block_1 : memory_type := (
+	);
+	signal memory_block_2 : memory_type := (
+	);
+	signal memory_block_3 : memory_type := (
+	);
+	signal memory_block_4 : memory_type := (
+	);
+	signal memory_block_5 : memory_type := (
+	);
+	signal memory_block_6 : memory_type := (
+	);
+	signal memory_block_7 : memory_type := (
 	);
 
 	attribute syn_ramstyle : string;
-	attribute syn_ramstyle of memory_block : signal is "block_ram";
+	attribute syn_ramstyle of memory_block_0 : signal is "block_ram";
+	attribute syn_ramstyle of memory_block_1 : signal is "block_ram";
+	attribute syn_ramstyle of memory_block_2 : signal is "block_ram";
+	attribute syn_ramstyle of memory_block_3 : signal is "block_ram";
+	attribute syn_ramstyle of memory_block_4 : signal is "block_ram";
+	attribute syn_ramstyle of memory_block_5 : signal is "block_ram";
+	attribute syn_ramstyle of memory_block_6 : signal is "block_ram";
+	attribute syn_ramstyle of memory_block_7 : signal is "block_ram";
 
 	signal rdata : std_logic_vector(63 downto 0) := (others => '0');
 
@@ -45,33 +66,40 @@ begin
 			if bram_wen = '1' then
 
 				if bram_wstrb(7) = '1' then
-					memory_block(to_integer(unsigned(bram_addr)))(63 downto 56) <= bram_wdata(63 downto 56);
+					memory_block_7(to_integer(unsigned(bram_addr))) <= bram_wdata(63 downto 56);
 				end if;
 				if bram_wstrb(6) = '1' then
-					memory_block(to_integer(unsigned(bram_addr)))(55 downto 48) <= bram_wdata(55 downto 48);
+					memory_block_6(to_integer(unsigned(bram_addr))) <= bram_wdata(55 downto 48);
 				end if;
 				if bram_wstrb(5) = '1' then
-					memory_block(to_integer(unsigned(bram_addr)))(47 downto 40) <= bram_wdata(47 downto 40);
+					memory_block_5(to_integer(unsigned(bram_addr))) <= bram_wdata(47 downto 40);
 				end if;
 				if bram_wstrb(4) = '1' then
-					memory_block(to_integer(unsigned(bram_addr)))(39 downto 32) <= bram_wdata(39 downto 32);
+					memory_block_4(to_integer(unsigned(bram_addr))) <= bram_wdata(39 downto 32);
 				end if;
 				if bram_wstrb(3) = '1' then
-					memory_block(to_integer(unsigned(bram_addr)))(31 downto 24) <= bram_wdata(31 downto 24);
+					memory_block_3(to_integer(unsigned(bram_addr))) <= bram_wdata(31 downto 24);
 				end if;
 				if bram_wstrb(2) = '1' then
-					memory_block(to_integer(unsigned(bram_addr)))(23 downto 16) <= bram_wdata(23 downto 16);
+					memory_block_2(to_integer(unsigned(bram_addr))) <= bram_wdata(23 downto 16);
 				end if;
 				if bram_wstrb(1) = '1' then
-					memory_block(to_integer(unsigned(bram_addr)))(15 downto 8) <= bram_wdata(15 downto 8);
+					memory_block_1(to_integer(unsigned(bram_addr))) <= bram_wdata(15 downto 8);
 				end if;
 				if bram_wstrb(0) = '1' then
-					memory_block(to_integer(unsigned(bram_addr)))(7 downto 0) <= bram_wdata(7 downto 0);
+					memory_block_0(to_integer(unsigned(bram_addr))) <= bram_wdata(7 downto 0);
 				end if;
 
 			end if;
 
-			rdata <= memory_block(to_integer(unsigned(bram_addr)));
+			rdata <= memory_block_7(to_integer(unsigned(bram_addr))) &
+							memory_block_6(to_integer(unsigned(bram_addr))) &
+							memory_block_5(to_integer(unsigned(bram_addr))) &
+							memory_block_4(to_integer(unsigned(bram_addr))) &
+							memory_block_3(to_integer(unsigned(bram_addr))) &
+							memory_block_2(to_integer(unsigned(bram_addr))) &
+							memory_block_1(to_integer(unsigned(bram_addr))) &
+							memory_block_0(to_integer(unsigned(bram_addr)));
 
 		end if;
 
