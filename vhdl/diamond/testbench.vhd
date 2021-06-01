@@ -19,6 +19,18 @@ architecture behavior of testbench is
 		);
 	end component;
 
+	component gsr
+		port(
+			gsr : in std_ulogic
+		);
+	end component;
+
+	component pur
+		port(
+			pur : in std_ulogic
+		);
+	end component;
+
 	signal reset   : std_logic := '0';
 	signal clock   : std_logic := '0';
 
@@ -36,6 +48,16 @@ begin
 			clock   => clock,
 			uart_rx => uart_rx,
 			uart_tx => uart_tx
+		);
+
+	gsr_inst : gsr
+		port map(
+			gsr => '1'
+		);
+
+	pur_inst : pur
+		port map(
+			pur => '1'
 		);
 
 end architecture;
