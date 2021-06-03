@@ -43,14 +43,14 @@ architecture behavior of bram_mem is
 	);
 
 	attribute syn_ramstyle : string;
-	attribute syn_ramstyle of memory_block_0 : signal is "block_ram";
-	attribute syn_ramstyle of memory_block_1 : signal is "block_ram";
-	attribute syn_ramstyle of memory_block_2 : signal is "block_ram";
-	attribute syn_ramstyle of memory_block_3 : signal is "block_ram";
-	attribute syn_ramstyle of memory_block_4 : signal is "block_ram";
-	attribute syn_ramstyle of memory_block_5 : signal is "block_ram";
-	attribute syn_ramstyle of memory_block_6 : signal is "block_ram";
-	attribute syn_ramstyle of memory_block_7 : signal is "block_ram";
+	attribute syn_ramstyle of memory_block_0 : signal is "lsram";
+	attribute syn_ramstyle of memory_block_1 : signal is "lsram";
+	attribute syn_ramstyle of memory_block_2 : signal is "lsram";
+	attribute syn_ramstyle of memory_block_3 : signal is "lsram";
+	attribute syn_ramstyle of memory_block_4 : signal is "lsram";
+	attribute syn_ramstyle of memory_block_5 : signal is "lsram";
+	attribute syn_ramstyle of memory_block_6 : signal is "lsram";
+	attribute syn_ramstyle of memory_block_7 : signal is "lsram";
 
 	signal rdata : std_logic_vector(63 downto 0) := (others => '0');
 
