@@ -120,6 +120,10 @@ $SYNTAX $DIR/vhdl/memory/sram.vhd
 $ANALYS $DIR/vhdl/memory/sram.vhd
 $SYNTAX $DIR/vhdl/memory/qspi.vhd
 $ANALYS $DIR/vhdl/memory/qspi.vhd
+$SYNTAX $DIR/vhdl/memory/check.vhd
+$ANALYS $DIR/vhdl/memory/check.vhd
+$SYNTAX $DIR/vhdl/memory/print.vhd
+$ANALYS $DIR/vhdl/memory/print.vhd
 
 $SYNTAX $DIR/vhdl/icache/iwire.vhd
 $ANALYS $DIR/vhdl/icache/iwire.vhd

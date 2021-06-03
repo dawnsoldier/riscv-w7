@@ -11,10 +11,6 @@ use work.constants.all;
 use work.fp_wire.all;
 use work.wire.all;
 
-library std;
-use std.textio.all;
-use std.env.all;
-
 entity cpu is
 	port(
 		reset         : in    std_logic;
@@ -94,6 +90,34 @@ architecture behavior of cpu is
 			memory_wdata : out std_logic_vector(63 downto 0);
 			memory_wstrb : out std_logic_vector(7 downto 0);
 			memory_rdata : in  std_logic_vector(63 downto 0)
+		);
+	end component;
+
+	component check
+		port(
+			reset       : in  std_logic;
+			clock       : in  std_logic;
+			check_valid : in  std_logic;
+			check_ready : out std_logic;
+			check_instr : in  std_logic;
+			check_addr  : in  std_logic_vector(63 downto 0);
+			check_wdata : in  std_logic_vector(63 downto 0);
+			check_wstrb : in  std_logic_vector(7 downto 0);
+			check_rdata : out std_logic_vector(63 downto 0)
+		);
+	end component;
+
+	component print
+		port(
+			reset       : in  std_logic;
+			clock       : in  std_logic;
+			print_valid : in  std_logic;
+			print_ready : out std_logic;
+			print_instr : in  std_logic;
+			print_addr  : in  std_logic_vector(63 downto 0);
+			print_wdata : in  std_logic_vector(63 downto 0);
+			print_wstrb : in  std_logic_vector(7 downto 0);
+			print_rdata : out std_logic_vector(63 downto 0)
 		);
 	end component;
 
@@ -253,8 +277,6 @@ architecture behavior of cpu is
 	signal uart_wstrb : std_logic_vector(7 downto 0);
 	signal uart_rdata : std_logic_vector(63 downto 0);
 
-	signal uart_complete : std_logic := '0';
-
 	signal timer_valid : std_logic;
 	signal timer_ready : std_logic;
 	signal timer_instr : std_logic;
@@ -287,80 +309,7 @@ architecture behavior of cpu is
 	signal axi_wstrb : std_logic_vector(7 downto 0);
 	signal axi_rdata : std_logic_vector(63 downto 0);
 
-	signal timer_irpt : std_logic;signal massage      : string(1 to 511) := (others => character'val(0));
-	signal index        : natural range 1 to 511 := 1;
-
-	procedure print(
-		signal info        : inout string(1 to 511);
-		signal counter     : inout natural range 1 to 511;
-		signal data        : in std_logic_vector(7 downto 0)) is
-		variable buf       : line;
-	begin
-		if data = X"0A" then
-			write(buf, info);
-			writeline(output, buf);
-			write(buf,integer'image(now/ 1 ns) & " ns");
-			writeline(output, buf);
-			info <= (others => character'val(0));
-			counter <= 1;
-		else
-			info(counter) <= character'val(to_integer(unsigned(data)));
-			counter <= counter + 1;
-		end if;
-	end procedure print;
-
-	type host_type is array (0 to 0) of std_logic_vector(63 downto 0);
-
-	impure function init_host(
-		file_name : in string
-	)
-	return host_type is
-		file host_file      : text open read_mode is file_name;
-		variable host_line  : line;
-		variable host_block : host_type;
-	begin
-		readline(host_file, host_line);
-		hread(host_line, host_block(0));
-		return host_block;
-	end function;
-
-	signal host_block : host_type := init_host("host.dat");
-
-	procedure check(
-		host : in std_logic_vector(63 downto 0);
-		addr : in std_logic_vector(63 downto 0);
-		strb : in std_logic_vector(7 downto 0);
-		data : in std_logic_vector(63 downto 0)) is
-		variable buf : line;
-		variable ok : std_logic;
-		constant succ : string := "TEST SUCCEEDED";
-		constant fail : string := "TEST FAILED";
-	begin
-		ok := '0';
-		if (addr = host) and (or_reduce(strb) = '1') then
-			ok := '1';
-		end if;
-		if ok = '1' then
-			if data(31 downto 0) = X"00000001" then
-				write(buf, succ);
-				writeline(output, buf);
-				finish;
-			elsif or_reduce(data(31 downto 0)) = '1' then
-				write(buf, fail);
-				writeline(output, buf);
-				finish;
-			end if;
-		end if;
-	end procedure check;
-
-	procedure exceed is
-		variable buf : line;
-		constant exc : string := "ADDRESS EXCEEDS MEMORY";
-	begin
-		write(buf, exc);
-		writeline(output, buf);
-		finish;
-	end procedure exceed;
+	signal timer_irpt : std_logic;
 
 begin
 
@@ -491,28 +440,6 @@ begin
 
 	end process;
 
-	process (clock)
-
-	begin
-
-		if rising_edge(clock) then
-			if uart_complete = '0' and uart_valid = '1' and or_reduce(uart_addr) = '0' and or_reduce(uart_wstrb) = '1' then
-				print(massage,index,memory_wdata(7 downto 0));
-			elsif memory_valid = '1' then
-				check(host_block(0),memory_addr,memory_wstrb,memory_wdata);
-				if (bram_valid or timer_valid or uart_valid) = '0' then
-					exceed;
-				end if;
-			end if;
-			if uart_valid = '1' then
-				uart_complete <= '1';
-			else
-				uart_complete <= '0';
-			end if;
-		end if;
-
-	end process;
-
 	core_comp : core
 		port map(
 			reset     => reset,
@@ -540,6 +467,32 @@ begin
 			memory_wdata  => memory_wdata,
 			memory_wstrb  => memory_wstrb,
 			memory_rdata  => memory_rdata
+		);
+
+	check_comp : check
+		port map(
+			reset       => reset,
+			clock       => clock,
+			check_valid => memory_valid,
+			check_ready => memory_ready,
+			check_instr => memory_instr,
+			check_addr  => memory_addr,
+			check_wdata => memory_wdata,
+			check_wstrb => memory_wstrb,
+			check_rdata => memory_rdata
+		);
+
+	print_comp : print
+		port map(
+			reset       => reset,
+			clock       => clock,
+			print_valid => uart_valid,
+			print_ready => uart_ready,
+			print_instr => uart_instr,
+			print_addr  => uart_addr,
+			print_wdata => uart_wdata,
+			print_wstrb => uart_wstrb,
+			print_rdata => uart_rdata
 		);
 
 	bram_comp : bram_mem
