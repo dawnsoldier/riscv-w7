@@ -225,6 +225,18 @@ begin
 			end if;
 		end if;
 
+		if v.ready = '1' then
+			if v.wren = '1' then
+				if v.waddr = 2**fetchbuffer_depth-1 then
+					v.oflow := '1';
+					v.waddr := 0;
+				else
+					v.waddr := v.waddr + 1;
+				end if;
+				v.fpc := std_logic_vector(unsigned(v.fpc) + 8);
+			end if;
+		end if;
+
 		if v.valid = '1' then
 			if v.incr = '1' then
 				if v.raddr1 = 2**fetchbuffer_depth-1 then
@@ -238,18 +250,6 @@ begin
 				else
 					v.raddr2 := v.raddr2 + 1;
 				end if;
-			end if;
-		end if;
-
-		if v.ready = '1' then
-			if v.wren = '1' then
-				if v.waddr = 2**fetchbuffer_depth-1 then
-					v.oflow := '1';
-					v.waddr := 0;
-				else
-					v.waddr := v.waddr + 1;
-				end if;
-				v.fpc := std_logic_vector(unsigned(v.fpc) + 8);
 			end if;
 		end if;
 
