@@ -102,7 +102,7 @@ recursion-options:
 #       section_name:  section_low,section_high (HEX)
 # ---------------------------------------------------------------------------------
 access-sections:
-  begin_signature: 0x10000,0x12000,rw
+  begin_signature: 0x18000,0x1A000,rw
 
 # ---------------------------------------------------------------------------------
 # CSR sections

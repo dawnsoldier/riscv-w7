@@ -26,7 +26,7 @@ SECTIONS
   .text : { *(.text) }
 
   /* data segment */
-  . = 0x10000;
+  . = 0x18000;
   .data : { *(begin_signature*) }
 
 
