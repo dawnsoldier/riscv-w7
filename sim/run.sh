@@ -76,6 +76,11 @@ $ANALYS $DIR/vhdl/integer/int_wire.vhd
 $SYNTAX $DIR/vhdl/integer/int_functions.vhd
 $ANALYS $DIR/vhdl/integer/int_functions.vhd
 
+$SYNTAX $DIR/vhdl/bitmanip/bit_wire.vhd
+$ANALYS $DIR/vhdl/bitmanip/bit_wire.vhd
+$SYNTAX $DIR/vhdl/bitmanip/bit_functions.vhd
+$ANALYS $DIR/vhdl/bitmanip/bit_functions.vhd
+
 $SYNTAX $DIR/vhdl/float/fp_cons.vhd
 $ANALYS $DIR/vhdl/float/fp_cons.vhd
 $SYNTAX $DIR/vhdl/float/fp_typ.vhd
@@ -209,6 +214,9 @@ $SYNTAX $DIR/vhdl/integer/int_pipeline.vhd
 $ANALYS $DIR/vhdl/integer/int_pipeline.vhd
 $SYNTAX $DIR/vhdl/integer/int_unit.vhd
 $ANALYS $DIR/vhdl/integer/int_unit.vhd
+
+$SYNTAX $DIR/vhdl/bitmanip/bit_decode.vhd
+$ANALYS $DIR/vhdl/bitmanip/bit_decode.vhd
 
 $SYNTAX $DIR/vhdl/float/fp_lib.vhd
 $ANALYS $DIR/vhdl/float/fp_lib.vhd
