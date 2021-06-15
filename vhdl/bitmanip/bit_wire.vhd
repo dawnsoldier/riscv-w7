@@ -92,7 +92,7 @@ package bit_wire is
 		bit_bset => '0'
 	);
 
-	type bit_operation_in_type is record
+	type bit_operation_type is record
 		bit_zba : zba_operation_type;
 		bit_zbb : zbb_operation_type;
 		bit_zbc : zbc_operation_type;
@@ -100,15 +100,41 @@ package bit_wire is
 		bit_zbs : zbs_operation_type;
 	end record;
 
+	constant init_bit_operation : bit_operation_type := (
+		bit_zba => init_zba_operation,
+		bit_zbb => init_zbb_operation,
+		bit_zbc => init_zbc_operation,
+		bit_zbr => init_zbr_operation,
+		bit_zbs => init_zbs_operation
+	);
+
 	type bit_decode_in_type is record
 		instr : std_logic_vector(31 downto 0);
 	end record;
 
 	type bit_decode_out_type is record
+		imm       : std_logic_vector(63 downto 0);
 		int_rden1 : std_logic;
 		int_rden2 : std_logic;
 		int_wren  : std_logic;
 		int       : std_logic;
+		bit_op    : bit_operation_type;
+		valid     : std_logic;
+	end record;
+
+	type bit_decode_reg_type is record
+		instr     : std_logic_vector(31 downto 0);
+		imm       : std_logic_vector(63 downto 0);
+		opcode    : std_logic_vector(6 downto 0);
+		funct3    : std_logic_vector(2 downto 0);
+		funct5    : std_logic_vector(4 downto 0);
+		funct6    : std_logic_vector(5 downto 0);
+		funct7    : std_logic_vector(6 downto 0);
+		int_rden1 : std_logic;
+		int_rden2 : std_logic;
+		int_wren  : std_logic;
+		int       : std_logic;
+		bit_op    : bit_operation_type;
 		valid     : std_logic;
 	end record;
 

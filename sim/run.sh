@@ -76,6 +76,8 @@ $ANALYS $DIR/vhdl/integer/int_wire.vhd
 $SYNTAX $DIR/vhdl/integer/int_functions.vhd
 $ANALYS $DIR/vhdl/integer/int_functions.vhd
 
+$SYNTAX $DIR/vhdl/bitmanip/bit_constants.vhd
+$ANALYS $DIR/vhdl/bitmanip/bit_constants.vhd
 $SYNTAX $DIR/vhdl/bitmanip/bit_types.vhd
 $ANALYS $DIR/vhdl/bitmanip/bit_types.vhd
 $SYNTAX $DIR/vhdl/bitmanip/bit_wire.vhd
