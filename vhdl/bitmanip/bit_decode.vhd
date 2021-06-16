@@ -167,12 +167,15 @@ begin
 						if v.funct3 = funct3_cmul then
 							v.bit_op.bit_zbc.bit_clmul := '1';
 							v.bit_op.bit_clmul := '1';
+							v.bit_op.bmcycle := '1';
 						elsif v.funct3 = funct3_cmulh then
 							v.bit_op.bit_zbc.bit_clmulh := '1';
 							v.bit_op.bit_clmul := '1';
+							v.bit_op.bmcycle := '1';
 						elsif v.funct3 = funct3_cmulr then
 							v.bit_op.bit_zbc.bit_clmulr := '1';
 							v.bit_op.bit_clmul := '1';
+							v.bit_op.bmcycle := '1';
 						elsif v.funct3 = funct3_max then
 							v.bit_op.bit_zbb.bit_max := '1';
 							v.bit_op.bit_alu := '1';

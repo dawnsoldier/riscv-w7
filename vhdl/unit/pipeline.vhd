@@ -9,6 +9,7 @@ use work.configure.all;
 use work.comp_wire.all;
 use work.csr_wire.all;
 use work.int_wire.all;
+use work.bit_wire.all;
 use work.fp_wire.all;
 
 entity pipeline is
@@ -56,6 +57,8 @@ architecture behavior of pipeline is
 			clock         : in  std_logic;
 			int_decode_i  : out int_decode_in_type;
 			int_decode_o  : in  int_decode_out_type;
+			bit_decode_i  : out bit_decode_in_type;
+			bit_decode_o  : in  bit_decode_out_type;
 			comp_decode_i : out comp_decode_in_type;
 			comp_decode_o : in  comp_decode_out_type;
 			fp_dec_i      : out fp_dec_in_type;
@@ -81,6 +84,8 @@ architecture behavior of pipeline is
 			csr_o          : in  csr_out_type;
 			int_pipeline_i : out int_pipeline_in_type;
 			int_pipeline_o : in  int_pipeline_out_type;
+			bit_pipeline_i : out bit_pipeline_in_type;
+			bit_pipeline_o : in  bit_pipeline_out_type;
 			csr_alu_i      : out csr_alu_in_type;
 			csr_alu_o      : in  csr_alu_out_type;
 			csr_eo         : in  csr_exception_out_type;
@@ -153,6 +158,15 @@ architecture behavior of pipeline is
 			clock      : in  std_logic;
 			int_unit_i : in  int_unit_in_type;
 			int_unit_o : out int_unit_out_type
+		);
+	end component;
+
+	component bit_unit
+		port(
+			reset      : in  std_logic;
+			clock      : in  std_logic;
+			bit_unit_i : in  bit_unit_in_type;
+			bit_unit_o : out bit_unit_out_type
 		);
 	end component;
 
@@ -241,6 +255,9 @@ architecture behavior of pipeline is
 	signal int_unit_i : int_unit_in_type;
 	signal int_unit_o : int_unit_out_type;
 
+	signal bit_unit_i : bit_unit_in_type;
+	signal bit_unit_o : bit_unit_out_type;
+
 	signal bp_i : bp_in_type;
 	signal bp_o : bp_out_type;
 
@@ -292,6 +309,8 @@ begin
 			clock         => clock,
 			int_decode_i  => int_unit_i.int_decode_i,
 			int_decode_o  => int_unit_o.int_decode_o,
+			bit_decode_i  => bit_unit_i.bit_decode_i,
+			bit_decode_o  => bit_unit_o.bit_decode_o,
 			comp_decode_i => comp_decode_i,
 			comp_decode_o => comp_decode_o,
 			fp_dec_i      => fpu_i.fp_dec_i,
@@ -324,6 +343,8 @@ begin
 			csr_o          => csr_unit_o.csr_o,
 			int_pipeline_i => int_unit_i.int_pipeline_i,
 			int_pipeline_o => int_unit_o.int_pipeline_o,
+			bit_pipeline_i => bit_unit_i.bit_pipeline_i,
+			bit_pipeline_o => bit_unit_o.bit_pipeline_o,
 			csr_alu_i      => csr_unit_i.csr_alu_i,
 			csr_alu_o      => csr_unit_o.csr_alu_o,
 			csr_eo         => csr_unit_o.csr_eo,
@@ -415,6 +436,14 @@ begin
 			clock      => clock,
 			int_unit_i => int_unit_i,
 			int_unit_o => int_unit_o
+		);
+
+	bit_unit_comp : bit_unit
+		port map(
+			reset      => reset,
+			clock      => clock,
+			bit_unit_i => bit_unit_i,
+			bit_unit_o => bit_unit_o
 		);
 
 	bp_comp : bp

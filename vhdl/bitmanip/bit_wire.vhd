@@ -97,6 +97,7 @@ package bit_wire is
 	);
 
 	type bit_operation_type is record
+		bmcycle   : std_logic;
 		bit_word  : std_logic;
 		bit_imm   : std_logic;
 		bit_alu   : std_logic;
@@ -109,6 +110,7 @@ package bit_wire is
 	end record;
 
 	constant init_bit_operation : bit_operation_type := (
+		bmcycle   => '0',
 		bit_word  => '0',
 		bit_imm   => '0',
 		bit_alu   => '0',
@@ -216,6 +218,16 @@ package bit_wire is
 	type bit_pipeline_out_type is record
 		result   : std_logic_vector(63 downto 0);
 		ready    : std_logic;
+	end record;
+
+	type bit_unit_in_type is record
+		bit_decode_i   : bit_decode_in_type;
+		bit_pipeline_i : bit_pipeline_in_type;
+	end record;
+
+	type bit_unit_out_type is record
+		bit_decode_o   : bit_decode_out_type;
+		bit_pipeline_o : bit_pipeline_out_type;
 	end record;
 
 end bit_wire;

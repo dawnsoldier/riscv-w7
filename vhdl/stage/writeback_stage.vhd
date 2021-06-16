@@ -62,6 +62,7 @@ begin
 		v.load_op := d.m.load_op;
 		v.store_op := d.m.store_op;
 		v.int_op := d.m.int_op;
+		v.bit_op := d.m.bit_op;
 		v.fpu_op := d.m.fpu_op;
 		v.exc := d.m.exc;
 		v.etval := d.m.etval;
@@ -122,6 +123,7 @@ begin
 		csr_ci.csr <= v.csr;
 		csr_ci.comp <= v.comp;
 		csr_ci.int_op <= v.int_op;
+		csr_ci.bit_op <= v.bit_op;
 		csr_ci.fpu_op <= v.fpu_op;
 		csr_ci.flags <= v.flags;
 

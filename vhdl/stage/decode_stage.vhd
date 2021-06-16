@@ -12,6 +12,7 @@ use work.functions.all;
 use work.comp_wire.all;
 use work.csr_wire.all;
 use work.int_wire.all;
+use work.bit_wire.all;
 use work.fp_wire.all;
 
 entity decode_stage is
@@ -20,6 +21,8 @@ entity decode_stage is
 		clock         : in  std_logic;
 		int_decode_i  : out int_decode_in_type;
 		int_decode_o  : in  int_decode_out_type;
+		bit_decode_i  : out bit_decode_in_type;
+		bit_decode_o  : in  bit_decode_out_type;
 		comp_decode_i : out comp_decode_in_type;
 		comp_decode_o : in  comp_decode_out_type;
 		fp_dec_i      : out fp_dec_in_type;
@@ -39,7 +42,7 @@ architecture behavior of decode_stage is
 
 begin
 
-	combinational : process(a, d, r, int_decode_o, comp_decode_o, fp_dec_o, csr_eo)
+	combinational : process(a, d, r, int_decode_o, bit_decode_o, comp_decode_o, fp_dec_o, csr_eo)
 
 		variable v : decode_reg_type;
 
@@ -128,6 +131,20 @@ begin
 		v.fpu_store := '0';
 		v.fpu := '0';
 		v.fpu_op := init_fp_operation;
+
+		v.bit_op := init_bit_operation;
+
+		bit_decode_i.instr <= v.instr;
+
+		if bit_decode_o.valid = '1' then
+			v.imm := bit_decode_o.imm;
+			v.int_rden1 := bit_decode_o.int_rden1;
+			v.int_rden2 := bit_decode_o.int_rden2;
+			v.int_wren := bit_decode_o.int_wren;
+			v.int := bit_decode_o.int;
+			v.bit_op := bit_decode_o.bit_op;
+			v.valid := bit_decode_o.valid;
+		end if;
 
 		comp_decode_i.instr <= v.instr;
 
@@ -286,6 +303,8 @@ begin
 			end if;
 		elsif (a.e.int_op.mcycle) = '1' then
 			v.stall := '1';
+		elsif (a.e.bit_op.bmcycle) = '1' then
+			v.stall := '1';
 		elsif (a.e.fpu_op.fmcycle) = '1' then
 			v.stall := '1';
 		end if;
@@ -323,6 +342,7 @@ begin
 			v.csr := '0';
 			v.comp := '0';
 			v.int_op := init_int_operation;
+			v.bit_op := init_bit_operation;
 			v.fpu_op := init_fp_operation;
 			v.load := '0';
 			v.store := '0';
@@ -380,6 +400,7 @@ begin
 		y.load_op <= v.load_op;
 		y.store_op <= v.store_op;
 		y.int_op <= v.int_op;
+		y.bit_op <= v.bit_op;
 		y.fpu_op <= v.fpu_op;
 		y.return_pop <= v.return_pop;
 		y.return_push <= v.return_push;
@@ -454,6 +475,7 @@ begin
 		q.load_op <= r.load_op;
 		q.store_op <= r.store_op;
 		q.int_op <= r.int_op;
+		q.bit_op <= r.bit_op;
 		q.fpu_op <= r.fpu_op;
 		q.return_pop <= r.return_pop;
 		q.return_push <= r.return_push;

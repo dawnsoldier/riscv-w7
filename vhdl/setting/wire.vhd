@@ -7,6 +7,7 @@ use ieee.numeric_std.all;
 use work.configure.all;
 use work.constants.all;
 use work.int_wire.all;
+use work.bit_wire.all;
 use work.fp_wire.all;
 use work.csr_wire.all;
 
@@ -94,6 +95,7 @@ package wire is
 		load_op       : load_operation_type;
 		store_op      : store_operation_type;
 		int_op        : int_operation_type;
+		bit_op        : bit_operation_type;
 		fpu_op        : fp_operation_type;
 		return_pop    : std_logic;
 		return_push   : std_logic;
@@ -172,6 +174,7 @@ package wire is
 		load_op         : load_operation_type;
 		store_op        : store_operation_type;
 		int_op          : int_operation_type;
+		bit_op          : bit_operation_type;
 		fpu_op          : fp_operation_type;
 		return_pop      : std_logic;
 		return_push     : std_logic;
@@ -255,6 +258,7 @@ package wire is
 		load_op         => init_load_operation,
 		store_op        => init_store_operation,
 		int_op          => init_int_operation,
+		bit_op          => init_bit_operation,
 		fpu_op          => init_fp_operation,
 		return_pop      => '0',
 		return_push     => '0',
@@ -326,6 +330,7 @@ package wire is
 		load_op       : load_operation_type;
 		store_op      : store_operation_type;
 		int_op        : int_operation_type;
+		bit_op        : bit_operation_type;
 		fpu_op        : fp_operation_type;
 		return_pop    : std_logic;
 		return_push   : std_logic;
@@ -392,6 +397,7 @@ package wire is
 		wdata         : std_logic_vector(63 downto 0);
 		sdata         : std_logic_vector(63 downto 0);
 		idata         : std_logic_vector(63 downto 0);
+		bdata         : std_logic_vector(63 downto 0);
 		fdata         : std_logic_vector(63 downto 0);
 		cdata         : std_logic_vector(63 downto 0);
 		flags         : std_logic_vector(4 downto 0);
@@ -414,6 +420,7 @@ package wire is
 		load_op       : load_operation_type;
 		store_op      : store_operation_type;
 		int_op        : int_operation_type;
+		bit_op        : bit_operation_type;
 		fpu_op        : fp_operation_type;
 		return_pop    : std_logic;
 		return_push   : std_logic;
@@ -431,6 +438,7 @@ package wire is
 		strobe        : std_logic_vector(7 downto 0);
 		enable        : std_logic;
 		ready         : std_logic;
+		bready        : std_logic;
 		fready        : std_logic;
 		etval         : std_logic_vector(63 downto 0);
 		ecause        : std_logic_vector(3 downto 0);
@@ -483,6 +491,7 @@ package wire is
 		wdata         => (others => '0'),
 		sdata         => (others => '0'),
 		idata         => (others => '0'),
+		bdata         => (others => '0'),
 		fdata         => (others => '0'),
 		cdata         => (others => '0'),
 		flags         => (others => '0'),
@@ -505,6 +514,7 @@ package wire is
 		load_op       => init_load_operation,
 		store_op      => init_store_operation,
 		int_op        => init_int_operation,
+		bit_op        => init_bit_operation,
 		fpu_op        => init_fp_operation,
 		return_pop    => '0',
 		return_push   => '0',
@@ -522,6 +532,7 @@ package wire is
 		strobe        => (others => '0'),
 		enable        => '0',
 		ready         => '0',
+		bready        => '0',
 		fready        => '0',
 		etval         => (others => '0'),
 		ecause        => (others => '0'),
@@ -573,6 +584,7 @@ package wire is
 		load_op     : load_operation_type;
 		store_op    : store_operation_type;
 		int_op      : int_operation_type;
+		bit_op      : bit_operation_type;
 		fpu_op      : fp_operation_type;
 		etval       : std_logic_vector(63 downto 0);
 		ecause      : std_logic_vector(3 downto 0);
@@ -626,6 +638,7 @@ package wire is
 		load_op     : load_operation_type;
 		store_op    : store_operation_type;
 		int_op      : int_operation_type;
+		bit_op      : bit_operation_type;
 		fpu_op      : fp_operation_type;
 		byteenable  : std_logic_vector(7 downto 0);
 		etval       : std_logic_vector(63 downto 0);
@@ -680,6 +693,7 @@ package wire is
 		load_op     => init_load_operation,
 		store_op    => init_store_operation,
 		int_op      => init_int_operation,
+		bit_op      => init_bit_operation,
 		fpu_op      => init_fp_operation,
 		byteenable  => (others => '0'),
 		etval       => (others => '0'),
@@ -733,6 +747,7 @@ package wire is
 		load_op    : load_operation_type;
 		store_op   : store_operation_type;
 		int_op     : int_operation_type;
+		bit_op     : bit_operation_type;
 		fpu_op     : fp_operation_type;
 		etval      : std_logic_vector(63 downto 0);
 		ecause     : std_logic_vector(3 downto 0);
@@ -766,6 +781,7 @@ package wire is
 		load_op    => init_load_operation,
 		store_op   => init_store_operation,
 		int_op     => init_int_operation,
+		bit_op     => init_bit_operation,
 		fpu_op     => init_fp_operation,
 		etval      => (others => '0'),
 		ecause     => (others => '0'),

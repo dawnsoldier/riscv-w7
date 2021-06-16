@@ -5,6 +5,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 use work.int_wire.all;
+use work.bit_wire.all;
 use work.fp_wire.all;
 
 package csr_wire is
@@ -70,6 +71,7 @@ package csr_wire is
 	type csr_counter_in_type is record
 		flags     : std_logic_vector(4 downto 0);
 		int_op    : int_operation_type;
+		bit_op    : bit_operation_type;
 		fpu_op    : fp_operation_type;
 		int       : std_logic;
 		fpu       : std_logic;

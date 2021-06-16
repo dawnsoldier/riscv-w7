@@ -11,6 +11,7 @@ use work.wire.all;
 use work.functions.all;
 use work.csr_wire.all;
 use work.int_wire.all;
+use work.bit_wire.all;
 use work.fp_wire.all;
 
 entity execute_stage is
@@ -26,6 +27,8 @@ entity execute_stage is
 		csr_o          : in  csr_out_type;
 		int_pipeline_i : out int_pipeline_in_type;
 		int_pipeline_o : in  int_pipeline_out_type;
+		bit_pipeline_i : out bit_pipeline_in_type;
+		bit_pipeline_o : in  bit_pipeline_out_type;
 		csr_alu_i      : out csr_alu_in_type;
 		csr_alu_o      : in  csr_alu_out_type;
 		csr_eo         : in  csr_exception_out_type;
@@ -54,7 +57,7 @@ architecture behavior of execute_stage is
 
 begin
 
-	combinational : process(a, d, r, int_for_o, int_reg_o, csr_o, csr_eo, int_pipeline_o, fp_reg_o, fp_for_o, fp_exe_o, csr_alu_o, dpmp_o, time_irpt, ext_irpt)
+	combinational : process(a, d, r, int_for_o, int_reg_o, csr_o, csr_eo, int_pipeline_o, bit_pipeline_o, fp_reg_o, fp_for_o, fp_exe_o, csr_alu_o, dpmp_o, time_irpt, ext_irpt)
 
 		variable v : execute_reg_type;
 
@@ -94,6 +97,7 @@ begin
 		v.load_op := d.d.load_op;
 		v.store_op := d.d.store_op;
 		v.int_op := d.d.int_op;
+		v.bit_op := d.d.bit_op;
 		v.fpu_op := d.d.fpu_op;
 		v.return_pop := d.d.return_pop;
 		v.return_push := d.d.return_push;
@@ -214,6 +218,13 @@ begin
 		int_pipeline_i.enable <= v.enable;
 		int_pipeline_i.clear <= v.clear;
 
+		bit_pipeline_i.rs1 <= v.rdata1;
+		bit_pipeline_i.rs2 <= v.rdata2;
+		bit_pipeline_i.imm <= v.imm;
+		bit_pipeline_i.bit_op <= v.bit_op;
+		bit_pipeline_i.enable <= v.enable;
+		bit_pipeline_i.clear <= v.clear;
+
 		fp_exe_i.idata <= v.rdata1;
 		fp_exe_i.data1 <= v.frdata1;
 		fp_exe_i.data2 <= v.frdata2;
@@ -229,6 +240,9 @@ begin
 		v.address := int_pipeline_o.mem_addr;
 		v.byteenable := int_pipeline_o.mem_byte;
 		v.ready := int_pipeline_o.ready;
+
+		v.bdata := bit_pipeline_o.result;
+		v.bready := bit_pipeline_o.ready;
 
 		v.fdata := fp_exe_o.result;
 		v.flags := fp_exe_o.flags;
@@ -288,6 +302,14 @@ begin
 
 		if v.int_op.mcycle = '1' then
 			if v.ready = '0' then
+				if (a.m.stall or a.w.stall) = '0' then
+					v.stall := '1';
+				end if;
+			end if;
+		end if;
+
+		if v.bit_op.bmcycle = '1' then
+			if v.bready = '0' then
 				if (a.m.stall or a.w.stall) = '0' then
 					v.stall := '1';
 				end if;
@@ -406,6 +428,7 @@ begin
 		y.load_op <= v.load_op;
 		y.store_op <= v.store_op;
 		y.int_op <= v.int_op;
+		y.bit_op <= v.bit_op;
 		y.fpu_op <= v.fpu_op;
 		y.return_pop <= v.return_pop;
 		y.return_push <= v.return_push;
@@ -474,6 +497,7 @@ begin
 		q.load_op <= r.load_op;
 		q.store_op <= r.store_op;
 		q.int_op <= r.int_op;
+		q.bit_op <= r.bit_op;
 		q.fpu_op <= r.fpu_op;
 		q.return_pop <= r.return_pop;
 		q.return_push <= r.return_push;

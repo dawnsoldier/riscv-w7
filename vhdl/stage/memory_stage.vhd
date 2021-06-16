@@ -62,6 +62,7 @@ begin
 		v.load_op := d.e.load_op;
 		v.store_op := d.e.store_op;
 		v.int_op := d.e.int_op;
+		v.bit_op := d.e.bit_op;
 		v.fpu_op := d.e.fpu_op;
 		v.exc := d.e.exc;
 		v.etval := d.e.etval;
@@ -175,6 +176,7 @@ begin
 		y.load_op <= v.load_op;
 		y.store_op <= v.store_op;
 		y.int_op <= v.int_op;
+		y.bit_op <= v.bit_op;
 		y.fpu_op <= v.fpu_op;
 		y.etval <= v.etval;
 		y.ecause <= v.ecause;
@@ -226,6 +228,7 @@ begin
 		q.load_op <= r.load_op;
 		q.store_op <= r.store_op;
 		q.int_op <= r.int_op;
+		q.bit_op <= r.bit_op;
 		q.fpu_op <= r.fpu_op;
 		q.etval <= r.etval;
 		q.ecause <= r.ecause;

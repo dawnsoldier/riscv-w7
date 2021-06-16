@@ -229,6 +229,8 @@ $SYNTAX $DIR/vhdl/bitmanip/bit_decode.vhd
 $ANALYS $DIR/vhdl/bitmanip/bit_decode.vhd
 $SYNTAX $DIR/vhdl/bitmanip/bit_pipeline.vhd
 $ANALYS $DIR/vhdl/bitmanip/bit_pipeline.vhd
+$SYNTAX $DIR/vhdl/bitmanip/bit_unit.vhd
+$ANALYS $DIR/vhdl/bitmanip/bit_unit.vhd
 
 $SYNTAX $DIR/vhdl/float/fp_lib.vhd
 $ANALYS $DIR/vhdl/float/fp_lib.vhd
