@@ -24,7 +24,7 @@ package bit_constants is
 	constant funct3_minu   : std_logic_vector(2 downto 0) := "101";
 	constant funct3_orcb   : std_logic_vector(2 downto 0) := "101";
 	constant funct3_orn    : std_logic_vector(2 downto 0) := "110";
-	constant funct3_rev    : std_logic_vector(2 downto 0) := "101";
+	constant funct3_rev8   : std_logic_vector(2 downto 0) := "101";
 	constant funct3_rol    : std_logic_vector(2 downto 0) := "001";
 	constant funct3_ror    : std_logic_vector(2 downto 0) := "101";
 	constant funct3_sextb  : std_logic_vector(2 downto 0) := "001";
@@ -37,7 +37,7 @@ package bit_constants is
 	constant funct3_zexth  : std_logic_vector(2 downto 0) := "100";
 
 	constant funct12_orcb  : std_logic_vector(11 downto 0) := "001010000111";
-	constant funct12_rev   : std_logic_vector(11 downto 0) := "011010111000";
+	constant funct12_rev8  : std_logic_vector(11 downto 0) := "011010111000";
 
 	constant funct7_add    : std_logic_vector(6 downto 0) := "0000100";
 	constant funct7_andn   : std_logic_vector(6 downto 0) := "0100000";

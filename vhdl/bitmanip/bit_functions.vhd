@@ -127,6 +127,12 @@ package bit_functions is
 	)
 	return std_logic_vector;
 
+	function bit_xnor(
+		rs1 : in std_logic_vector(63 downto 0);
+		rs2 : in std_logic_vector(63 downto 0)
+	)
+	return std_logic_vector;
+
 	function bit_zexth(
 		rs1 : in std_logic_vector(63 downto 0)
 	)
@@ -390,6 +396,15 @@ package body bit_functions is
 	begin
 		return std_logic_vector(shift_left(unsigned(rs1),to_integer(unsigned(imm(5 downto 0)))));
 	end function bit_slli;
+
+	function bit_xnor(
+		rs1 : in std_logic_vector(63 downto 0);
+		rs2 : in std_logic_vector(63 downto 0)
+	)
+	return std_logic_vector is
+	begin
+		return not(rs1 xor rs2);
+	end function bit_xnor;
 
 	function bit_zexth(
 		rs1 : in std_logic_vector(63 downto 0)

@@ -158,7 +158,7 @@ begin
 						when funct_sll =>
 						 	if v.opcode(3) = '1' and v.funct7 = "0000000" then
 								v.int_op.alu_op.alu_sll := '1';
-						 	elsif v.opcode(3) = '0' and v.funct7(6 downto 2) = "00000" then
+						 	elsif v.opcode(3) = '0' and v.funct7(6 downto 1) = "000000" then
 								v.int_op.alu_op.alu_sll := '1';
 							else
 								v.valid := '0';
@@ -172,11 +172,11 @@ begin
 						when funct_srl =>
 						 	if v.opcode(3) = '1' and v.funct7 = "0000000" then
 								v.int_op.alu_op.alu_srl := '1';
-						 	elsif v.opcode(3) = '0' and v.funct7(6 downto 2) = "00000" then
+						 	elsif v.opcode(3) = '0' and v.funct7(6 downto 1) = "000000" then
 								v.int_op.alu_op.alu_srl := '1';
 						 	elsif v.opcode(3) = '1' and v.funct7 = "0100000" then
 								v.int_op.alu_op.alu_sra := '1';
-						 	elsif v.opcode(3) = '0' and v.funct7(6 downto 2) = "01000" then
+						 	elsif v.opcode(3) = '0' and v.funct7(6 downto 1) = "010000" then
 								v.int_op.alu_op.alu_sra := '1';
 							else
 								v.valid := '0';

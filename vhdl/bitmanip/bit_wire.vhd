@@ -29,8 +29,8 @@ package bit_wire is
 		bit_orn   : std_logic;
 		bit_xnor  : std_logic;
 		bit_clz   : std_logic;
-		bit_ctz   : std_logic;
 		bit_cpop  : std_logic;
+		bit_ctz   : std_logic;
 		bit_max   : std_logic;
 		bit_maxu  : std_logic;
 		bit_min   : std_logic;
@@ -45,8 +45,8 @@ package bit_wire is
 		bit_orn   => '0',
 		bit_xnor  => '0',
 		bit_clz   => '0',
-		bit_ctz   => '0',
 		bit_cpop  => '0',
+		bit_ctz   => '0',
 		bit_max   => '0',
 		bit_maxu  => '0',
 		bit_min   => '0',
@@ -69,13 +69,17 @@ package bit_wire is
 	);
 
 	type zbr_operation_type is record
-		bit_rol : std_logic;
-		bit_ror : std_logic;
+		bit_rol  : std_logic;
+		bit_ror  : std_logic;
+		bit_orcb : std_logic;
+		bit_rev8 : std_logic;
 	end record;
 
 	constant init_zbr_operation : zbr_operation_type := (
-		bit_rol => '0',
-		bit_ror => '0'
+		bit_rol  => '0',
+		bit_ror  => '0',
+		bit_orcb => '0',
+		bit_rev8 => '0'
 	);
 
 	type zbs_operation_type is record
@@ -93,19 +97,23 @@ package bit_wire is
 	);
 
 	type bit_operation_type is record
-		bit_zba : zba_operation_type;
-		bit_zbb : zbb_operation_type;
-		bit_zbc : zbc_operation_type;
-		bit_zbr : zbr_operation_type;
-		bit_zbs : zbs_operation_type;
+		bit_word : std_logic;
+		bit_imm  : std_logic;
+		bit_zba  : zba_operation_type;
+		bit_zbb  : zbb_operation_type;
+		bit_zbc  : zbc_operation_type;
+		bit_zbr  : zbr_operation_type;
+		bit_zbs  : zbs_operation_type;
 	end record;
 
 	constant init_bit_operation : bit_operation_type := (
-		bit_zba => init_zba_operation,
-		bit_zbb => init_zbb_operation,
-		bit_zbc => init_zbc_operation,
-		bit_zbr => init_zbr_operation,
-		bit_zbs => init_zbs_operation
+		bit_word => '0',
+		bit_imm  => '0',
+		bit_zba  => init_zba_operation,
+		bit_zbb  => init_zbb_operation,
+		bit_zbc  => init_zbc_operation,
+		bit_zbr  => init_zbr_operation,
+		bit_zbs  => init_zbs_operation
 	);
 
 	type bit_decode_in_type is record
@@ -125,11 +133,14 @@ package bit_wire is
 	type bit_decode_reg_type is record
 		instr     : std_logic_vector(31 downto 0);
 		imm       : std_logic_vector(63 downto 0);
+		imm5      : std_logic_vector(63 downto 0);
+		imm6      : std_logic_vector(63 downto 0);
 		opcode    : std_logic_vector(6 downto 0);
 		funct3    : std_logic_vector(2 downto 0);
 		funct5    : std_logic_vector(4 downto 0);
 		funct6    : std_logic_vector(5 downto 0);
 		funct7    : std_logic_vector(6 downto 0);
+		funct12   : std_logic_vector(11 downto 0);
 		int_rden1 : std_logic;
 		int_rden2 : std_logic;
 		int_wren  : std_logic;
