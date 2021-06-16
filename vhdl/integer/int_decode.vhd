@@ -69,7 +69,7 @@ begin
 		v.wfi := '0';
 
 		v.fence := '0';
-		v.valid := '0';
+		v.valid := '1';
 
 		case v.opcode is
 
@@ -80,7 +80,6 @@ begin
 				v.int := '1';
 				v.int_op.lui := v.opcode(5);
 				v.int_op.auipc := not v.opcode(5);
-				v.valid := '1';
 
 			when opcode_jal | opcode_jalr =>
 
@@ -95,7 +94,6 @@ begin
 				end if;
 				v.int_op.word := '1';
 				v.int := '1';
-				v.valid := '1';
 
 			when opcode_branch =>
 
@@ -111,9 +109,8 @@ begin
 					when funct_bge  => v.int_op.branch_op.bge := '1';
 					when funct_bltu => v.int_op.branch_op.bltu := '1';
 					when funct_bgeu => v.int_op.branch_op.bgeu := '1';
-					when others     => null;
+					when others     => v.valid := '0';
 				end case;
-				v.valid := '1';
 
 			when opcode_load | opcode_store =>
 
@@ -131,7 +128,7 @@ begin
 						when funct_lbu => v.load_op.mem_lbu := '1';
 						when funct_lhu => v.load_op.mem_lhu := '1';
 						when funct_lwu => v.load_op.mem_lwu := '1';
-						when others     => null;
+						when others    => v.valid := '0';
 					end case;
 				elsif v.opcode(5) = '1' then
 					v.imm := v.imm_s;
@@ -143,10 +140,9 @@ begin
 						when funct_sh  => v.store_op.mem_sh := '1';
 						when funct_sw  => v.store_op.mem_sw := '1';
 						when funct_sd  => v.store_op.mem_sd := '1';
-						when others     => null;
+						when others    => v.valid := '0';
 					end case;
 				end if;
-				v.valid := '1';
 
 			when opcode_imm | opcode_reg | opcode_imm_32 | opcode_reg_32 =>
 
@@ -157,32 +153,64 @@ begin
 					v.int_op.alu := '1';
 					v.int_op.alu_imm := '1';
 					case v.funct3 is
-						when funct_add  => v.int_op.alu_op.alu_add := '1';
-						when funct_sll  => v.int_op.alu_op.alu_sll := '1';
-						when funct_slt  => v.int_op.alu_op.alu_slt := '1';
-						when funct_sltu => v.int_op.alu_op.alu_sltu := '1';
-						when funct_xor  => v.int_op.alu_op.alu_xor := '1';
-						when funct_srl  => v.int_op.alu_op.alu_srl := not v.funct7(5); v.int_op.alu_op.alu_sra := v.funct7(5);
-						when funct_or   => v.int_op.alu_op.alu_or := '1';
-						when funct_and  => v.int_op.alu_op.alu_and := '1';
-						when others     => null;
+						when funct_add =>
+							v.int_op.alu_op.alu_add := '1';
+						when funct_sll =>
+						 	if v.opcode(3) = '1' and v.funct7 = "0000000" then
+								v.int_op.alu_op.alu_sll := '1';
+						 	elsif v.opcode(3) = '0' and v.funct7(6 downto 2) = "00000" then
+								v.int_op.alu_op.alu_sll := '1';
+							else
+								v.valid := '0';
+							end if;
+						when funct_slt =>
+							v.int_op.alu_op.alu_slt := '1';
+						when funct_sltu =>
+							v.int_op.alu_op.alu_sltu := '1';
+						when funct_xor =>
+							v.int_op.alu_op.alu_xor := '1';
+						when funct_srl =>
+						 	if v.opcode(3) = '1' and v.funct7 = "0000000" then
+								v.int_op.alu_op.alu_srl := '1';
+						 	elsif v.opcode(3) = '0' and v.funct7(6 downto 2) = "00000" then
+								v.int_op.alu_op.alu_srl := '1';
+						 	elsif v.opcode(3) = '1' and v.funct7 = "0100000" then
+								v.int_op.alu_op.alu_sra := '1';
+						 	elsif v.opcode(3) = '0' and v.funct7(6 downto 2) = "01000" then
+								v.int_op.alu_op.alu_sra := '1';
+							else
+								v.valid := '0';
+							end if;
+						when funct_or =>
+							v.int_op.alu_op.alu_or := '1';
+						when funct_and =>
+							v.int_op.alu_op.alu_and := '1';
+						when others =>
+							v.valid := '0';
 					end case;
 				elsif v.opcode(5) = '1' then
 					v.int_rden2 := '1';
-					if v.funct7(0) = '0' then
+					if v.funct7 = "0000000" then
 						v.int_op.alu := '1';
 						case v.funct3 is
-							when funct_add  => v.int_op.alu_op.alu_add := not v.funct7(5); v.int_op.alu_op.alu_sub := v.funct7(5);
+							when funct_add  => v.int_op.alu_op.alu_add := '1';
 							when funct_sll  => v.int_op.alu_op.alu_sll := '1';
 							when funct_slt  => v.int_op.alu_op.alu_slt := '1';
 							when funct_sltu => v.int_op.alu_op.alu_sltu := '1';
 							when funct_xor  => v.int_op.alu_op.alu_xor := '1';
-							when funct_srl  => v.int_op.alu_op.alu_srl := not v.funct7(5);  v.int_op.alu_op.alu_sra := v.funct7(5);
+							when funct_srl  => v.int_op.alu_op.alu_srl := '1';
 							when funct_or   => v.int_op.alu_op.alu_or := '1';
 							when funct_and  => v.int_op.alu_op.alu_and := '1';
-							when others     => null;
+							when others     => v.valid := '0';
 						end case;
-					elsif v.funct7(0) = '1' then
+					elsif v.funct7 = "0100000" then
+						v.int_op.alu := '1';
+						case v.funct3 is
+							when funct_add  => v.int_op.alu_op.alu_sub := '1';
+							when funct_srl  => v.int_op.alu_op.alu_sra := '1';
+							when others     => v.valid := '0';
+						end case;
+					elsif v.funct7 = "0000001" then
 						v.int_op.div := v.funct3(2);
 						v.int_op.mul := not v.funct3(2);
 						case v.funct3 is
@@ -194,7 +222,7 @@ begin
 							when funct_divu   => v.int_op.div_op.alu_divu := '1';
 							when funct_rem    => v.int_op.div_op.alu_rem := '1';
 							when funct_remu   => v.int_op.div_op.alu_remu := '1';
-							when others       => null;
+							when others       => v.valid := '0';
 						end case;
 						if v.int_op.mul = '1' then
 							if mul_performance then
@@ -209,7 +237,6 @@ begin
 				end if;
 				v.int := '1';
 				v.int_op.word := v.opcode(3);
-				v.valid := '1';
 
 			when opcode_fence =>
 
@@ -217,7 +244,6 @@ begin
 				if v.funct3 = "001" then
 					v.fence := '1';
 				end if;
-				v.valid := '1';
 
 			when opcode_system =>
 
@@ -228,22 +254,18 @@ begin
 							when csr_ecall =>
 								v.csr := '1';
 								v.ecall := '1';
-								v.valid := '1';
 							when csr_ebreak =>
 								v.csr := '1';
 								v.ebreak := '1';
-								v.valid := '1';
 							when csr_mret =>
 								v.csr_rden := '1';
 								v.csr := '1';
 								v.mret := '1';
-								v.valid := '1';
 							when csr_wfi =>
 								v.csr := '1';
 								v.wfi := '1';
-								v.valid := '1';
 							when others =>
-								null;
+								v.valid := '0';
 						end case;
 					when others =>
 						v.int_rden1 := '1';
@@ -251,12 +273,11 @@ begin
 						v.csr_rden := '1';
 						v.csr_wren := '1';
 						v.csr := '1';
-						v.valid := '1';
 				end case;
 
 			when others =>
 
-				null;
+				v.valid := '0';
 
 		end case;
 
