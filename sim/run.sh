@@ -219,10 +219,16 @@ $ANALYS $DIR/vhdl/integer/int_pipeline.vhd
 $SYNTAX $DIR/vhdl/integer/int_unit.vhd
 $ANALYS $DIR/vhdl/integer/int_unit.vhd
 
+$SYNTAX $DIR/vhdl/bitmanip/bit_library.vhd
+$ANALYS $DIR/vhdl/bitmanip/bit_library.vhd
+$SYNTAX $DIR/vhdl/bitmanip/bit_alu.vhd
+$ANALYS $DIR/vhdl/bitmanip/bit_alu.vhd
 $SYNTAX $DIR/vhdl/bitmanip/bit_clmul.vhd
 $ANALYS $DIR/vhdl/bitmanip/bit_clmul.vhd
 $SYNTAX $DIR/vhdl/bitmanip/bit_decode.vhd
 $ANALYS $DIR/vhdl/bitmanip/bit_decode.vhd
+$SYNTAX $DIR/vhdl/bitmanip/bit_pipeline.vhd
+$ANALYS $DIR/vhdl/bitmanip/bit_pipeline.vhd
 
 $SYNTAX $DIR/vhdl/float/fp_lib.vhd
 $ANALYS $DIR/vhdl/float/fp_lib.vhd

@@ -58,7 +58,7 @@ package bit_functions is
 	)
 	return std_logic_vector;
 
-	function bit_rev(
+	function bit_rev8(
 		rs1 : in std_logic_vector(63 downto 0)
 	)
 	return std_logic_vector;
@@ -66,7 +66,6 @@ package bit_functions is
 	function bit_rol(
 		rs1   : in std_logic_vector(63 downto 0);
 		rs2   : in std_logic_vector(63 downto 0);
-		imm   : in std_logic_vector(5 downto 0);
 		word  : in std_logic
 	)
 	return std_logic_vector;
@@ -74,7 +73,6 @@ package bit_functions is
 	function bit_ror(
 		rs1   : in std_logic_vector(63 downto 0);
 		rs2   : in std_logic_vector(63 downto 0);
-		imm   : in std_logic_vector(5 downto 0);
 		word  : in std_logic
 	)
 	return std_logic_vector;
@@ -123,7 +121,7 @@ package bit_functions is
 
 	function bit_slli(
 		rs1 : in std_logic_vector(63 downto 0);
-		imm : in std_logic_vector(63 downto 0)
+		rs2 : in std_logic_vector(63 downto 0)
 	)
 	return std_logic_vector;
 
@@ -135,6 +133,13 @@ package bit_functions is
 
 	function bit_zexth(
 		rs1 : in std_logic_vector(63 downto 0)
+	)
+	return std_logic_vector;
+
+	function multiplexer(
+		data0 : in std_logic_vector(63 downto 0);
+		data1 : in std_logic_vector(63 downto 0);
+		sel   : in std_logic
 	)
 	return std_logic_vector;
 
@@ -266,7 +271,7 @@ package body bit_functions is
 		return rs1 or not(rs2);
 	end function bit_orn;
 
-	function bit_rev(
+	function bit_rev8(
 		rs1 : in std_logic_vector(63 downto 0)
 	)
 	return std_logic_vector is
@@ -277,12 +282,11 @@ package body bit_functions is
 			res(8*i+7 downto 8*i) := rs1(63-8*i downto 56-8*i);
 		end loop;
 		return res;
-	end function bit_rev;
+	end function bit_rev8;
 
 	function bit_rol(
 		rs1   : in std_logic_vector(63 downto 0);
 		rs2   : in std_logic_vector(63 downto 0);
-		imm   : in std_logic_vector(5 downto 0);
 		word  : in std_logic
 	)
 	return std_logic_vector is
@@ -296,7 +300,6 @@ package body bit_functions is
 	function bit_ror(
 		rs1   : in std_logic_vector(63 downto 0);
 		rs2   : in std_logic_vector(63 downto 0);
-		imm : in std_logic_vector(5 downto 0);
 		word  : in std_logic
 	)
 	return std_logic_vector is
@@ -390,11 +393,11 @@ package body bit_functions is
 
 	function bit_slli(
 		rs1 : in std_logic_vector(63 downto 0);
-		imm : in std_logic_vector(63 downto 0)
+		rs2 : in std_logic_vector(63 downto 0)
 	)
 	return std_logic_vector is
 	begin
-		return std_logic_vector(shift_left(unsigned(rs1),to_integer(unsigned(imm(5 downto 0)))));
+		return std_logic_vector(shift_left(unsigned(rs1),to_integer(unsigned(rs2(5 downto 0)))));
 	end function bit_slli;
 
 	function bit_xnor(
@@ -413,5 +416,21 @@ package body bit_functions is
 	begin
 		return std_logic_vector(resize(signed(rs1(15 downto 0)), 64));
 	end function bit_zexth;
+
+	function multiplexer(
+		data0 : in std_logic_vector(63 downto 0);
+		data1 : in std_logic_vector(63 downto 0);
+		sel   : in std_logic
+	)
+	return std_logic_vector is
+		variable res : std_logic_vector(63 downto 0);
+	begin
+		if sel = '0' then
+			res := data0;
+		else
+			res := data1;
+		end if;
+		return res;
+	end multiplexer;
 
 end bit_functions;

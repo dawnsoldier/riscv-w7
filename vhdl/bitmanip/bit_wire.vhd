@@ -97,23 +97,27 @@ package bit_wire is
 	);
 
 	type bit_operation_type is record
-		bit_word : std_logic;
-		bit_imm  : std_logic;
-		bit_zba  : zba_operation_type;
-		bit_zbb  : zbb_operation_type;
-		bit_zbc  : zbc_operation_type;
-		bit_zbr  : zbr_operation_type;
-		bit_zbs  : zbs_operation_type;
+		bit_word  : std_logic;
+		bit_imm   : std_logic;
+		bit_alu   : std_logic;
+		bit_clmul : std_logic;
+		bit_zba   : zba_operation_type;
+		bit_zbb   : zbb_operation_type;
+		bit_zbc   : zbc_operation_type;
+		bit_zbr   : zbr_operation_type;
+		bit_zbs   : zbs_operation_type;
 	end record;
 
 	constant init_bit_operation : bit_operation_type := (
-		bit_word => '0',
-		bit_imm  => '0',
-		bit_zba  => init_zba_operation,
-		bit_zbb  => init_zbb_operation,
-		bit_zbc  => init_zbc_operation,
-		bit_zbr  => init_zbr_operation,
-		bit_zbs  => init_zbs_operation
+		bit_word  => '0',
+		bit_imm   => '0',
+		bit_alu   => '0',
+		bit_clmul => '0',
+		bit_zba   => init_zba_operation,
+		bit_zbb   => init_zbb_operation,
+		bit_zbc   => init_zbc_operation,
+		bit_zbr   => init_zbr_operation,
+		bit_zbs   => init_zbs_operation
 	);
 
 	type bit_decode_in_type is record
@@ -147,6 +151,19 @@ package bit_wire is
 		int       : std_logic;
 		bit_op    : bit_operation_type;
 		valid     : std_logic;
+	end record;
+
+	type bit_alu_in_type is record
+		rs1    : std_logic_vector(63 downto 0);
+		rs2    : std_logic_vector(63 downto 0);
+		imm    : std_logic_vector(63 downto 0);
+		bit_op : bit_operation_type;
+		word   : std_logic;
+		sel    : std_logic;
+	end record;
+
+	type bit_alu_out_type is record
+		res : std_logic_vector(63 downto 0);
 	end record;
 
 	type bit_clmul_in_type is record
@@ -186,5 +203,19 @@ package bit_wire is
 		result  => (others => '0'),
 		ready   => '0'
 	);
+
+	type bit_pipeline_in_type is record
+		rs1      : std_logic_vector(63 downto 0);
+		rs2      : std_logic_vector(63 downto 0);
+		imm      : std_logic_vector(63 downto 0);
+		bit_op   : bit_operation_type;
+		enable   : std_logic;
+		clear    : std_logic;
+	end record;
+
+	type bit_pipeline_out_type is record
+		result   : std_logic_vector(63 downto 0);
+		ready    : std_logic;
+	end record;
 
 end bit_wire;
