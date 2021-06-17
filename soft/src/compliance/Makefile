@@ -5,6 +5,7 @@ bld_dir = $(BASEDIR)/build/compliance/elf
 
 include $(src_dir)/rv64c/Makefrag
 include $(src_dir)/rv64i/Makefrag
+include $(src_dir)/rv64b/Makefrag
 include $(src_dir)/rv64m/Makefrag
 include $(src_dir)/rv64p/Makefrag
 include $(src_dir)/rv64z/Makefrag
@@ -32,6 +33,7 @@ endef
 
 $(eval $(call compile_template,rv64c,$(src_dir),$(bld_dir),-march=rv64ic -mabi=lp64 -DXLEN=64))
 $(eval $(call compile_template,rv64i,$(src_dir),$(bld_dir),-march=rv64i -mabi=lp64 -DXLEN=64))
+# $(eval $(call compile_template,rv64b,$(src_dir),$(bld_dir),-march=rv64ib -mabi=lp64 -DXLEN=64))
 $(eval $(call compile_template,rv64m,$(src_dir),$(bld_dir),-march=rv64im -mabi=lp64 -DXLEN=64))
 $(eval $(call compile_template,rv64p,$(src_dir),$(bld_dir),-march=rv64i -mabi=lp64 -DXLEN=64 -Drvtest_mtrap_routine=True))
 $(eval $(call compile_template,rv64z,$(src_dir),$(bld_dir),-march=rv64i -mabi=lp64 -DXLEN=64))

@@ -35,6 +35,10 @@ package bit_wire is
 		bit_maxu  : std_logic;
 		bit_min   : std_logic;
 		bit_minu  : std_logic;
+		bit_orcb  : std_logic;
+		bit_rev8  : std_logic;
+		bit_rol   : std_logic;
+		bit_ror   : std_logic;
 		bit_sextb : std_logic;
 		bit_sexth : std_logic;
 		bit_zexth : std_logic;
@@ -51,6 +55,10 @@ package bit_wire is
 		bit_maxu  => '0',
 		bit_min   => '0',
 		bit_minu  => '0',
+		bit_orcb  => '0',
+		bit_rev8  => '0',
+		bit_rol   => '0',
+		bit_ror   => '0',
 		bit_sextb => '0',
 		bit_sexth => '0',
 		bit_zexth => '0'
@@ -66,20 +74,6 @@ package bit_wire is
 		bit_clmul  => '0',
 		bit_clmulh => '0',
 		bit_clmulr => '0'
-	);
-
-	type zbr_operation_type is record
-		bit_rol  : std_logic;
-		bit_ror  : std_logic;
-		bit_orcb : std_logic;
-		bit_rev8 : std_logic;
-	end record;
-
-	constant init_zbr_operation : zbr_operation_type := (
-		bit_rol  => '0',
-		bit_ror  => '0',
-		bit_orcb => '0',
-		bit_rev8 => '0'
 	);
 
 	type zbs_operation_type is record
@@ -105,7 +99,6 @@ package bit_wire is
 		bit_zba   : zba_operation_type;
 		bit_zbb   : zbb_operation_type;
 		bit_zbc   : zbc_operation_type;
-		bit_zbr   : zbr_operation_type;
 		bit_zbs   : zbs_operation_type;
 	end record;
 
@@ -118,7 +111,6 @@ package bit_wire is
 		bit_zba   => init_zba_operation,
 		bit_zbb   => init_zbb_operation,
 		bit_zbc   => init_zbc_operation,
-		bit_zbr   => init_zbr_operation,
 		bit_zbs   => init_zbs_operation
 	);
 
@@ -131,7 +123,7 @@ package bit_wire is
 		int_rden1 : std_logic;
 		int_rden2 : std_logic;
 		int_wren  : std_logic;
-		int       : std_logic;
+		bitm      : std_logic;
 		bit_op    : bit_operation_type;
 		valid     : std_logic;
 	end record;
@@ -150,7 +142,7 @@ package bit_wire is
 		int_rden1 : std_logic;
 		int_rden2 : std_logic;
 		int_wren  : std_logic;
-		int       : std_logic;
+		bitm      : std_logic;
 		bit_op    : bit_operation_type;
 		valid     : std_logic;
 	end record;

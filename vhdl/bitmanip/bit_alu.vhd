@@ -30,7 +30,6 @@ begin
 
 		variable bit_zba : zba_operation_type;
 		variable bit_zbb : zbb_operation_type;
-		variable bit_zbr : zbr_operation_type;
 		variable bit_zbs : zbs_operation_type;
 
 	begin
@@ -44,7 +43,6 @@ begin
 
 		bit_zba := bit_alu_i.bit_op.bit_zba;
 		bit_zbb := bit_alu_i.bit_op.bit_zbb;
-		bit_zbr := bit_alu_i.bit_op.bit_zbr;
 		bit_zbs := bit_alu_i.bit_op.bit_zbs;
 
 		if bit_zba.bit_sh1add = '1' then
@@ -85,20 +83,20 @@ begin
 			res := bit_ctz(rs1,word);
 		elsif (bit_zbb.bit_max or bit_zbb.bit_maxu or bit_zbb.bit_min or bit_zbb.bit_minu) = '1' then
 			res := bit_minmax(rs1,rs2,op);
+		elsif  bit_zbb.bit_orcb = '1' then
+			res := bit_orcb(rs1);
+		elsif  bit_zbb.bit_rev8 = '1' then
+			res := bit_rev8(rs1);
+		elsif  bit_zbb.bit_rol = '1' then
+			res := bit_rol(rs1,rs2,word);
+		elsif  bit_zbb.bit_ror = '1' then
+			res := bit_ror(rs1,rs2,word);
 		elsif bit_zbb.bit_sextb = '1' then
 			res := bit_sextb(rs1);
 		elsif bit_zbb.bit_sexth = '1' then
 			res := bit_sexth(rs1);
 		elsif bit_zbb.bit_zexth = '1' then
 			res := bit_zexth(rs1);
-		elsif  bit_zbr.bit_rol = '1' then
-			res := bit_rol(rs1,rs2,word);
-		elsif  bit_zbr.bit_ror = '1' then
-			res := bit_ror(rs1,rs2,word);
-		elsif  bit_zbr.bit_orcb = '1' then
-			res := bit_orcb(rs1);
-		elsif  bit_zbr.bit_rev8 = '1' then
-			res := bit_rev8(rs1);
 		elsif  bit_zbs.bit_bclr = '1' then
 			res := bit_bclr(rs1,rs2);
 		elsif  bit_zbs.bit_bext = '1' then

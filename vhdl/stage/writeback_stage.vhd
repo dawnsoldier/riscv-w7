@@ -56,6 +56,7 @@ begin
 		v.fpu_load := d.m.fpu_load;
 		v.fpu_store := d.m.fpu_store;
 		v.int := d.m.int;
+		v.bitm := d.m.bitm;
 		v.fpu := d.m.fpu;
 		v.csr := d.m.csr;
 		v.comp := d.m.comp;
@@ -86,6 +87,7 @@ begin
 			v.fpu_wren := '0';
 			v.csr_wren := '0';
 			v.int := '0';
+			v.bitm := '0';
 			v.fpu := '0';
 			v.csr := '0';
 			v.comp := '0';
@@ -119,6 +121,7 @@ begin
 		csr_ci.load <= v.load;
 		csr_ci.store <= v.store;
 		csr_ci.int <= v.int;
+		csr_ci.bitm <= v.bitm;
 		csr_ci.fpu <= v.fpu;
 		csr_ci.csr <= v.csr;
 		csr_ci.comp <= v.comp;

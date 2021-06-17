@@ -36,6 +36,7 @@ git clone https://github.com/riscv/riscv-compliance.git ${BASEDIR}/soft/src/risc
 cp -r ${BASEDIR}/soft/src/riscv-compliance/riscv-test-suite/env/* ${BASEDIR}/soft/src/compliance/env/
 cp -r ${BASEDIR}/soft/src/riscv-compliance/riscv-test-suite/rv64i_m/C/src/* ${BASEDIR}/soft/src/compliance/rv64c/
 cp -r ${BASEDIR}/soft/src/riscv-compliance/riscv-test-suite/rv64i_m/I/src/* ${BASEDIR}/soft/src/compliance/rv64i/
+cp -r ${BASEDIR}/soft/src/riscv-compliance/riscv-test-suite/rv64i_m/K_unratified/src/* ${BASEDIR}/soft/src/compliance/rv64b/
 cp -r ${BASEDIR}/soft/src/riscv-compliance/riscv-test-suite/rv64i_m/M/src/* ${BASEDIR}/soft/src/compliance/rv64m/
 cp -r ${BASEDIR}/soft/src/riscv-compliance/riscv-test-suite/rv64i_m/Zifencei/src/* ${BASEDIR}/soft/src/compliance/rv64z/
 cp -r ${BASEDIR}/soft/src/riscv-compliance/riscv-test-suite/rv64i_m/privilege/src/* ${BASEDIR}/soft/src/compliance/rv64p/

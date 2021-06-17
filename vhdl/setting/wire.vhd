@@ -85,10 +85,12 @@ package wire is
 		fpu_load_n    : std_logic;
 		fpu_store_n   : std_logic;
 		int           : std_logic;
+		bitm          : std_logic;
 		fpu           : std_logic;
 		csr           : std_logic;
 		comp          : std_logic;
 		int_n         : std_logic;
+		bitm_n        : std_logic;
 		fpu_n         : std_logic;
 		csr_n         : std_logic;
 		comp_n        : std_logic;
@@ -163,10 +165,12 @@ package wire is
 		fpu_load_n      : std_logic;
 		fpu_store_n     : std_logic;
 		int             : std_logic;
+		bitm            : std_logic;
 		fpu             : std_logic;
 		csr             : std_logic;
 		comp            : std_logic;
 		int_n           : std_logic;
+		bitm_n          : std_logic;
 		fpu_n           : std_logic;
 		csr_n           : std_logic;
 		comp_n          : std_logic;
@@ -247,10 +251,12 @@ package wire is
 		fpu_load_n      => '0',
 		fpu_store_n     => '0',
 		int             => '0',
+		bitm            => '0',
 		fpu             => '0',
 		csr             => '0',
 		comp            => '0',
 		int_n           => '0',
+		bitm_n          => '0',
 		fpu_n           => '0',
 		csr_n           => '0',
 		comp_n          => '0',
@@ -320,10 +326,12 @@ package wire is
 		fpu_load_n    : std_logic;
 		fpu_store_n   : std_logic;
 		int           : std_logic;
+		bitm          : std_logic;
 		fpu           : std_logic;
 		csr           : std_logic;
 		comp          : std_logic;
 		int_n         : std_logic;
+		bitm_n        : std_logic;
 		fpu_n         : std_logic;
 		csr_n         : std_logic;
 		comp_n        : std_logic;
@@ -410,10 +418,12 @@ package wire is
 		fpu_load_n    : std_logic;
 		fpu_store_n   : std_logic;
 		int           : std_logic;
+		bitm          : std_logic;
 		fpu           : std_logic;
 		csr           : std_logic;
 		comp          : std_logic;
 		int_n         : std_logic;
+		bitm_n        : std_logic;
 		fpu_n         : std_logic;
 		csr_n         : std_logic;
 		comp_n        : std_logic;
@@ -504,10 +514,12 @@ package wire is
 		fpu_load_n    => '0',
 		fpu_store_n   => '0',
 		int           => '0',
+		bitm          => '0',
 		fpu           => '0',
 		csr           => '0',
 		comp          => '0',
 		int_n         => '0',
+		bitm_n        => '0',
 		fpu_n         => '0',
 		csr_n         => '0',
 		comp_n        => '0',
@@ -574,10 +586,12 @@ package wire is
 		fpu_load_n  : std_logic;
 		fpu_store_n : std_logic;
 		int         : std_logic;
+		bitm        : std_logic;
 		fpu         : std_logic;
 		csr         : std_logic;
 		comp        : std_logic;
 		int_n       : std_logic;
+		bitm_n      : std_logic;
 		fpu_n       : std_logic;
 		csr_n       : std_logic;
 		comp_n      : std_logic;
@@ -628,10 +642,12 @@ package wire is
 		fpu_load_n  : std_logic;
 		fpu_store_n : std_logic;
 		int         : std_logic;
+		bitm        : std_logic;
 		fpu         : std_logic;
 		csr         : std_logic;
 		comp        : std_logic;
 		int_n       : std_logic;
+		bitm_n      : std_logic;
 		fpu_n       : std_logic;
 		csr_n       : std_logic;
 		comp_n      : std_logic;
@@ -683,10 +699,12 @@ package wire is
 		fpu_load_n  => '0',
 		fpu_store_n => '0',
 		int         => '0',
+		bitm        => '0',
 		fpu         => '0',
 		csr         => '0',
 		comp        => '0',
 		int_n       => '0',
+		bitm_n      => '0',
 		fpu_n       => '0',
 		csr_n       => '0',
 		comp_n      => '0',
@@ -741,6 +759,7 @@ package wire is
 		fpu_load   : std_logic;
 		fpu_store  : std_logic;
 		int        : std_logic;
+		bitm       : std_logic;
 		fpu        : std_logic;
 		csr        : std_logic;
 		comp       : std_logic;
@@ -775,6 +794,7 @@ package wire is
 		fpu_load   => '0',
 		fpu_store  => '0',
 		int        => '0',
+		bitm       => '0',
 		fpu        => '0',
 		csr        => '0',
 		comp       => '0',

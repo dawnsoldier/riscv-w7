@@ -132,6 +132,8 @@ begin
 		v.fpu := '0';
 		v.fpu_op := init_fp_operation;
 
+		v.bitm := '0';
+
 		v.bit_op := init_bit_operation;
 
 		bit_decode_i.instr <= v.instr;
@@ -141,7 +143,7 @@ begin
 			v.int_rden1 := bit_decode_o.int_rden1;
 			v.int_rden2 := bit_decode_o.int_rden2;
 			v.int_wren := bit_decode_o.int_wren;
-			v.int := bit_decode_o.int;
+			v.bitm := bit_decode_o.bitm;
 			v.bit_op := bit_decode_o.bit_op;
 			v.valid := bit_decode_o.valid;
 		end if;
@@ -313,6 +315,7 @@ begin
 		v.fpu_wren_n := v.fpu_wren;
 		v.csr_wren_n := v.csr_wren;
 		v.int_n := v.int;
+		v.bitm_n := v.bitm;
 		v.fpu_n := v.fpu;
 		v.csr_n := v.csr;
 		v.comp_n := v.comp;
@@ -338,6 +341,7 @@ begin
 			v.fpu_wren := '0';
 			v.csr_wren := '0';
 			v.int := '0';
+			v.bitm := '0';
 			v.fpu := '0';
 			v.csr := '0';
 			v.comp := '0';
@@ -394,6 +398,7 @@ begin
 		y.fpu_load <= v.fpu_load;
 		y.fpu_store <= v.fpu_store;
 		y.int <= v.int;
+		y.bitm <= v.bitm;
 		y.fpu <= v.fpu;
 		y.csr <= v.csr;
 		y.comp <= v.comp;
@@ -423,6 +428,7 @@ begin
 		y.fpu_wren_n <= v.fpu_wren_n;
 		y.csr_wren_n <= v.csr_wren_n;
 		y.int_n <= v.int_n;
+		y.bitm_n <= v.bitm_n;
 		y.fpu_n <= v.fpu_n;
 		y.csr_n <= v.csr_n;
 		y.comp_n <= v.comp_n;
@@ -469,6 +475,7 @@ begin
 		q.fpu_load <= r.fpu_load;
 		q.fpu_store <= r.fpu_store;
 		q.int <= r.int;
+		q.bitm <= r.bitm;
 		q.fpu <= r.fpu;
 		q.csr <= r.csr;
 		q.comp <= r.comp;
@@ -498,6 +505,7 @@ begin
 		q.fpu_wren_n <= r.fpu_wren_n;
 		q.csr_wren_n <= r.csr_wren_n;
 		q.int_n <= r.int_n;
+		q.bitm_n <= r.bitm_n;
 		q.fpu_n <= r.fpu_n;
 		q.csr_n <= r.csr_n;
 		q.comp_n <= r.comp_n;

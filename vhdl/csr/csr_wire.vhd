@@ -74,6 +74,7 @@ package csr_wire is
 		bit_op    : bit_operation_type;
 		fpu_op    : fp_operation_type;
 		int       : std_logic;
+		bitm      : std_logic;
 		fpu       : std_logic;
 		csr       : std_logic;
 		comp      : std_logic;

@@ -46,7 +46,7 @@ begin
 
 		v.bit_op := init_bit_operation;
 
-		v.int := '0';
+		v.bitm := '0';
 		v.valid := '1';
 
 		case v.opcode is
@@ -61,14 +61,14 @@ begin
 				case v.funct12 is
 					when funct12_orcb =>
 						if v.funct3 = funct3_orcb then
-							v.bit_op.bit_zbr.bit_orcb := '1';
+							v.bit_op.bit_zbb.bit_orcb := '1';
 							v.bit_op.bit_alu := '1';
 						else
 							v.valid := '0';
 						end if;
 					when funct12_rev8 =>
 						if v.funct3 = funct3_rev8 then
-							v.bit_op.bit_zbr.bit_rev8 := '1';
+							v.bit_op.bit_zbb.bit_rev8 := '1';
 							v.bit_op.bit_alu := '1';
 						else
 							v.valid := '0';
@@ -109,7 +109,7 @@ begin
 									v.bit_op.bit_zbs.bit_binv := '1';
 									v.bit_op.bit_alu := '1';
 								elsif v.funct6 = funct6_rori and v.funct3 = funct3_ror then
-									v.bit_op.bit_zbr.bit_ror := '1';
+									v.bit_op.bit_zbb.bit_ror := '1';
 									v.bit_op.bit_alu := '1';
 								else
 									v.valid := '0';
@@ -117,7 +117,7 @@ begin
 						end case;
 				end case;
 
-				v.int := '1';
+				v.bitm := '1';
 
 			when opcode_reg =>
 
@@ -193,10 +193,10 @@ begin
 						end if;
 					when funct7_clz =>
 						if v.funct3 = funct3_rol then
-							v.bit_op.bit_zbr.bit_rol := '1';
+							v.bit_op.bit_zbb.bit_rol := '1';
 							v.bit_op.bit_alu := '1';
 						elsif v.funct3 = funct3_ror then
-							v.bit_op.bit_zbr.bit_ror := '1';
+							v.bit_op.bit_zbb.bit_ror := '1';
 							v.bit_op.bit_alu := '1';
 						else
 							v.valid := '0';
@@ -218,7 +218,7 @@ begin
 						v.valid := '0';
 				end case;
 
-				v.int := '1';
+				v.bitm := '1';
 
 			when opcode_imm_32 =>
 
@@ -238,7 +238,7 @@ begin
 						elsif v.funct5 = funct5_ctz and v.funct3 = funct3_ctz then
 							v.bit_op.bit_zbb.bit_ctz := '1';
 						elsif v.funct3 = funct3_ror then
-							v.bit_op.bit_zbr.bit_ror := '1';
+							v.bit_op.bit_zbb.bit_ror := '1';
 						else
 							v.valid := '0';
 						end if;
@@ -251,7 +251,7 @@ begin
 						end if;
 				end case;
 
-				v.int := '1';
+				v.bitm := '1';
 
 			when opcode_reg_32 =>
 
@@ -272,9 +272,9 @@ begin
 						end if;
 					when funct7_clz =>
 						if v.funct3 = funct3_rol then
-							v.bit_op.bit_zbr.bit_rol := '1';
+							v.bit_op.bit_zbb.bit_rol := '1';
 						elsif v.funct3 = funct3_ror then
-							v.bit_op.bit_zbr.bit_ror := '1';
+							v.bit_op.bit_zbb.bit_ror := '1';
 						else
 							v.valid := '0';
 						end if;
@@ -292,7 +292,7 @@ begin
 						v.valid := '0';
 				end case;
 
-				v.int := '1';
+				v.bitm := '1';
 
 			when others =>
 
@@ -304,7 +304,7 @@ begin
 		bit_decode_o.int_rden1 <= v.int_rden1;
 		bit_decode_o.int_rden2 <= v.int_rden2;
 		bit_decode_o.int_wren <= v.int_wren;
-		bit_decode_o.int <= v.int;
+		bit_decode_o.bitm <= v.bitm;
 		bit_decode_o.bit_op <= v.bit_op;
 		bit_decode_o.valid <= v.valid;
 
