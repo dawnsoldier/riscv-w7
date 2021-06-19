@@ -76,6 +76,13 @@ $ANALYS $DIR/vhdl/integer/int_wire.vhd
 $SYNTAX $DIR/vhdl/integer/int_functions.vhd
 $ANALYS $DIR/vhdl/integer/int_functions.vhd
 
+$SYNTAX $DIR/vhdl/atomic/atom_constants.vhd
+$ANALYS $DIR/vhdl/atomic/atom_constants.vhd
+$SYNTAX $DIR/vhdl/atomic/atom_wire.vhd
+$ANALYS $DIR/vhdl/atomic/atom_wire.vhd
+$SYNTAX $DIR/vhdl/atomic/atom_functions.vhd
+$ANALYS $DIR/vhdl/atomic/atom_functions.vhd
+
 $SYNTAX $DIR/vhdl/bitmanip/bit_constants.vhd
 $ANALYS $DIR/vhdl/bitmanip/bit_constants.vhd
 $SYNTAX $DIR/vhdl/bitmanip/bit_types.vhd
@@ -218,6 +225,13 @@ $SYNTAX $DIR/vhdl/integer/int_pipeline.vhd
 $ANALYS $DIR/vhdl/integer/int_pipeline.vhd
 $SYNTAX $DIR/vhdl/integer/int_unit.vhd
 $ANALYS $DIR/vhdl/integer/int_unit.vhd
+
+$SYNTAX $DIR/vhdl/atomic/atom_library.vhd
+$ANALYS $DIR/vhdl/atomic/atom_library.vhd
+$SYNTAX $DIR/vhdl/atomic/atom_alu.vhd
+$ANALYS $DIR/vhdl/atomic/atom_alu.vhd
+$SYNTAX $DIR/vhdl/atomic/atom_decode.vhd
+$ANALYS $DIR/vhdl/atomic/atom_decode.vhd
 
 $SYNTAX $DIR/vhdl/bitmanip/bit_library.vhd
 $ANALYS $DIR/vhdl/bitmanip/bit_library.vhd
