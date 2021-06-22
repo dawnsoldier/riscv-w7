@@ -33,7 +33,7 @@ endef
 
 $(eval $(call compile_template,rv64c,$(src_dir),$(bld_dir),-march=rv64ic -mabi=lp64 -DXLEN=64))
 $(eval $(call compile_template,rv64i,$(src_dir),$(bld_dir),-march=rv64i -mabi=lp64 -DXLEN=64))
-# $(eval $(call compile_template,rv64b,$(src_dir),$(bld_dir),-march=rv64ib -mabi=lp64 -DXLEN=64))
+$(eval $(call compile_template,rv64b,$(src_dir),$(bld_dir),-march=rv64i_zba_zbb_zbc -mabi=lp64 -DXLEN=64))
 $(eval $(call compile_template,rv64m,$(src_dir),$(bld_dir),-march=rv64im -mabi=lp64 -DXLEN=64))
 $(eval $(call compile_template,rv64p,$(src_dir),$(bld_dir),-march=rv64i -mabi=lp64 -DXLEN=64 -Drvtest_mtrap_routine=True))
 $(eval $(call compile_template,rv64z,$(src_dir),$(bld_dir),-march=rv64i -mabi=lp64 -DXLEN=64))

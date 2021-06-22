@@ -58,64 +58,54 @@ begin
 
 				v.bit_op.bit_imm := '1';
 
-				case v.funct12 is
-					when funct12_orcb =>
-						if v.funct3 = funct3_orcb then
-							v.bit_op.bit_zbb.bit_orcb := '1';
+				v.imm := v.imm6;
+				if v.funct6 = funct6_bclri and v.funct3 = funct3_bclr then
+					v.bit_op.bit_zbs.bit_bclr := '1';
+					v.bit_op.bit_alu := '1';
+				elsif v.funct6 = funct6_bexti and v.funct3 = funct3_bext then
+					v.bit_op.bit_zbs.bit_bext := '1';
+					v.bit_op.bit_alu := '1';
+				elsif v.funct6 = funct6_bseti and v.funct3 = funct3_bset then
+					v.bit_op.bit_zbs.bit_bset := '1';
+					v.bit_op.bit_alu := '1';
+				elsif v.funct6 = funct6_binvi and v.funct3 = funct3_binv then
+					v.bit_op.bit_zbs.bit_binv := '1';
+					v.bit_op.bit_alu := '1';
+				elsif v.funct6 = funct6_rori and v.funct3 = funct3_ror then
+					v.bit_op.bit_zbb.bit_ror := '1';
+					v.bit_op.bit_alu := '1';
+				else
+					if v.funct7 = funct7_clz then
+						if v.funct5 = funct5_clz and v.funct3 = funct3_clz then
+							v.bit_op.bit_zbb.bit_clz := '1';
+							v.bit_op.bit_alu := '1';
+						elsif v.funct5 = funct5_cpop and v.funct3 = funct3_cpop then
+							v.bit_op.bit_zbb.bit_cpop := '1';
+							v.bit_op.bit_alu := '1';
+						elsif v.funct5 = funct5_ctz and v.funct3 = funct3_ctz then
+							v.bit_op.bit_zbb.bit_ctz := '1';
+							v.bit_op.bit_alu := '1';
+						elsif v.funct5 = funct5_sextb and v.funct3 = funct3_sextb then
+							v.bit_op.bit_zbb.bit_sextb := '1';
+							v.bit_op.bit_alu := '1';
+						elsif v.funct5 = funct5_sexth and v.funct3 = funct3_sexth then
+							v.bit_op.bit_zbb.bit_sexth := '1';
 							v.bit_op.bit_alu := '1';
 						else
 							v.valid := '0';
 						end if;
-					when funct12_rev8 =>
-						if v.funct3 = funct3_rev8 then
+					else
+						if v.funct12 = funct12_orcb and v.funct3 = funct3_orcb then
+							v.bit_op.bit_zbb.bit_orcb := '1';
+							v.bit_op.bit_alu := '1';
+						elsif v.funct12 = funct12_rev8 and v.funct3 = funct3_rev8 then
 							v.bit_op.bit_zbb.bit_rev8 := '1';
 							v.bit_op.bit_alu := '1';
 						else
 							v.valid := '0';
 						end if;
-					when others =>
-						case v.funct7 is
-							when funct7_clz =>
-								if v.funct5 = funct5_clz and v.funct3 = funct3_clz then
-									v.bit_op.bit_zbb.bit_clz := '1';
-									v.bit_op.bit_alu := '1';
-								elsif v.funct5 = funct5_cpop and v.funct3 = funct3_cpop then
-									v.bit_op.bit_zbb.bit_cpop := '1';
-									v.bit_op.bit_alu := '1';
-								elsif v.funct5 = funct5_ctz and v.funct3 = funct3_ctz then
-									v.bit_op.bit_zbb.bit_ctz := '1';
-									v.bit_op.bit_alu := '1';
-								elsif v.funct5 = funct5_sextb and v.funct3 = funct3_sextb then
-									v.bit_op.bit_zbb.bit_sextb := '1';
-									v.bit_op.bit_alu := '1';
-								elsif v.funct5 = funct5_sexth and v.funct3 = funct3_sexth then
-									v.bit_op.bit_zbb.bit_sexth := '1';
-									v.bit_op.bit_alu := '1';
-								else
-									v.valid := '0';
-								end if;
-							when others =>
-								v.imm := v.imm6;
-								if v.funct6 = funct6_bclri and v.funct3 = funct3_bclr then
-									v.bit_op.bit_zbs.bit_bclr := '1';
-									v.bit_op.bit_alu := '1';
-								elsif v.funct6 = funct6_bexti and v.funct3 = funct3_bext then
-									v.bit_op.bit_zbs.bit_bext := '1';
-									v.bit_op.bit_alu := '1';
-								elsif v.funct6 = funct6_bseti and v.funct3 = funct3_bset then
-									v.bit_op.bit_zbs.bit_bset := '1';
-									v.bit_op.bit_alu := '1';
-								elsif v.funct6 = funct6_binvi and v.funct3 = funct3_binv then
-									v.bit_op.bit_zbs.bit_binv := '1';
-									v.bit_op.bit_alu := '1';
-								elsif v.funct6 = funct6_rori and v.funct3 = funct3_ror then
-									v.bit_op.bit_zbb.bit_ror := '1';
-									v.bit_op.bit_alu := '1';
-								else
-									v.valid := '0';
-								end if;
-						end case;
-				end case;
+					end if;
+				end if;
 
 				v.bitm := '1';
 
@@ -228,8 +218,11 @@ begin
 				v.bit_op.bit_word := '1';
 				v.bit_op.bit_imm := '1';
 
-				case v.funct7 is
-					when funct7_clz =>
+				v.imm := v.imm6;
+				if v.funct6 = funct6_slli and v.funct3 = funct3_slli then
+					v.bit_op.bit_zba.bit_slli := '1';
+				else
+					if v.funct7 = funct7_clz then
 						v.imm := v.imm5;
 						if v.funct5 = funct5_clz and v.funct3 = funct3_clz then
 							v.bit_op.bit_zbb.bit_clz := '1';
@@ -242,14 +235,10 @@ begin
 						else
 							v.valid := '0';
 						end if;
-					when others =>
-						v.imm := v.imm6;
-						if v.funct6 = funct6_slli and v.funct3 = funct3_slli then
-							v.bit_op.bit_zba.bit_slli := '1';
-						else
-							v.valid := '0';
-						end if;
-				end case;
+					else
+						v.valid := '0';
+					end if;
+				end if;
 
 				v.bitm := '1';
 

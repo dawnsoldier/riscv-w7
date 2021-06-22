@@ -3,9 +3,6 @@ rv64b_test = \
 	clmul-01 \
 	clmulh-01 \
 	orn-01 \
-	rev.b-01 \
-	rev8-01 \
-	rev8.w-01 \
 	rol-01 \
 	rolw-01 \
 	ror-01 \
