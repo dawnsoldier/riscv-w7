@@ -101,27 +101,49 @@ begin
 
 		v.csr_mode := v.instr(29 downto 28);
 
+		v.imm := (others => '0');
+		v.int_rden1 := '0';
+		v.int_rden2 := '0';
+		v.int_wren := '0';
+		v.csr_rden := '0';
+		v.csr_wren := '0';
+		v.load := '0';
+		v.store := '0';
+		v.int := '0';
+		v.int_op := init_int_operation;
+		v.load_op := init_load_operation;
+		v.store_op := init_store_operation;
+		v.csr := '0';
+		v.ecall := '0';
+		v.ebreak := '0';
+		v.mret := '0';
+		v.wfi := '0';
+		v.fence := '0';
+		v.valid := '0';
+
 		int_decode_i.instr <= v.instr;
 
-		v.imm := int_decode_o.imm;
-		v.int_rden1 := int_decode_o.int_rden1;
-		v.int_rden2 := int_decode_o.int_rden2;
-		v.int_wren := int_decode_o.int_wren;
-		v.csr_rden := int_decode_o.csr_rden;
-		v.csr_wren := int_decode_o.csr_wren;
-		v.load := int_decode_o.load;
-		v.store := int_decode_o.store;
-		v.int := int_decode_o.int;
-		v.int_op := int_decode_o.int_op;
-		v.load_op := int_decode_o.load_op;
-		v.store_op := int_decode_o.store_op;
-		v.csr := int_decode_o.csr;
-		v.ecall := int_decode_o.ecall;
-		v.ebreak := int_decode_o.ebreak;
-		v.mret := int_decode_o.mret;
-		v.wfi := int_decode_o.wfi;
-		v.fence := int_decode_o.fence;
-		v.valid := int_decode_o.valid;
+		if int_decode_o.valid = '1' then
+			v.imm := int_decode_o.imm;
+			v.int_rden1 := int_decode_o.int_rden1;
+			v.int_rden2 := int_decode_o.int_rden2;
+			v.int_wren := int_decode_o.int_wren;
+			v.csr_rden := int_decode_o.csr_rden;
+			v.csr_wren := int_decode_o.csr_wren;
+			v.load := int_decode_o.load;
+			v.store := int_decode_o.store;
+			v.int := int_decode_o.int;
+			v.int_op := int_decode_o.int_op;
+			v.load_op := int_decode_o.load_op;
+			v.store_op := int_decode_o.store_op;
+			v.csr := int_decode_o.csr;
+			v.ecall := int_decode_o.ecall;
+			v.ebreak := int_decode_o.ebreak;
+			v.mret := int_decode_o.mret;
+			v.wfi := int_decode_o.wfi;
+			v.fence := int_decode_o.fence;
+			v.valid := int_decode_o.valid;
+		end if;
 
 		v.fpu_rden1 := '0';
 		v.fpu_rden2 := '0';
