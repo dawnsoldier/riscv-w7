@@ -252,12 +252,12 @@ begin
 
 		if v.csr = '1' then
 			v.wdata := v.cdata;
-		elsif v.int = '1' then
-			v.wdata := v.idata;
 		elsif v.bitm = '1' then
 			v.wdata := v.bdata;
 		elsif v.fpu = '1' then
 			v.wdata := v.fdata;
+		elsif v.int = '1' then
+			v.wdata := v.idata;
 		end if;
 
 		csr_alu_i.rs1 <= v.rdata1;
