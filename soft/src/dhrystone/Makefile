@@ -2,7 +2,7 @@ default: all
 
 src_dir = $(BASEDIR)/soft/src
 bld_dir = $(BASEDIR)/build/dhrystone/elf
-srcs = $(wildcard $(src_dir)/common/*.S) $(wildcard $(src_dir)/common/*.c) $(wildcard $(src_dir)/dhrystone/*.c)
+srcs = $(wildcard $(src_dir)/common/*.S) $(wildcard $(src_dir)/common/*.c) $(wildcard $(src_dir)/dhrystone/*.S) $(wildcard $(src_dir)/dhrystone/*.c)
 objs0 = $(srcs:.c=.o)
 objs = $(objs0:.S=.o)
 
