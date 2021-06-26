@@ -13,6 +13,8 @@ rv64b_test = \
 	I-ROL-01 \
 	I-ROR-01 \
 	I-RORI-01 \
+	I-SEXT-B-01 \
+	I-SEXT-H-01 \
 	I-XNOR-01 \
 	I-CLZW-01 \
 	I-CTZW-01 \
