@@ -19,6 +19,7 @@ if [ ! -z "$3" ]
 then
   if [ ! "$3" = 'isa' ] && \
      [ ! "$3" = 'compliance' ] && \
+     [ ! "$3" = 'ovp' ] && \
      [ ! "$3" = 'dhrystone' ] && \
      [ ! "$3" = 'coremark' ] && \
      [ ! "$3" = 'csmith' ] && \
@@ -335,6 +336,23 @@ then
     filename=${filename##*/}
     filename=${filename%.dat}
     cp $DIR/build/compliance/elf/${filename}.host host.dat
+    if [ "$5" = 'wave' ]
+    then
+      WAVE="--wave=${filename}.ghw"
+    elif [ "$5" = 'vcd' ]
+    then
+      WAVE="--vcd=${filename}.vcd"
+    fi
+    echo "${filename}"
+    $SIMULA soc --max-stack-alloc=0 --stop-time=${CYCLES}ns ${WAVE}
+  done
+elif [ "$3" = 'ovp' ]
+then
+  for filename in $DIR/build/ovp/dat/*.dat; do
+    cp $filename bram_mem.dat
+    filename=${filename##*/}
+    filename=${filename%.dat}
+    cp $DIR/build/ovp/elf/${filename}.host host.dat
     if [ "$5" = 'wave' ]
     then
       WAVE="--wave=${filename}.ghw"
