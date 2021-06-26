@@ -1,0 +1,34 @@
+rv64ic_test = \
+	I-C-ADD-01 \
+	I-C-ADDW-01 \
+	I-C-MV-01 \
+	I-C-ADDI-01 \
+	I-C-ADDIW-01 \
+	I-C-LI-01 \
+	I-C-LUI-01 \
+	I-C-AND-01 \
+	I-C-OR-01 \
+	I-C-SUB-01 \
+	I-C-SUBW-01 \
+	I-C-XOR-01 \
+	I-C-ANDI-01 \
+	I-C-BEQZ-01 \
+	I-C-BNEZ-01 \
+	I-C-J-01 \
+	I-C-JALR-01 \
+	I-C-JR-01 \
+	I-C-LW-01 \
+	I-C-LD-01 \
+	I-C-LWSP-01 \
+	I-C-LDSP-01 \
+	I-C-SLLI-01 \
+	I-C-SRAI-01 \
+	I-C-SRLI-01 \
+	I-C-SW-01 \
+	I-C-SD-01 \
+	I-C-SWSP-01 \
+	I-C-SDSP-01 \
+	I-C-EBREAK-01 \
+	I-C-NOP-01 \
+
+rv64ic_tests = $(addprefix rv64ic-, $(rv64ic_test))

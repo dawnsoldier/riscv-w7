@@ -11,6 +11,7 @@ CSMITH_INCL ?= $(shell ls -d $(CSMITH)/include/csmith-* | head -n1)
 GCC ?= /usr/bin/gcc
 PYTHON ?= /usr/bin/python2
 BASEDIR ?= $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
+OVP ?= riscv-ovpsim-plus-bitmanip-tests.zip
 OFFSET ?= 0x40000 # Number of dwords in blockram (address range is OFFSET * 8)
 TEST ?= dhrystone
 AAPG ?= aapg
@@ -23,6 +24,9 @@ generate_isa:
 
 generate_compliance:
 	soft/compliance.sh ${RISCV} ${MARCH} ${MABI} ${XLEN} ${PYTHON} ${OFFSET} ${BASEDIR}
+
+generate_ovp:
+	soft/ovp.sh ${RISCV} ${MARCH} ${MABI} ${XLEN} ${PYTHON} ${OFFSET} ${BASEDIR} ${OVP}
 
 generate_dhrystone:
 	soft/dhrystone.sh ${RISCV} ${MARCH} ${MABI} ${ITER} ${PYTHON} ${OFFSET} ${BASEDIR}

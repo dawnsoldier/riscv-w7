@@ -1,0 +1,16 @@
+rv64m_test = \
+	I-MUL-01 \
+	I-MULH-01 \
+	I-MULHSU-01 \
+	I-MULHU-01 \
+	I-DIV-01 \
+	I-DIVU-01 \
+	I-REM-01 \
+	I-REMU-01 \
+	I-MULW-01 \
+	I-DIVW-01 \
+	I-DIVUW-01 \
+	I-REMW-01 \
+	I-REMUW-01 \
+
+rv64m_tests = $(addprefix rv64m-, $(rv64m_test))
