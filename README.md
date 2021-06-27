@@ -10,6 +10,6 @@ RISCV W7 CPU supports riscv64-imfdc instruction set architecture and is implemen
 ## Coremark Benchmark ##
 | Cycles | Iteration/s/MHz | Iteration |
 | ------ | --------------- | --------- |
-| 419979 |            2.38 |        10 |
+| 379254 |            2.64 |        10 |
 
 Documentation will be expanded in the future.
