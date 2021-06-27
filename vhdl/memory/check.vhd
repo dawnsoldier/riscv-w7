@@ -18,12 +18,10 @@ entity check is
 		reset       : in  std_logic;
 		clock       : in  std_logic;
 		check_valid : in  std_logic;
-		check_ready : out std_logic;
 		check_instr : in  std_logic;
 		check_addr  : in  std_logic_vector(63 downto 0);
 		check_wdata : in  std_logic_vector(63 downto 0);
-		check_wstrb : in  std_logic_vector(7 downto 0);
-		check_rdata : out std_logic_vector(63 downto 0)
+		check_wstrb : in  std_logic_vector(7 downto 0)
 	);
 end check;
 

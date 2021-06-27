@@ -17,12 +17,10 @@ entity print is
 		reset       : in  std_logic;
 		clock       : in  std_logic;
 		print_valid : in  std_logic;
-		print_ready : out std_logic;
 		print_instr : in  std_logic;
 		print_addr  : in  std_logic_vector(63 downto 0);
 		print_wdata : in  std_logic_vector(63 downto 0);
-		print_wstrb : in  std_logic_vector(7 downto 0);
-		print_rdata : out std_logic_vector(63 downto 0)
+		print_wstrb : in  std_logic_vector(7 downto 0)
 	);
 end print;
 

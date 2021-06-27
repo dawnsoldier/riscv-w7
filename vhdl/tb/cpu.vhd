@@ -98,12 +98,10 @@ architecture behavior of cpu is
 			reset       : in  std_logic;
 			clock       : in  std_logic;
 			check_valid : in  std_logic;
-			check_ready : out std_logic;
 			check_instr : in  std_logic;
 			check_addr  : in  std_logic_vector(63 downto 0);
 			check_wdata : in  std_logic_vector(63 downto 0);
-			check_wstrb : in  std_logic_vector(7 downto 0);
-			check_rdata : out std_logic_vector(63 downto 0)
+			check_wstrb : in  std_logic_vector(7 downto 0)
 		);
 	end component;
 
@@ -112,12 +110,10 @@ architecture behavior of cpu is
 			reset       : in  std_logic;
 			clock       : in  std_logic;
 			print_valid : in  std_logic;
-			print_ready : out std_logic;
 			print_instr : in  std_logic;
 			print_addr  : in  std_logic_vector(63 downto 0);
 			print_wdata : in  std_logic_vector(63 downto 0);
-			print_wstrb : in  std_logic_vector(7 downto 0);
-			print_rdata : out std_logic_vector(63 downto 0)
+			print_wstrb : in  std_logic_vector(7 downto 0)
 		);
 	end component;
 
@@ -474,12 +470,10 @@ begin
 			reset       => reset,
 			clock       => clock,
 			check_valid => memory_valid,
-			check_ready => memory_ready,
 			check_instr => memory_instr,
 			check_addr  => memory_addr,
 			check_wdata => memory_wdata,
-			check_wstrb => memory_wstrb,
-			check_rdata => memory_rdata
+			check_wstrb => memory_wstrb
 		);
 
 	print_comp : print
@@ -487,12 +481,10 @@ begin
 			reset       => reset,
 			clock       => clock,
 			print_valid => uart_valid,
-			print_ready => uart_ready,
 			print_instr => uart_instr,
 			print_addr  => uart_addr,
 			print_wdata => uart_wdata,
-			print_wstrb => uart_wstrb,
-			print_rdata => uart_rdata
+			print_wstrb => uart_wstrb
 		);
 
 	bram_comp : bram_mem
