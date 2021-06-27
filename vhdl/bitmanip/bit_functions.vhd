@@ -414,7 +414,7 @@ package body bit_functions is
 	)
 	return std_logic_vector is
 	begin
-		return std_logic_vector(resize(signed(rs1(15 downto 0)), 64));
+		return std_logic_vector(resize(unsigned(rs1(15 downto 0)), 64));
 	end function bit_zexth;
 
 	function multiplexer(
