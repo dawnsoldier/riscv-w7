@@ -353,8 +353,11 @@ package body bit_functions is
 	return std_logic_vector is
 		variable res : std_logic_vector(63 downto 0);
 	begin
-		res := (others => '0');
-		res(to_integer(unsigned(rs2(5 downto 0)))) := '1';
+		if rs1(to_integer(unsigned(rs2(5 downto 0)))) = '1' then
+			res := (0 =>'1',others => '0');
+		else
+			res := (others => '0');
+		end if;
 		return res;
 	end function bit_bext;
 
