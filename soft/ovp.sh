@@ -32,6 +32,11 @@ if [ -d "${BASEDIR}/soft/src/riscv-ovp" ]; then
   rm -rf ${BASEDIR}/soft/src/riscv-ovp
 fi
 
+if [ ! -f "${OVP}" ]; then
+  echo "${OVP} not exist"
+  exit
+fi
+
 unzip ${OVP} -d ${BASEDIR}/soft/src/riscv-ovp
 
 cp -r ${BASEDIR}/soft/src/riscv-ovp/imperas-riscv-tests/riscv-test-env/*.h ${BASEDIR}/soft/src/ovp/env/
